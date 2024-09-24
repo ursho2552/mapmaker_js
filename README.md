@@ -63,10 +63,10 @@ This web application provides interactive visualizations of marine plankton dive
 1. **SSH into the Server:**\
    `ssh username@servername`
 2. **Update the System:**\
-   `sudo apt update`\
-   `sudo apt upgrade`
+   `sudo dnf update`\
+   `sudo dnf upgrade`
 3. **Install Dependencies** Install Python 3, pip, and venv:\
-   `sudo apt install python3-pip python3-venv nginx git`
+   `sudo dnf install python3-pip python3-virtualenv nginx git`
 4. **Clone this Application** Navigate to the /var/www/ directory:\
    `cd /var/www/`\
    `sudo mkdir mapmaker`\
@@ -76,11 +76,25 @@ This web application provides interactive visualizations of marine plankton dive
    `cd backend`\
    `python3 -m venv mapmaker_env`\
    `source mapmaker_env/bin/activate`\
-   `pip install -r requirements.txt`
+   `pip install -r requirements.txt`\
+
+   `cd frontend`\
+   `curl -fsSL https://rpm.nodesource.com/setup_20.x | sudo bash -`\
+   `sudo dnf install -y nodejs`\
+   `npm install`
+
 6. **Test locally:**\
    run `python app.py` on the backend directory
    and `npm start` on the frontend directory
-7. **Set Up Gunicorn:** Create a Gunicorn service file:\
+7. **Build the React Application:**
+
+   Before deploying, you need to build the frontend (React) application. From the frontend directory, run the following commands:
+
+   `cd frontend`\
+   `npm install`\
+   `npm run build`
+
+8. **Set Up Gunicorn:** Create a Gunicorn service file:\
    `sudo nano /etc/systemd/system/mapmaker.service`\
    Add the following:\
    ```
@@ -97,10 +111,10 @@ This web application provides interactive visualizations of marine plankton dive
 
    [Install]
    WantedBy=multi-user.target```
-8. **Start and Enable Gunicorn:**\
+9. **Start and Enable Gunicorn:**\
    `sudo systemctl start mapmaker`\
    `sudo systemctl enable mapmaker`
-9. **Install and Configure Nginx:**\
+10. **Install and Configure Nginx:**\
     `sudo apt install nginx`\
     `sudo nano /etc/nginx/sites-available/mapmaker``\
     Add the following:
@@ -117,12 +131,12 @@ This web application provides interactive visualizations of marine plankton dive
       }
    ```
 
-10. **Enable the site:**\
+11. **Enable the site:**\
    `sudo ln -s /etc/nginx/sites-available/mapmaker /etc/nginx/sites-enabled`\
    `sudo nginx -t`\
    `sudo systemctl restart nginx`
 
-11. **Set Up HTTPS with Certbot:** Install Certbot and the Nginx plugin:\
+12. **Set Up HTTPS with Certbot:** Install Certbot and the Nginx plugin:\
 `sudo apt install certbot python3-certbot-nginx`\
 `sudo certbot --nginx -d mapmaker-new`
 
@@ -149,18 +163,3 @@ To allow access from a specific IP address (replace xxx.xxx.xxx.xxx with the act
 
 `ACCEPT net fw tcp 80,443`\
 `sudo systemctl reload shorewall`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
