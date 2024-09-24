@@ -60,26 +60,106 @@ This web application provides interactive visualizations of marine plankton dive
 
 ### Step-by-Step Installation
 
-1. **SSH into the Server:**
+1. **SSH into the Server:**\
    `ssh username@servername`
-2. **Update the System:**
-   `sudo apt update`
+2. **Update the System:**\
+   `sudo apt update`\
    `sudo apt upgrade`
-3. **Install Dependencies** Install Python 3, pip, and venv:
+3. **Install Dependencies** Install Python 3, pip, and venv:\
    `sudo apt install python3-pip python3-venv nginx git`
-4. **Clone this Application** Navigate to the /var/www/ directory:
-   `cd /var/www/`
-   `sudo mkdir mapmaker`
-   `cd mapmaker`
+4. **Clone this Application** Navigate to the /var/www/ directory:\
+   `cd /var/www/`\
+   `sudo mkdir mapmaker`\
+   `cd mapmaker`\
    `git clone <your-repository-url>`
-6. **Create a Python Virtual Environment and Install Dependencies**
-   `cd backend`
-   `python3 -m venv mapmaker_env`
-   `source mapmaker_env/bin/activate`
+5. **Create a Python Virtual Environment and Install Dependencies**\
+   `cd backend`\
+   `python3 -m venv mapmaker_env`\
+   `source mapmaker_env/bin/activate`\
    `pip install -r requirements.txt`
-7. **Test locally:**
-   `run python app.py on the backend directory`
-   `run npm start on the frontend directory`
+6. **Test locally:**\
+   run `python app.py` on the backend directory
+   and `npm start` on the frontend directory
+7. **Set Up Gunicorn:** Create a Gunicorn service file:\
+   `sudo nano /etc/systemd/system/mapmaker.service`\
+   Add the following:\
+   ```
+   [Unit]
+   Description=Gunicorn instance to serve mapmaker-new
+   After=network.target
+
+   [Service]
+   User=<username>
+   Group=www-data
+   WorkingDirectory=/var/www/mapmaker
+   Environment="PATH=/var/www/mapmaker/backend/mapmaker_env/bin"
+   ExecStart=/var/www/mapmaker/backend/mapmaker_env/bin/gunicorn --workers 3 --bind unix:/var/www/mapmaker/mapmaker.sock wsgi:app
+
+   [Install]
+   WantedBy=multi-user.target```
+8. **Start and Enable Gunicorn:**\
+   `sudo systemctl start mapmaker`\
+   `sudo systemctl enable mapmaker`
+9. **Install and Configure Nginx:**\
+    `sudo apt install nginx`\
+    `sudo nano /etc/nginx/sites-available/mapmaker``\
+    Add the following:
+
+   ```
+      server {
+      listen 80;
+      server_name mapmaker;
+
+      location / {
+         include proxy_params;
+         proxy_pass http://unix:/var/www/mapmaker/mapmaker.sock;
+         }
+      }
+   ```
+
+10. **Enable the site:**\
+   `sudo ln -s /etc/nginx/sites-available/mapmaker /etc/nginx/sites-enabled`\
+   `sudo nginx -t`\
+   `sudo systemctl restart nginx`
+
+11. **Set Up HTTPS with Certbot:** Install Certbot and the Nginx plugin:\
+`sudo apt install certbot python3-certbot-nginx`\
+`sudo certbot --nginx -d mapmaker-new`
+
+## Firewall Configuration
+
+### Using Shorewall
+
+To configure the firewall using Shorewall, follow these steps to manage access to the web server.
+
+#### Edit Shorewall Rules
+You need to edit the `/etc/shorewall/rules` file to modify access settings:
+
+`sudo nano /etc/shorewall/rules`
+
+#### Allow Access from a Specific IP
+To allow access from a specific IP address (replace xxx.xxx.xxx.xxx with the actual IP), add the following rule:\
+`ACCEPT net:xxx.xxx.xxx.xxx fw tcp 80,443`
+
+#### Reload the Firewall
+
+`sudo systemctl reload shorewall`
+
+#### Full Webserver Access
+
+`ACCEPT net fw tcp 80,443`\
+`sudo systemctl reload shorewall`
+
+
+
+
+
+
+
+
+
+
+
 
 
 
