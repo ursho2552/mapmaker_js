@@ -110,7 +110,8 @@ This web application provides interactive visualizations of marine plankton dive
    ExecStart=/var/www/mapmaker/backend/mapmaker_env/bin/gunicorn --workers 3 --bind unix:/var/www/mapmaker/mapmaker.sock wsgi:app
 
    [Install]
-   WantedBy=multi-user.target```
+   WantedBy=multi-user.target
+   ```
 9. **Start and Enable Gunicorn:**\
    `sudo systemctl start mapmaker`\
    `sudo systemctl enable mapmaker`
