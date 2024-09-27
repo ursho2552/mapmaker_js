@@ -180,7 +180,7 @@ def get_file_and_variable(index:str, group:str, scenario:str, model:str):
 
     return file_path, variable
 
-@app.route('/globe-data', methods=['GET'])
+@app.route('/api/globe-data', methods=['GET'])
 def get_globe_data():
 
     year = request.args.get('year', type=int)  # Get the year parameter
@@ -200,7 +200,7 @@ def get_globe_data():
     response.headers["Expires"] = "0"
     return response
 
-@app.route('/map-data', methods=['GET'])
+@app.route('/api/map-data', methods=['GET'])
 def get_map_data():
 
     year = request.args.get('year', type=int)  # Get the year parameter
@@ -219,9 +219,11 @@ def get_map_data():
     response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
     response.headers["Pragma"] = "no-cache"
     response.headers["Expires"] = "0"
+
+    print(f"Response length: {len(response.get_data(as_text=True))}")
     return response
 
-@app.route('/line-data', methods=['GET'])
+@app.route('/api/line-data', methods=['GET'])
 def get_line_data():
 
     x = request.args.get('x', type=float)

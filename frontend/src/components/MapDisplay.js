@@ -64,7 +64,7 @@ const MapDisplay = ({ year, index, group, scenario, model, view, onPointClick })
 
   useEffect(() => {
     console.log('Fetching data for year:', year); // Log year to verify
-    fetch(`http://127.0.0.1:5000/map-data?year=${year}&index=${index}&group=${group}&scenario=${scenario}&model=${model}`)
+    fetch(`/api/map-data?year=${year}&index=${index}&group=${group}&scenario=${scenario}&model=${model}`)
       .then(response => {
         if (!response.ok) {
           throw new Error('Network response was not ok');

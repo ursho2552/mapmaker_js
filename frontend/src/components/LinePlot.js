@@ -54,7 +54,7 @@ const LinePlot = ({ selectedPoint, startYear, endYear, index, group, scenario, m
 
   useEffect(() => {
     if (selectedPoint.x !== null && selectedPoint.y !== null) {
-      fetch(`http://127.0.0.1:5000/line-data?x=${selectedPoint.x}&y=${selectedPoint.y}&startYear=${startYear}&endYear=${endYear}&index=${index}&group=${group}&scenario=${scenario}&model=${model}&envParam=${envParam}`)
+      fetch(`/api/line-data?x=${selectedPoint.x}&y=${selectedPoint.y}&startYear=${startYear}&endYear=${endYear}&index=${index}&group=${group}&scenario=${scenario}&model=${model}&envParam=${envParam}`)
         .then(response => {
           if (!response.ok) {
             throw new Error('Network response was not ok');

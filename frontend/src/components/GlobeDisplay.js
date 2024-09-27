@@ -35,7 +35,7 @@ const GlobeDisplay = ({ year, index, scenario, model, onPointClick }) => {
     console.log('Fetching globe data for year:', year);
     try {
       const response = await fetch(
-        `http://127.0.0.1:5000/globe-data?year=${year}&index=${index}&scenario=${scenario}&model=${model}`
+        `/api/globe-data?year=${year}&index=${index}&scenario=${scenario}&model=${model}`
       );
       if (!response.ok) throw new Error('Network response was not ok');
 
