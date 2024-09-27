@@ -104,7 +104,6 @@ h1 {
 .ReactModal__Overlay {
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 1000; /* High value to ensure modal stays on top */
-
 }
 
 .ReactModal__Content {
@@ -125,7 +124,6 @@ h1 {
   font-size: 16px;
   margin-bottom: 20px;
 }
-
 
 .ReactModal__Content button {
   background-color: #1890ff;
@@ -155,10 +153,8 @@ h1 {
   width: 100%; /* Take the full width of the container */
   height: 100%; /* Take the full height */
   margin: 0 auto;
-  flex: 2
+  flex: 2;
 }
-
-
 
 /* Ensure the slider is centered */
 .slider-container {
@@ -231,8 +227,6 @@ h1 {
   padding: 5px;
 }
 
-
-
 /* Colorbar Container */
 .colorbar-container {
   display: flex;
@@ -271,7 +265,6 @@ h1 {
   margin-top: 5px; /* Adjust to your desired spacing */
 }
 
-
 /* Line Plot Container */
 .line-plot-container {
   width: 65%;
@@ -282,8 +275,8 @@ h1 {
   box-shadow: 0 0 0px rgba(0, 0, 0, 0.1);
 }
 
-
 /* Responsive Design */
+/* Adjustments for screens up to 1024px wide */
 @media (max-width: 1024px) {
   .four-columns {
     flex-direction: column;
@@ -297,8 +290,13 @@ h1 {
   .visual-container {
     flex-direction: column;
   }
+
+  .line-plot-container {
+    width: 100%;
+  }
 }
 
+/* Adjustments for screens up to 768px wide */
 @media (max-width: 768px) {
   .slider-container {
     width: 80%;
@@ -308,4 +306,66 @@ h1 {
     padding: 10px;
     font-size: 14px;
   }
+
+  .map-container {
+    height: 300px; /* Reduce height for smaller screens */
+  }
+
+  .line-plot-container {
+    width: 100%;
+    padding: 20px;
+  }
+
+  .button-row {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .filter-button {
+    margin: 10px 0;
+    width: 80%;
+  }
+
+  .four-columns {
+    padding: 0 10px;
+  }
+
+  .column {
+    margin: 10px 0;
+  }
+
+  .visual-container {
+    padding: 0 10px;
+  }
 }
+
+/* Adjustments for screens up to 480px wide */
+@media (max-width: 480px) {
+  h1 {
+    font-size: 24px;
+  }
+
+  .header-content {
+    padding: 0 10px;
+  }
+
+  .dropdown {
+    font-size: 14px;
+    padding: 8px;
+  }
+
+  .info-button {
+    padding: 8px;
+    font-size: 14px;
+  }
+
+  .filter-button {
+    padding: 8px;
+    font-size: 14px;
+  }
+
+  .line-plot-container {
+    padding: 15px;
+  }
+}
+

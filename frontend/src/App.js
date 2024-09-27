@@ -2,6 +2,7 @@ import React, { useState, useMemo, useRef } from 'react';
 import GlobeDisplay from './components/GlobeDisplay';
 import MapDisplay from './components/MapDisplay';
 import LinePlot from './components/LinePlot';
+import Footer from './components/Footer';
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
 import './App.css';
@@ -257,6 +258,7 @@ const App = () => {
       </div>
     </div>
 
+	<Footer />
 
     </div>
   );

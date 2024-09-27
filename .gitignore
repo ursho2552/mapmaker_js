@@ -12,6 +12,7 @@ coverage
 # production
 frontend/build
 frontend_build
+restart_mapmaker.sh
 
 # misc
 .DS_Store
