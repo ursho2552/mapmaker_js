@@ -2,6 +2,8 @@ import React, { useState, useMemo, useRef } from 'react';
 import GlobeDisplay from './components/GlobeDisplay';
 import MapDisplay from './components/MapDisplay';
 import LinePlot from './components/LinePlot';
+import Footer from './components/Footer';
+
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
 import './App.css';
@@ -143,36 +145,30 @@ const App = () => {
 
       {/* Five Buttons Below */}
       <div className="button-row">
-      <button
-        className="filter-button"
-        style={{ backgroundColor: '#ADD8E6' }} // Light Blue
-        onClick={() => openModal(selectedDiversity)}>
-        {selectedDiversity}
-      </button>
-      <button
-    className="filter-button"
-    style={{ backgroundColor: '#00FF00' }} // Bright Green
-    onClick={() => openModal(selectedPlankton)}>
-    {selectedPlankton}
-  </button>
-  <button
-    className="filter-button"
-    style={{ backgroundColor: '#FFA500' }} // Orange
-    onClick={() => openModal(selectedRCP)}>
-    {selectedRCP}
-  </button>
-  <button
-    className="filter-button"
-    style={{ backgroundColor: '#FF6347' }} // Red
-    onClick={() => openModal(selectedModel)}>
-    {selectedModel}
-  </button>
-  {/* <button
-    className="filter-button"
-    style={{ backgroundColor: '#A9A9A9' }} // Grey
-    onClick={() => openModal("General Info")}>
-    More Info
-  </button> */}
+        <button
+          className="filter-button"
+          style={{ backgroundColor: '#ADD8E6' }} // Light Blue
+          onClick={() => openModal(selectedDiversity)}>
+          {selectedDiversity}
+        </button>
+        <button
+          className="filter-button"
+          style={{ backgroundColor: '#00FF00' }} // Bright Green
+          onClick={() => openModal(selectedPlankton)}>
+          {selectedPlankton}
+        </button>
+        <button
+          className="filter-button"
+          style={{ backgroundColor: '#FFA500' }} // Orange
+          onClick={() => openModal(selectedRCP)}>
+          {selectedRCP}
+        </button>
+        <button
+          className="filter-button"
+          style={{ backgroundColor: '#FF6347' }} // Red
+          onClick={() => openModal(selectedModel)}>
+          {selectedModel}
+        </button>
       </div>
 
       {/* Modal Popup */}
@@ -181,7 +177,8 @@ const App = () => {
         <p>{modalText}</p>
         <button onClick={closeModal}>Close</button>
       </Modal>
-            {/* Year Slider */}
+
+      {/* Year Slider */}
       <div className="slider-container">
         <Slider
           min={2012}
@@ -191,12 +188,14 @@ const App = () => {
           className="slider"
           handleStyle={[{ borderColor: '#1890ff', borderWidth: 2 }, { borderColor: '#1890ff', borderWidth: 2 }]}
         />
+
         <div className="slider-labels">
           <div className="slider-label" style={{ left: `${((year - 2012) / (2100 - 2012)) * 100}%` }}>
             {year}
           </div>
         </div>
       </div>
+
       {/* Flat Map */}
       <div className="map-display" >
         <MapDisplay
@@ -208,7 +207,7 @@ const App = () => {
         view="flat" onPointClick={handlePointClick} />
       </div>
 
-     {/* Globe and Line Plot (side-by-side) */}
+      {/* Globe and Line Plot (side-by-side) */}
       <div className="visual-container">
         <div className="globe-container" style={{ flex: 1 }}>
         {/* Environmental Data Dropdown on top of the globe */}
@@ -220,6 +219,7 @@ const App = () => {
             onChange={(e) => setSelectedEnvParam(e.target.value)}
             className="dropdown"
           >
+
             {environmentalParameters.map((param) => (
               <option key={param} value={param}>
                 {param}
@@ -256,9 +256,11 @@ const App = () => {
         )}
       </div>
     </div>
-
-
+        < Footer />
     </div>
+
+
+
   );
 };
 
