@@ -67,10 +67,11 @@ This web application provides interactive visualizations of marine plankton dive
    `sudo dnf upgrade`
 3. **Install Dependencies** Install Python 3, pip, and venv:\
    `sudo dnf install python3-pip python3-virtualenv nginx git`
-4. **Clone this Application** Navigate to the /var/www/ directory:\
-   `cd /var/www/`\
+4. **Clone this Application**
+   Navigate to a chosen directory <directory>:\
+   
    `git clone <your-repository-url>`
-5. **Create a Python Virtual Environment and Install Dependencies**\
+6. **Create a Python Virtual Environment and Install Dependencies**\
    `cd mapmaker_js/backend`\
    `python3 -m venv mapmaker_env`\
    `source mapmaker_env/bin/activate`\
@@ -81,11 +82,11 @@ This web application provides interactive visualizations of marine plankton dive
    `sudo dnf install -y nodejs`\
    `npm install`
 
-6. **Test locally:**\
+7. **Test locally:**\
    run `python app.py` on the backend directory
    and `npm start` on the frontend directory
 
-7. **Set Up Gunicorn:** Create a Gunicorn service file:\
+8. **Set Up Gunicorn:** Create a Gunicorn service file:\
    `pip install gunicorn`\
    `sudo vim /etc/systemd/system/mapmaker_backend.service`\
    Add the following:\
@@ -96,10 +97,10 @@ This web application provides interactive visualizations of marine plankton dive
 
    [Service]
    User=<username>
-   Group=www-data
-   WorkingDirectory=/var/www/mapmaker_js/backend
-   Environment="PATH=/var/www/mapmaker_js/backend/mapmaker_env/bin"
-   ExecStart=/var/www/mapmaker_js/backend/mapmaker_env/bin/gunicorn --workers 3 --bind unix:/var/www/mapmaker/mapmaker.sock  -m 007 --timeout 120 app:app
+   Group=<group><group>
+   WorkingDirectory=<directory>/mapmaker_js/backend
+   Environment="PATH=<directory>/mapmaker_js/backend/mapmaker_env/bin"
+   ExecStart=<directory>/mapmaker_js/backend/mapmaker_env/bin/gunicorn --workers 3 --bind unix:<directory>/mapmaker/mapmaker.sock  -m 007 --timeout 120 app:app
 
    [Install]
    WantedBy=multi-user.target
@@ -107,16 +108,16 @@ This web application provides interactive visualizations of marine plankton dive
 
    Set ownership of the socket and directory:
 
-   `sudo chown upuser:www-data /var/www/mapmaker_js/backend/mapmaker_backend.sock`\
-   `sudo chmod 770 /var/www/mapmaker_js/backend/mapmaker_backend.sock`\
-   `sudo chown upuser:www-data /var/www/mapmaker_js/backend`\
-   `sudo chmod 755 /var/www/mapmaker_js/backend`
+   `sudo chown <username>:<group> <directory>/mapmaker_js/backend/mapmaker_backend.sock`\
+   `sudo chmod 770 <directory>/mapmaker_js/backend/mapmaker_backend.sock`\
+   `sudo chown <username>:<group> <directory>/mapmaker_js/backend`\
+   `sudo chmod 755 <directory>/mapmaker_js/backend`
 
-8. **Start and Enable Gunicorn:**\
+9. **Start and Enable Gunicorn:**\
    `sudo systemctl start mapmaker_backend`\
    `sudo systemctl enable mapmaker_backend`
 
-9. **Build the React Application:**
+10. **Build the React Application:**
 
    Before deploying, you need to build the frontend (React) application. From the frontend directory, run the following commands:
 
@@ -124,13 +125,13 @@ This web application provides interactive visualizations of marine plankton dive
    `npm install`\
    `npm run build`
 
-   `sudo mkdir -p /var/www/`\
+   `sudo mkdir -p <directory>/`\
    `mapmaker_js/frontend_build`\
-   `sudo cp -r build/* /var/www/mapmaker_js/frontend_build/`
+   `sudo cp -r build/* <directory>/mapmaker_js/frontend_build/`
 
    Make sure the user and group match with those in mapmaker_backend.service
 
-10. **Install and Configure Nginx:**\
+11. **Install and Configure Nginx:**\
     `sudo dnf install nginx`\
     `sudo vim /etc/nginx/sites-available/mapmaker``\
     Add the following:
@@ -141,7 +142,7 @@ This web application provides interactive visualizations of marine plankton dive
       server_name <servername>;
 
       location /mapmaker/static/ {
-         alias /var/www/mapmaker_js/frontend_build/static/;
+         alias <directory>/mapmaker_js/frontend_build/static/;
          expires 1y;
          access_log off;
          add_header Cache_Control "public";
@@ -149,14 +150,14 @@ This web application provides interactive visualizations of marine plankton dive
 
       #Serve the React app for all other routes (single-page application behaviour)
       location / {
-         root /var/www/mapmaker_js/frontend_build;
+         root <directory>/mapmaker_js/frontend_build;
          try_files $uri /index.html
       }
 
       # Proxy API requests to the backend (Flask)
       location /api {
          include proxy_params;
-         proxy_pass http://unix:/var/www/mapmaker_js/backend/mapmaker_backend.sock;
+         proxy_pass http://unix:<directory>/mapmaker_js/backend/mapmaker_backend.sock;
          }
       }
    ```
