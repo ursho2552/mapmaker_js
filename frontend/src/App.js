@@ -39,6 +39,19 @@ const App = () => {
   const selectedPointRef = useRef({ x: null, y: null, year });
   const endYear = 2100; // End year for the line plot
 
+  // Filter RCP scenarios based on selected diversity index
+  const filteredRcpScenarios = selectedDiversity === 'Biomes'
+    ? rcpScenarios.slice(0, 3) // First three options if "Biomes" is selected
+    : rcpScenarios; // All options otherwise
+
+  const filteredEarthModels = selectedDiversity === 'Biomes'
+  ? earthModels.slice(0, 1) // Only the first option if "Biomes" is selected
+  : earthModels; // All options otherwise
+
+  const filteredPlanktonGroups = selectedDiversity === 'Biomes'
+    ? planktonGroups.slice(0, 1) // Only the first option if "Biomes" is selected
+    : planktonGroups; // All options otherwise
+
   // Debounced update for globe
   const debouncedUpdateGlobe = useMemo(
     () =>
@@ -116,7 +129,7 @@ const App = () => {
         <div className="column">
           <button className="info-button" onClick={() => openModal('Marine taxonomic groupings important for global ecosystem services provided by our oceans. Total number of different species included were 859. Thereof 523 (~61%) zooplankton and 336 (~39%) phytoplankton species. Further species included were Copepods 272 (~32%), Diatoms 154 (~18%), Dinoflagelates 154 (~18%) and Coccolithophores 24 (~3%).')}>Plankton Groups</button>
           <select value={selectedPlankton} onChange={(e) => setSelectedPlankton(e.target.value)} className="dropdown">
-            {planktonGroups.map((item) => (
+          {filteredPlanktonGroups.map((item) => (
               <option key={item} value={item}>{item}</option>
             ))}
           </select>
@@ -126,7 +139,7 @@ const App = () => {
         <div className="column">
           <button className="info-button" onClick={() => openModal('The Intergovernmental Panel on Climate Change provide policymakers with scientific assessments on climate change such as the published scenarios of greenhouse gas concentration and emission pathways called representative concentration pathways (RCPs). The different climate scenarios are labelled after their respective radiative forcing in the year 2100 (e.g. RCP8.5 Wm-2). At present, global carbon emissions are tracking just above the highest representative concentration pathway (RCP 8.5) while the RCP 2.6 scenario represents the lowest concentration pathway with high mitigation strategies.')}>RCP Scenarios</button>
           <select value={selectedRCP} onChange={(e) => setSelectedRCP(e.target.value)} className="dropdown">
-            {rcpScenarios.map((item) => (
+          {filteredRcpScenarios.map((item) => (
               <option key={item} value={item}>{item}</option>
             ))}
           </select>
@@ -136,7 +149,7 @@ const App = () => {
         <div className="column">
           <button className="info-button" onClick={() => openModal('Earth System Models (ESMs) are global climate models which represent biogeochemical processes that interact with the climate. The three different Earth System Models used are fully coupled models from the Coupled Model Inter- comparison Project (CMIP5) assessment.')}>Earth System Models</button>
           <select value={selectedModel} onChange={(e) => setSelectedModel(e.target.value)} className="dropdown">
-            {earthModels.map((item) => (
+          {filteredEarthModels.map((item) => (
               <option key={item} value={item}>{item}</option>
             ))}
           </select>
