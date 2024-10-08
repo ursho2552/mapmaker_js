@@ -22,6 +22,44 @@ const rcpScenarios = ['RCP 2.6 (Paris Agreement)', 'RCP 4.5', 'RCP 8.5 (Business
 const earthModels = ['Model Mean', 'CNRM-CM5', 'GFDL-ESM2M', 'IPSL-CMSA-LR'];
 const environmentalParameters = ['Temperature', 'Oxygen', 'Change in Temperature', 'Chlorophyll-a Concentration'];
 
+// Custom modal text for diversity indices
+const diversityMessages = {
+  'Biomes': 'Biomes refer to distinct biological communities that have formed in response to a shared physical climate.',
+  'Species Richness': 'Species richness is the number of different species represented in an ecological community, landscape or region.',
+  'Hotspots of Change in Diversity': 'Hotspots of change in diversity indicate areas where significant changes in species diversity are occurring.',
+  'Habitat Suitability Index (HSI)': 'HSI is an index that represents the suitability of a given habitat for a species or group of species.',
+  'Change in HSI': 'Change in Habitat Suitability Index tracks how suitable a habitat is for species over time.',
+  'Species Turnover': 'Species turnover refers to the rate at which one species replaces another in a community over time.'
+};
+
+// Custom modal text for plankton groups
+const planktonMessages = {
+  'Total Plankton': 'Total Plankton includes all microscopic organisms, including both phytoplankton and zooplankton.',
+  'Zooplankton': 'Zooplankton are small drifting animals in the water, including species such as jellyfish and crustaceans.',
+  'Phytoplankton': 'Phytoplankton are microscopic marine algae that form the foundation of the ocean food web.',
+  'Copepods': 'Copepods are a type of small crustacean found in nearly every freshwater and saltwater habitat.',
+  'Diatoms': 'Diatoms are a group of microalgae that are known for their unique silica-based cell walls.',
+  'Dinoflagellates': 'Dinoflagellates are a type of plankton responsible for phenomena like red tides and bioluminescence.',
+  'Coccolithophores': 'Coccolithophores are single-celled marine algae surrounded by a microscopic plating made of calcium carbonate.'
+};
+
+// Custom modal text for RCP scenarios
+const rcpMessages = {
+  'RCP 2.6 (Paris Agreement)': 'RCP 2.6 is a scenario that assumes global annual greenhouse gas emissions peak between 2010–2020 and decline substantially thereafter.',
+  'RCP 4.5': 'RCP 4.5 is an intermediate scenario where emissions peak around 2040, then decline.',
+  'RCP 8.5 (Business as Usual)': 'RCP 8.5 is a high greenhouse gas emission scenario often considered the "business as usual" pathway.',
+  'RCP 8.5 - RCP2.6': 'This difference shows the projected climate outcomes between the high-emission RCP 8.5 and the low-emission RCP 2.6 scenario.',
+  'RCP 8.5 - RCP 4.5': 'This scenario shows the differences between the high-emission RCP 8.5 and moderate-emission RCP 4.5 pathways.',
+  'RCP 4.5 - RCP 2.6': 'This scenario compares the moderate-emission RCP 4.5 and low-emission RCP 2.6 pathways.'
+};
+
+// Custom modal text for earth system models
+const modelMessages = {
+  'Model Mean': 'The Model Mean represents the average outcome across multiple climate models, providing a consensus projection.',
+  'CNRM-CM5': 'CNRM-CM5 is a global climate model developed by Météo-France in collaboration with other research institutions.',
+  'GFDL-ESM2M': 'GFDL-ESM2M is a coupled climate model developed by NOAA’s Geophysical Fluid Dynamics Laboratory.',
+  'IPSL-CMSA-LR': 'IPSL-CMSA-LR is a climate model developed by the Institut Pierre-Simon Laplace, used for climate projections.'
+};
 
 const App = () => {
   const [selectedDiversity, setSelectedDiversity] = useState(diversityIndices[1]);
@@ -74,10 +112,29 @@ const App = () => {
   );
 
   // Open modal with custom text
-  const openModal = (text) => {
-    setModalText(text);
-    setIsOpen(true);
-  };
+  const openModal = (category) => {
+  let text = '';
+
+  switch (category) {
+    case 'Diversity Indices':
+      text = diversityMessages[selectedDiversity];
+      break;
+    case 'Plankton Groups':
+      text = planktonMessages[selectedPlankton];
+      break;
+    case 'RCP Scenarios':
+      text = rcpMessages[selectedRCP];
+      break;
+    case 'Earth System Models':
+      text = modelMessages[selectedModel];
+      break;
+    default:
+      text = 'No information available';
+  }
+
+  setModalText(text);
+  setIsOpen(true);
+};
 
   const closeModal = () => {
     setIsOpen(false);
@@ -159,25 +216,25 @@ const App = () => {
       <button
         className="filter-button"
         style={{ backgroundColor: '#ADD8E6' }} // Light Blue
-        onClick={() => openModal(selectedDiversity)}>
+        onClick={() => openModal('Diversity Indices')}>
         {selectedDiversity}
       </button>
       <button
     className="filter-button"
     style={{ backgroundColor: '#00FF00' }} // Bright Green
-    onClick={() => openModal(selectedPlankton)}>
+    onClick={() => openModal('Plankton Groups')}>
     {selectedPlankton}
   </button>
   <button
     className="filter-button"
     style={{ backgroundColor: '#FFA500' }} // Orange
-    onClick={() => openModal(selectedRCP)}>
+    onClick={() => openModal('RCP Scenarios')}>
     {selectedRCP}
   </button>
   <button
     className="filter-button"
     style={{ backgroundColor: '#FF6347' }} // Red
-    onClick={() => openModal(selectedModel)}>
+    onClick={() => openModal('Earth System Models')}>
     {selectedModel}
   </button>
   {/* <button
