@@ -119,6 +119,18 @@ const openModal = (category) => {
   let text = '';
 
   switch (category) {
+    case 'Diversity Indices general':
+      text = 'Different diversity indices based on the Habitat Suitability Index.';
+      break;
+    case 'Plankton Groups general':
+      text = 'Marine taxonomic groupings important for global ecosystem services provided by our oceans. Total number of different species included were 859. Thereof 523 (~61%) zooplankton and 336 (~39%) phytoplankton species. Further species included were Copepods 272 (~32%), Diatoms 154 (~18%), Dinoflagelates 154 (~18%) and Coccolithophores 24 (~3%).';
+      break;
+    case 'RCP Scenarios general':
+      text = 'The Intergovernmental Panel on Climate Change provide policymakers with scientific assessments on climate change such as the published scenarios of greenhouse gas concentration and emission pathways called representative concentration pathways (RCPs). The different climate scenarios are labelled after their respective radiative forcing in the year 2100 (e.g. RCP8.5 Wm-2). At present, global carbon emissions are tracking just above the highest representative concentration pathway (RCP 8.5) while the RCP 2.6 scenario represents the lowest concentration pathway with high mitigation strategies.';
+      break;
+    case 'Earth System Models general':
+      text = 'Earth System Models (ESMs) are global climate models which represent biogeochemical processes that interact with the climate. The three different Earth System Models used are fully coupled models from the Coupled Model Inter- comparison Project (CMIP5) assessment.';
+      break;
     case 'Diversity Indices':
       text = diversityMessages[selectedDiversity];
       break;
@@ -175,7 +187,7 @@ const openModal = (category) => {
       <div className="four-columns">
         {/* Column 1: Diversity Indices */}
         <div className="column">
-          <button className="info-button" onClick={() => openModal('Different diversity indices based on the Habitat Suitability Index.')}>Diversity Indices</button>
+          <button className="info-button" onClick={() => openModal('Diversity Indices general')}>Diversity Indices</button>
           <select value={selectedDiversity} onChange={(e) => setSelectedDiversity(e.target.value)} className="dropdown">
             {diversityIndices.map((item) => (
               <option key={item} value={item}>{item}</option>
@@ -185,7 +197,7 @@ const openModal = (category) => {
 
         {/* Column 2: Plankton Groups */}
         <div className="column">
-          <button className="info-button" onClick={() => openModal('Marine taxonomic groupings important for global ecosystem services provided by our oceans. Total number of different species included were 859. Thereof 523 (~61%) zooplankton and 336 (~39%) phytoplankton species. Further species included were Copepods 272 (~32%), Diatoms 154 (~18%), Dinoflagelates 154 (~18%) and Coccolithophores 24 (~3%).')}>Plankton Groups</button>
+          <button className="info-button" onClick={() => openModal('Plankton Groups general')}>Plankton Groups</button>
           <select value={selectedPlankton} onChange={(e) => setSelectedPlankton(e.target.value)} className="dropdown">
           {filteredPlanktonGroups.map((item) => (
               <option key={item} value={item}>{item}</option>
@@ -195,7 +207,7 @@ const openModal = (category) => {
 
         {/* Column 3: RCP Scenarios */}
         <div className="column">
-          <button className="info-button" onClick={() => openModal('The Intergovernmental Panel on Climate Change provide policymakers with scientific assessments on climate change such as the published scenarios of greenhouse gas concentration and emission pathways called representative concentration pathways (RCPs). The different climate scenarios are labelled after their respective radiative forcing in the year 2100 (e.g. RCP8.5 Wm-2). At present, global carbon emissions are tracking just above the highest representative concentration pathway (RCP 8.5) while the RCP 2.6 scenario represents the lowest concentration pathway with high mitigation strategies.')}>RCP Scenarios</button>
+          <button className="info-button" onClick={() => openModal('RCP Scenarios general')}>RCP Scenarios</button>
           <select value={selectedRCP} onChange={(e) => setSelectedRCP(e.target.value)} className="dropdown">
           {filteredRcpScenarios.map((item) => (
               <option key={item} value={item}>{item}</option>
@@ -205,7 +217,7 @@ const openModal = (category) => {
 
         {/* Column 4: Earth System Models */}
         <div className="column">
-          <button className="info-button" onClick={() => openModal('Earth System Models (ESMs) are global climate models which represent biogeochemical processes that interact with the climate. The three different Earth System Models used are fully coupled models from the Coupled Model Inter- comparison Project (CMIP5) assessment.')}>Earth System Models</button>
+          <button className="info-button" onClick={() => openModal('Earth System Models general')}>Earth System Models</button>
           <select value={selectedModel} onChange={(e) => setSelectedModel(e.target.value)} className="dropdown">
           {filteredEarthModels.map((item) => (
               <option key={item} value={item}>{item}</option>
