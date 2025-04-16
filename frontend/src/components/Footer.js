@@ -1,58 +1,42 @@
 import React, { useState } from 'react';
 
 const Footer = () => {
-  // State to manage the visibility of the references
   const [showReferences, setShowReferences] = useState(false);
 
-  // Toggle the visibility of the references section
   const toggleReferences = () => {
     setShowReferences(!showReferences);
   };
 
   return (
-    <footer style={footerStyle}>
-      <div style={logoContainerStyle}>
-        {/* Logos */}
+    <footer className="footer">
+      <div className="footer-logo-container">
         <a href="https://up.ethz.ch/research/ongoing-projects.html">
-          <img
-            src="/assets/ETH_logo.png"
-            alt="ETH Zurich"
-            style={logoStyle}
-          />
+          <img src="/assets/ETH_logo.png" alt="ETH Zurich" className="footer-logo" />
         </a>
         <a href="https://gspi.ch/collaboration_projec/marine-plankton-diversity-bioindicator-scenarios-for-policy-makers-mapmaker/">
-          <img
-            src="/assets/GSPI_logo.png"
-            alt="GSPI"
-            style={logoStyle}
-          />
+          <img src="/assets/GSPI_logo.png" alt="GSPI" className="footer-logo" />
         </a>
         <a href="https://www.iucn.org/theme/marine-and-polar">
-          <img
-            src="/assets/IUCN_logo.png"
-            alt="IUCN"
-            style={logoStyle}
-          />
+          <img src="/assets/IUCN_logo.png" alt="IUCN" className="footer-logo" />
         </a>
         <a href="https://esgf-node.llnl.gov/search/cmip5/">
           <img
             src="/assets/CMIP5_Data_Archive_3.png"
             alt="CMIP5"
-            style={{ ...logoStyle, width: '140px' }}
+            className="footer-logo"
+            style={{ width: '140px' }} // Optional override
           />
         </a>
       </div>
+
       <div>
-        {/* Button to toggle the references section */}
-        <button onClick={toggleReferences} style={textButtonStyle}>
+        <button onClick={toggleReferences} className="footer-text-button">
           References and Data Courtesy
         </button>
       </div>
 
-      {/* Conditionally render the references section */}
       {showReferences && (
-        <div style={textContainerStyle}>
-
+        <div className="footer-text-container">
           <p><strong>Data</strong></p>
 
           <p><em>Phytoplankton</em></p>
@@ -161,46 +145,6 @@ const Footer = () => {
       )}
     </footer>
   );
-};
-
-// Styles for the footer
-const footerStyle = {
-  backgroundColor: '#282c34',
-  padding: '20px',
-  textAlign: 'left',
-  color: 'white',
-  marginTop: '20px',
-};
-
-const logoContainerStyle = {
-  display: 'flex',
-  justifyContent: 'left',
-  alignItems: 'left',
-  gap: '20px',
-  marginBottom: '20px',
-};
-
-const logoStyle = {
-  width: '70px',
-  height: '40px',
-};
-
-const textContainerStyle = {
-  marginTop: '20px',
-  textAlign: 'left',
-  color: 'white',
-  maxWidth: '800px',
-  margin: '0 auto',
-  fontSize: '14px',
-};
-
-const textButtonStyle = {
-  background: 'none',
-  border: 'none',
-  color: '#1890ff',
-  textDecoration: 'underline',
-  cursor: 'pointer',
-  padding: '0',
 };
 
 export default Footer;

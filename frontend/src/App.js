@@ -261,9 +261,11 @@ const App = () => {
       <Modal isOpen={modalIsOpen} onRequestClose={closeModal} contentLabel="Information Modal">
         <h2>Explanation</h2>
         <p>{modalText}</p>
-        <button onClick={closeModal}>Close</button>
+        <div className="center-button">
+          <button onClick={closeModal}>Close</button>
+      </div>
       </Modal>
-            {/* Year Slider */}
+      {/* Year Slider */}
       <div className="slider-container">
         <Slider
           min={2012}
@@ -271,7 +273,6 @@ const App = () => {
           value={year}
           onChange={handleSliderChange}
           className="slider"
-          handleStyle={[{ borderColor: '#1890ff', borderWidth: 2 }, { borderColor: '#1890ff', borderWidth: 2 }]}
         />
         <div className="slider-labels">
           <div className="slider-label" style={{ left: `${((year - 2012) / (2100 - 2012)) * 100}%` }}>
