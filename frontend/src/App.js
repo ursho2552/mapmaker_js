@@ -227,25 +227,25 @@ const App = () => {
       <div className="button-row">
       <button
         className="filter-button"
-        style={{ backgroundColor: '#ADD8E6' }} // Light Blue
+        style={{ backgroundColor: '#4682B4' }} // Light Blue
         onClick={() => openModal('Diversity Indices')}>
         {selectedDiversity}
       </button>
       <button
     className="filter-button"
-    style={{ backgroundColor: '#00FF00' }} // Bright Green
+    style={{ backgroundColor: '#388E3C' }} // Bright Green
     onClick={() => openModal('Plankton Groups')}>
     {selectedPlankton}
   </button>
   <button
     className="filter-button"
-    style={{ backgroundColor: '#FFA500' }} // Orange
+    style={{ backgroundColor: '#F57C00' }} // Orange
     onClick={() => openModal('RCP Scenarios')}>
     {selectedRCP}
   </button>
   <button
     className="filter-button"
-    style={{ backgroundColor: '#FF6347' }} // Red
+    style={{ backgroundColor: '#D84315' }} // Red
     onClick={() => openModal('Earth System Models')}>
     {selectedModel}
   </button>
