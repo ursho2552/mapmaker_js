@@ -176,7 +176,7 @@ const App = () => {
       {/* Header */}
       <header>
         <div className="header-content">
-          <h1>Marine Plankton diversity bioindicator scenarios for policy <b>MAKER</b>s, <b>MAPMAKER</b></h1>
+          <h1>MAPMAKER</h1>
         </div>
       </header>
 

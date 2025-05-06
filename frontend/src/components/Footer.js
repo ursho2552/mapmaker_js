@@ -8,8 +8,15 @@ const Footer = () => {
   };
 
   return (
-    <footer className="footer">
-      <div className="footer-logo-container">
+    <footer className="footer" style={{ width: '100%'}}>
+      <div className="footer-logo-container"
+        style={{
+          display: 'flex',
+          justifyContent: 'space-around',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          marginBottom: '1rem',
+        }}>
         <a href="https://up.ethz.ch/research/ongoing-projects.html">
           <img src="/assets/ETH_logo.png" alt="ETH Zurich" className="footer-logo" />
         </a>
@@ -24,11 +31,9 @@ const Footer = () => {
             src="/assets/CMIP5_Data_Archive_3.png"
             alt="CMIP5"
             className="footer-logo"
-            style={{ width: '140px' }} // Optional override
           />
         </a>
       </div>
-
       <div>
         <button onClick={toggleReferences} className="footer-text-button">
           References and Data Courtesy
