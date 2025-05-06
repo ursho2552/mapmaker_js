@@ -145,7 +145,6 @@ h1 {
 .center-button {
   display: flex;
   justify-content: center;
-  margin-top: 24px;
 }
 
 /* Button Row */
@@ -159,33 +158,35 @@ h1 {
 .ReactModal__Overlay {
   background-color: rgba(0, 0, 0, 0.6);
   z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
 }
 
 .ReactModal__Content {
   background: #2c2b30;
   border-radius: var(--md-border-radius);
-  padding: 24px;
-  width: 50%;
-  margin: 10% auto;
-  z-index: 1001;
-  color: var(--md-on-surface);
+  max-width: 50%;
+  max-height: 50%;
+  margin: auto;
+  width: fit-content;
+  height: fit-content;
+  overflow-y: auto;
+  color: black;
   box-shadow: var(--md-shadow);
 }
 
 .ReactModal__Content h2 {
   font-size: 24px;
-  margin-bottom: 16px;
 }
 
 .ReactModal__Content p {
   font-size: 16px;
-  margin-bottom: 24px;
 }
 
 /* Map & Containers */
 .map-container {
   width: 100%;
-  height: 500px;
   background-color: var(--md-surface);
   display: flex;
   justify-content: center;
@@ -200,10 +201,9 @@ h1 {
 }
 
 .slider-labels {
-  position: absolute;
+  position: relative;
   top: 50%;
   width: 100%;
-  transform: translateY(-50%);
   display: flex;
   justify-content: space-between;
 }
@@ -227,6 +227,11 @@ h1 {
   justify-content: center;
   align-items: center;
   background-color: var(--md-surface);
+  position: relative;
+}
+
+.globe-dropdown-container {
+  padding: 10px;
 }
 
 .globe-colorbar-wrapper {
@@ -234,17 +239,6 @@ h1 {
   justify-content: space-between;
   align-items: center;
   gap: 20px;
-}
-
-.globe-dropdown-container {
-  position: absolute;
-  top: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 10;
-  background-color: #2c2b30;
-  padding: 8px;
-  border-radius: var(--md-border-radius);
 }
 
 .colorbar-container {
