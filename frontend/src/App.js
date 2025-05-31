@@ -266,29 +266,6 @@ const App = () => {
                 </select>
               </>
             )}
-            {/* View selection via radio buttons */}
-            <div className="radio-group">
-              <label>
-                <input
-                  type="radio"
-                  name="view1"
-                  value="map"
-                  checked={panel1View === 'map'}
-                  onChange={e => setPanel1View(e.target.value)}
-                />
-                Map
-              </label>
-              <label>
-                <input
-                  type="radio"
-                  name="view1"
-                  value="globe"
-                  checked={panel1View === 'globe'}
-                  onChange={e => setPanel1View(e.target.value)}
-                />
-                Globe
-              </label>
-            </div>
         </div>
         {/* Year Slider for Panel 1 */}
         <div className="slider-container" style={{ marginBottom: '12px' }}>
