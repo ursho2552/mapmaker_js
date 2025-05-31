@@ -1,415 +1,79 @@
-/* General Styling */
-body, html {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  background-color: #282c34; /* Set the background color */
-}
 
-.App {
-  text-align: center;
-  background-color: #282c34; /* Make sure the background extends across the app */
-  min-height: 100vh;
-  color: white;
-}
+        /* Global */
+        html, body {
+          margin: 0;
+          padding: 0;
+          height: 100%;
+          background: #282c34;
+          color: white;
+          font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+        }
+        #root {
+          background: #282c34;
+          min-height: 100vh;
+        }
 
-header {
-  padding: 8px;
-  background-color: #282c34; /* Same background as the rest */
-  color: white;
-  border-bottom: 1px solid #ccc;
-}
+        /* Map Display */
+        .map-container,
+        .globe-display-container {
+          width: 100%;
+          height: 500px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          background: #282c34;
+          position: relative;
+        }
 
-.header-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
+        /* Legend / Colorbar */
+        .colorbar-container {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          margin: 16px 0;
+        }
+        .colorbar {
+          width: 20px;
+          height: 300px;
+          background: linear-gradient(
+            to top,
+            #2b83ba 0%,
+            #abdda4 20%,
+            #ffffbf 40%,
+            #fdae61 60%,
+            #d7191c 100%
+          );
+          border: 1px solid #ccc;
+          border-radius: 3px;
+          position: relative;
+        }
+        .colorbar-labels {
+          display: flex;
+          flex-direction: column-reverse;
+          justify-content: space-between;
+          height: 300px;
+          font-size: 12px;
+        }
+        .colorbar-title {
+          writing-mode: vertical-rl;
+          transform: rotate(180deg);
+          text-align: center;
+          margin-top: 4px;
+        }
 
-h1 {
-  margin: 0 0 4px 0;
-  font-size: 28px;
-}
+        /* Responsive */
+        @media (max-width: 1024px) {
+          .map-container, .globe-display-container { height: 400px; }
+          .colorbar, .colorbar-labels { height: 250px; }
+        }
+        @media (max-width: 768px) {
+          .map-container, .globe-display-container { height: 300px; }
+          .colorbar, .colorbar-labels { height: 200px; font-size: 11px; }
+        }
+        @media (max-width: 480px) {
+          .map-container, .globe-display-container { height: 200px; }
+          .colorbar, .colorbar-labels { height: 150px; font-size: 10px; }
+        }
 
-/* Four Columns Layout */
-.four-columns {
-  display: flex;
-  justify-content: space-between;
-  margin: 20px 0;
-  padding: 0 10px;
-}
 
-.column {
-  flex: 1;
-  margin: 0 10px;
-  text-align: left;
-}
-
-.column h3 {
-  font-size: 18px;
-  color: #fff;
-}
-
-.dropdown {
-  width: 100%;
-  padding: 10px;
-  font-size: 16px;
-  margin-top: 10px;
-  background-color: #e9ecef;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-.info-button {
-  background-color: #1890ff;
-  color: white;
-  border: none;
-  padding: 10px;
-  cursor: pointer;
-  width: 100%;
-  font-size: 16px;
-  margin-bottom: 10px;
-  border-radius: 5px;
-  transition: background-color 0.3s ease;
-}
-
-.info-button:hover {
-  background-color: #0056b3;
-}
-/* Inline icon-style help buttons */
-.icon-button {
-  background: none;
-  border: none;
-  color: #1890ff;
-  cursor: pointer;
-  font-size: 16px;
-  padding: 0 6px;
-  margin-left: 4px;
-}
-.input-with-icon {
-  display: flex;
-  align-items: center;
-  margin-bottom: 12px;
-}
-/* Reset nested rule */
-.icon-button:hover {
-  color: #0056b3;
-}
-
-/* Radio button group styling under panel controls */
-.radio-group {
-  display: flex;
-  gap: 16px;
-  align-items: center;
-}
-.radio-group label {
-  color: white;
-  font-size: 16px;
-}
-.radio-group input[type="radio"] {
-  margin-right: 4px;
-  cursor: pointer;
-}
-/* Ensure map/globe containers align by making panel-controls uniform height */
-.panel-controls {
-  min-height: 200px;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-}
-.icon-button:hover {
-  color: #0056b3;
-}
-
-/* Button Row Below Columns */
-.button-row {
-  display: flex;
-  justify-content: center;
-  margin: 20px 0;
-}
-
-.filter-button {
-  background-color: #28a745;
-  color: white;
-  padding: 12px 20px;
-  margin: 0 10px;
-  border: none;
-  cursor: pointer;
-  border-radius: 5px;
-  transition: background-color 0.3s ease;
-  font-size: 16px;
-}
-
-.filter-button:hover {
-  background-color: #218838;
-}
-
-/* Modal Styling */
-.ReactModal__Overlay {
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 1000; /* High value to ensure modal stays on top */
-}
-
-.ReactModal__Content {
-  background: white;
-  border-radius: 10px;
-  padding: 20px;
-  width: 50%;
-  margin: 10% auto;
-  z-index: 1001; /* Modal content is also high */
-}
-
-.ReactModal__Content h2 {
-  margin: 0 0 20px 0;
-  font-size: 24px;
-}
-
-.ReactModal__Content p {
-  font-size: 16px;
-  margin-bottom: 20px;
-}
-
-.ReactModal__Content button {
-  background-color: #1890ff;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  cursor: pointer;
-  border-radius: 5px;
-}
-
-.ReactModal__Content button:hover {
-  background-color: #0056b3;
-}
-
-.map-container {
-  width: 100%; /* Full width of the window */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #282c34; /* Ensure the map container has the same background color */
-  margin: 0; /* Remove margin around the map */
-  padding: 0;
-  height: 500px; /* Adjust height to fit the design */
-}
-
-.map-display {
-  width: 100%; /* Take the full width of the container */
-  height: 100%; /* Take the full height */
-  margin: 0 auto;
-  flex: 2;
-}
-
-/* Ensure the slider is centered */
-.slider-container {
-  position: relative;
-  width: 100%; /* Full width */
-  max-width: 800px; /* Optional: Limit max width */
-  margin: 20px auto; /* Center the slider */
-  padding: 0;
-  z-index: 500; /* Lower than modal */
-}
-
-.slider-labels {
-  position: absolute;
-  top: 50%;
-  width: 100%;
-  transform: translateY(-50%);
-  display: flex;
-  justify-content: space-between;
-}
-
-.slider-label {
-  font-size: 14px;
-  color: white;
-  position: absolute;
-}
-
-/* Visualizations Container */
-.visual-container {
-  display: flex;
-  justify-content: space-between;
-  margin: 20px 0;
-  padding: 0 20px;
-}
-
-/* General Styling */
-.globe-display-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 0px;
-  background-color: #282c34; /* Set the background color */
-}
-
-/* Wrapper for Globe and Colorbar */
-.globe-colorbar-wrapper {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 20px;
-}
-
-/* Globe Container Styling */
-.globe-container {
-  position: relative; /* Ensures the absolute positioning of the dropdown is relative to this container */
-}
-
-.globe-dropdown-container {
-  position: absolute;
-  top: 10px; /* Adjust this value to position the dropdown higher or lower */
-  left: 50%;
-  transform: translateX(-50%); /* Center the dropdown horizontally */
-  z-index: 10; /* Ensure the dropdown stays above the globe */
-  background-color: #282c34; /* Match background color */
-  padding: 5px;
-  border-radius: 5px;
-}
-
-.dropdown {
-  margin-top: 5px;
-  padding: 5px;
-}
-
-/* Colorbar Container */
-.colorbar-container {
-  display: flex;
-  align-items: center; /* Align items horizontally */
-  gap: 10px; /* Space between the colorbar and labels */
-}
-
-.colorbar {
-  width: 20px;
-  height: 300px;
-  border: 1px solid #ccc;
-  border-radius: 3px;
-  position: relative;
-}
-
-.colorbar-labels {
-  display: flex;
-  flex-direction: column-reverse; /* Reverse the order of labels */
-  justify-content: space-between;
-  height: 300px; /* Match the height of the colorbar */
-}
-
-.colorbar-label {
-  color: white;
-  font-size: 12px;
-  text-align: left; /* Align text to the left */
-  margin-left: 5px; /* Add space between the label and the colorbar */
-}
-
-.colorbar-title {
-  writing-mode: vertical-rl; /* Rotates the label vertically */
-  transform: rotate(180deg); /* Ensures the text is upright */
-  text-align: center;
-  font-size: 14px;
-  color: white;
-  margin-top: 5px; /* Adjust to your desired spacing */
-}
-
-/* Line Plot Container */
-.line-plot-container {
-  width: 65%;
-  flex: 2;
-  background-color: #282c34; /* Set the background color */
-  border-radius: 0px;
-  padding: 30px;
-  box-shadow: 0 0 0px rgba(0, 0, 0, 0.1);
-}
-
-/* Responsive Design */
-/* Adjustments for screens up to 1024px wide */
-@media (max-width: 1024px) {
-  .four-columns {
-    flex-direction: column;
-    margin: 20px 0;
-  }
-
-  .column {
-    margin-bottom: 20px;
-  }
-
-  .visual-container {
-    flex-direction: column;
-  }
-
-  .line-plot-container {
-    width: 100%;
-  }
-}
-
-/* Adjustments for screens up to 768px wide */
-@media (max-width: 768px) {
-  .slider-container {
-    width: 80%;
-  }
-
-  .filter-button {
-    padding: 10px;
-    font-size: 14px;
-  }
-
-  .map-container {
-    height: 300px; /* Reduce height for smaller screens */
-  }
-
-  .line-plot-container {
-    width: 100%;
-    padding: 20px;
-  }
-
-  .button-row {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .filter-button {
-    margin: 10px 0;
-    width: 80%;
-  }
-
-  .four-columns {
-    padding: 0 10px;
-  }
-
-  .column {
-    margin: 10px 0;
-  }
-
-  .visual-container {
-    padding: 0 10px;
-  }
-}
-
-/* Adjustments for screens up to 480px wide */
-@media (max-width: 480px) {
-  h1 {
-    font-size: 24px;
-  }
-
-  .header-content {
-    padding: 0 10px;
-  }
-
-  .dropdown {
-    font-size: 14px;
-    padding: 8px;
-  }
-
-  .info-button {
-    padding: 8px;
-    font-size: 14px;
-  }
-
-  .filter-button {
-    padding: 8px;
-    font-size: 14px;
-  }
-
-  .line-plot-container {
-    padding: 15px;
-  }
-}
 
