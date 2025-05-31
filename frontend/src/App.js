@@ -4,6 +4,7 @@ import GlobeDisplay from './components/GlobeDisplay';
 import MapDisplay from './components/MapDisplay';
 import CombinedLinePlot from './components/CombinedLinePlot';
 import Footer from './components/Footer';
+import './App.css';
 import _ from 'lodash';
 
 // MUI v5 imports

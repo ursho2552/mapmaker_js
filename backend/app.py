@@ -182,17 +182,25 @@ def get_file_and_variable(index:str, group:str, scenario:str, model:str):
 
 @app.route('/api/globe-data', methods=['GET'])
 def get_globe_data():
-
-    year = request.args.get('year', type=int)  # Get the year parameter
-    index = request.args.get('index', type=str)  # Get the index parameter
+    # Determine source type: 'env' for environmental, 'plankton' for diversity data
+    source = request.args.get('source', 'env')
+    year = request.args.get('year', type=int)
     scenario = request.args.get('scenario', type=str)
     model = request.args.get('model', type=str)
 
-    file_path, variable = get_environmental_data(index, scenario, model)
+    if source == 'plankton':
+        # Diversity/plankton data uses 'index' and 'group'
+        index = request.args.get('index', type=str)
+        group = request.args.get('group', type=str)
+        file_path, variable = get_file_and_variable(index, group, scenario, model)
+    else:
+        # Environmental data uses 'index' as parameter name
+        index = request.args.get('index', type=str)
+        file_path, variable = get_environmental_data(index, scenario, model)
 
     # Run the data processing asynchronously
     future = executor.submit(read_netcdf, file_path, variable, year)
-    data = future.result()  # Wait for the result
+    data = future.result()
 
     response = jsonify(data)
     response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
