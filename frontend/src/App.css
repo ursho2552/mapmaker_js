@@ -332,4 +332,21 @@ h1 {
   .line-plot-container {
     padding: 15px;
   }
+
+  .dropdown-sentence {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    margin: 20px auto;
+    font-size: 1.1rem;
+    justify-content: center;
+    gap: 4px;
+  }
+  
+  .inline-dropdown {
+    font-size: 1rem;
+    padding: 4px 8px;
+    margin: 0 2px;
+  }
+  
 }

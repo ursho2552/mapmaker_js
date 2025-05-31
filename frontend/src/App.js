@@ -180,48 +180,50 @@ const App = () => {
         </div>
       </header>
 
-      {/* Four Columns with Dropdowns */}
-      <div className="four-columns">
-        {/* Column 1: Diversity Indices */}
-        <div className="column">
-          <button className="info-button" onClick={() => openModal('Diversity Indices general')}>Diversity Indices</button>
-	  <select value={selectedDiversity} onChange={(e) => setSelectedDiversity(e.target.value)} className="dropdown">
-            {diversityIndices.map((item) => (
-              <option key={item} value={item}>{item}</option>
-            ))}
-          </select>
-        </div>
+     {/* Sentence with Inline Dropdowns */}
+<div className="dropdown-sentence">
+  Show&nbsp;
+  <select
+    value={selectedDiversity}
+    onChange={(e) => setSelectedDiversity(e.target.value)}
+    className="inline-dropdown"
+  >
+    {diversityIndices.map((item) => (
+      <option key={item} value={item}>{item}</option>
+    ))}
+  </select>
+  &nbsp;and&nbsp;
+  <select
+    value={selectedPlankton}
+    onChange={(e) => setSelectedPlankton(e.target.value)}
+    className="inline-dropdown"
+  >
+    {filteredPlanktonGroups.map((item) => (
+      <option key={item} value={item}>{item}</option>
+    ))}
+  </select>
+  &nbsp;predicted by&nbsp;
+  <select
+    value={selectedRCP}
+    onChange={(e) => setSelectedRCP(e.target.value)}
+    className="inline-dropdown"
+  >
+    {filteredRcpScenarios.map((item) => (
+      <option key={item} value={item}>{item}</option>
+    ))}
+  </select>
+  &nbsp;on&nbsp;
+  <select
+    value={selectedModel}
+    onChange={(e) => setSelectedModel(e.target.value)}
+    className="inline-dropdown"
+  >
+    {filteredEarthModels.map((item) => (
+      <option key={item} value={item}>{item}</option>
+    ))}
+  </select>
+</div>
 
-        {/* Column 2: Plankton Groups */}
-        <div className="column">
-          <button className="info-button" onClick={() => openModal('Plankton Groups general')}>Plankton Groups</button>
-	  <select value={selectedPlankton} onChange={(e) => setSelectedPlankton(e.target.value)} className="dropdown">
-            {filteredPlanktonGroups.map((item) => (
-              <option key={item} value={item}>{item}</option>
-            ))}
-          </select>
-        </div>
-
-        {/* Column 3: RCP Scenarios */}
-        <div className="column">
-          <button className="info-button" onClick={() => openModal('RCP Scenarios general')}>RCP Scenarios</button>
-	  <select value={selectedRCP} onChange={(e) => setSelectedRCP(e.target.value)} className="dropdown">
-          {filteredRcpScenarios.map((item) => (
-              <option key={item} value={item}>{item}</option>
-            ))}
-	  </select>
-        </div>
-
-        {/* Column 4: Earth System Models */}
-        <div className="column">
-          <button className="info-button" onClick={() => openModal('Earth System Models general')}>Earth System Models</button>
-	  <select value={selectedModel} onChange={(e) => setSelectedModel(e.target.value)} className="dropdown">
-          {filteredEarthModels.map((item) => (
-              <option key={item} value={item}>{item}</option>
-            ))}
-	  </select>
-        </div>
-      </div>
 
       {/* Five Buttons Below */}
       <div className="button-row">
