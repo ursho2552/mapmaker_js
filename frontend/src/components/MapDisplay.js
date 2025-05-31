@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Plot from 'react-plotly.js';
 
-const MapDisplay = ({ year, index, group, scenario, model, view, onPointClick }) => {
+const MapDisplay = ({ year, index, group, scenario, model, sourceType = 'plankton', onPointClick }) => {
 
   const colorbarLabelMapping = {
     'Biomes': 'Biome label',
@@ -10,6 +10,11 @@ const MapDisplay = ({ year, index, group, scenario, model, view, onPointClick })
     'Habitat Suitability Index (HSI)': 'HSI [%]',
     'Change in HSI': 'ΔHSI [%]',
     'Species Turnover': 'Jaccard Index [-]',
+    // Environmental metrics
+    'Temperature': '°C',
+    'Change in Temperature': 'Δ°C',
+    'Oxygen': 'mg/L',
+    'Chlorophyll-a Concentration': 'log(mg/m³)',
   };
 
   const layout = {
@@ -63,17 +68,18 @@ const MapDisplay = ({ year, index, group, scenario, model, view, onPointClick })
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    console.log('Fetching data for year:', year); // Log year to verify
-    fetch(`/api/map-data?year=${year}&index=${index}&group=${group}&scenario=${scenario}&model=${model}`)
+    // Decide which endpoint to call based on sourceType prop
+    const isEnv = sourceType === 'environmental';
+    const url = isEnv
+      ? `/api/globe-data?source=env&year=${year}&index=${index}&scenario=${scenario}&model=${model}`
+      : `/api/map-data?year=${year}&index=${index}&group=${group}&scenario=${scenario}&model=${model}`;
+    console.log('Fetching data from', url);
+    fetch(url)
       .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        console.log('Response:', response); // Log response for debugging
+        if (!response.ok) throw new Error('Network response was not ok');
         return response.json();
       })
       .then(data => {
-        console.log('Data received:', data); // Log fetched data
         setLats(data.lats);
         setLons(data.lons);
         setData(data.variable);
@@ -86,7 +92,7 @@ const MapDisplay = ({ year, index, group, scenario, model, view, onPointClick })
         console.error('Error fetching map data:', error);
         setError('Failed to load data');
       });
-  }, [year, index, group, scenario, model]); // Update whenever year or filters change
+  }, [year, index, group, scenario, model, sourceType]);
 
   return (
     <div>

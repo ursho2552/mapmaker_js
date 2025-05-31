@@ -1,7 +1,7 @@
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import GlobeDisplay from './components/GlobeDisplay';
 import MapDisplay from './components/MapDisplay';
-import LinePlot from './components/LinePlot';
+import CombinedLinePlot from './components/CombinedLinePlot';
 import Footer from './components/Footer';
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
@@ -48,6 +48,9 @@ const rcpMessages = {
   'RCP 2.6 (Paris Agreement)': 'RCP 2.6 is a scenario that assumes global annual greenhouse gas emissions peak between 2010–2020 and decline substantially thereafter.',
   'RCP 4.5': 'RCP 4.5 is an intermediate scenario where emissions peak around 2040, then decline.',
   'RCP 8.5 (Business as Usual)': 'RCP 8.5 is a high greenhouse gas emission scenario often considered the "business as usual" pathway.',
+  'RCP 8.5 - RCP2.6': 'Difference between RCP 8.5 and RCP 2.6; highlights the contrast between high-emission and stringent mitigation pathways.',
+  'RCP 8.5 - RCP 4.5': 'Difference between RCP 8.5 and RCP 4.5; shows the impact of extreme versus intermediate emission trajectories.',
+  'RCP 4.5 - RCP 2.6': 'Difference between RCP 4.5 and RCP 2.6; illustrates the benefits of intermediate versus stringent mitigation scenarios.',
   'RCP 8.5 - RCP2.6': 'This difference shows the projected climate outcomes between the high-emission RCP 8.5 and the low-emission RCP 2.6 scenario.',
   'RCP 8.5 - RCP 4.5': 'This scenario shows the differences between the high-emission RCP 8.5 and moderate-emission RCP 4.5 pathways.',
   'RCP 4.5 - RCP 2.6': 'This scenario compares the moderate-emission RCP 4.5 and low-emission RCP 2.6 pathways.'
@@ -68,12 +71,35 @@ const App = () => {
   const [selectedModel, setSelectedModel] = useState(earthModels[0]);
   const [selectedEnvParam, setSelectedEnvParam] = useState(environmentalParameters[0]);
   const [year, setYear] = useState(2012); // Track only one year
-  const [debouncedYear, setDebouncedYear] = useState(year); // Debounced year for the globe
+  // per-panel years
+  const [panel1Year, setPanel1Year] = useState(2012);
+  const [panel1DebouncedYear, setPanel1DebouncedYear] = useState(2012);
+  const [panel2Year, setPanel2Year] = useState(2012);
+  const [panel2DebouncedYear, setPanel2DebouncedYear] = useState(2012);
+  // Panel 1 and Panel 2 settings: sourceType = 'plankton' or 'environmental'; view = 'map' or 'globe'
+  const [panel1Source, setPanel1Source] = useState('plankton');
+  const [panel1View, setPanel1View] = useState('map');
+  const [panel1EnvParam, setPanel1EnvParam] = useState(environmentalParameters[0]);
+  const [panel2Source, setPanel2Source] = useState('environmental');
+  const [panel2View, setPanel2View] = useState('globe');
+  const [panel2EnvParam, setPanel2EnvParam] = useState(environmentalParameters[0]);
+  // Panel-specific plankton settings
+  const [panel1Diversity, setPanel1Diversity] = useState(selectedDiversity);
+  const [panel1Group, setPanel1Group] = useState(selectedPlankton);
+  const [panel1RCP, setPanel1RCP] = useState(selectedRCP);
+  const [panel1Model, setPanel1Model] = useState(selectedModel);
+  const [panel2Diversity, setPanel2Diversity] = useState(selectedDiversity);
+  const [panel2Group, setPanel2Group] = useState(selectedPlankton);
+  const [panel2RCP, setPanel2RCP] = useState(selectedRCP);
+  const [panel2Model, setPanel2Model] = useState(selectedModel);
   const [modalIsOpen, setIsOpen] = useState(false);
   const [modalText, setModalText] = useState('');
 
-  const selectedPointRef = useRef({ x: null, y: null, year });
-  const endYear = 2100; // End year for the line plot
+  // Single selected point for combined line chart
+  const [selectedPoint, setSelectedPoint] = useState({ x: null, y: null });
+  const endYear = 2100;
+  // Unified click handler
+  const handlePointClick = (x, y) => setSelectedPoint({ x, y });
   
  // Filter RCP scenarios based on selected diversity index
   const filteredRcpScenarios = selectedDiversity === 'Biomes'
@@ -88,261 +114,390 @@ const App = () => {
     ? planktonGroups.slice(0, 1) // Only the first option if "Biomes" is selected
     : planktonGroups; // All options otherwise
   
-  // Debounced update for globe
-  const debouncedUpdateGlobe = useMemo(
-    () =>
-      _.debounce((newYear) => {
-        setDebouncedYear(newYear); // Update the globe after the debounce delay
-      }, 500), // Delay in milliseconds
+  // Filter options for panel-specific plankton settings
+  const filteredRcpScenariosPanel1 = panel1Diversity === 'Biomes'
+    ? rcpScenarios.slice(0, 3)
+    : rcpScenarios;
+  const filteredModelsPanel1 = panel1Diversity === 'Biomes'
+    ? earthModels.slice(0, 1)
+    : earthModels;
+  const filteredGroupsPanel1 = panel1Diversity === 'Biomes'
+    ? planktonGroups.slice(0, 1)
+    : planktonGroups;
+  const filteredRcpScenariosPanel2 = panel2Diversity === 'Biomes'
+    ? rcpScenarios.slice(0, 3)
+    : rcpScenarios;
+  const filteredModelsPanel2 = panel2Diversity === 'Biomes'
+    ? earthModels.slice(0, 1)
+    : earthModels;
+  const filteredGroupsPanel2 = panel2Diversity === 'Biomes'
+    ? planktonGroups.slice(0, 1)
+    : planktonGroups;
+  // Debounced update for panel1
+  const debouncedUpdatePanel1 = useMemo(
+    () => _.debounce(newYear => setPanel1DebouncedYear(newYear), 500),
+    []
+  );
+  // Debounced update for panel2
+  const debouncedUpdatePanel2 = useMemo(
+    () => _.debounce(newYear => setPanel2DebouncedYear(newYear), 500),
     []
   );
 
-  // Debounced update for line plot
-  const debouncedUpdateLinePlot = useMemo(
-    () =>
-      _.debounce((newYear) => {
-        if (selectedPointRef.current.x !== null && selectedPointRef.current.y !== null) {
-          setSelectedPoint((prevPoint) => ({
-            ...prevPoint,
-            year: newYear,
-          }));
-        }
-      }, 500), // Delay in milliseconds
-    []
-  );
 
   // Open modal with custom text
   const openModal = (category) => {
-  let text = '';
-
-  switch (category) {
-    case 'Diversity Indices general':
-      text = 'Different diversity indices based on the Habitat Suitability Index.';
-      break;
-    case 'Plankton Groups general':
-      text = 'Marine taxonomic groupings important for global ecosystem services provided by our oceans. Total number of different species included were 859. Thereof 523 (~61%) zooplankton and 336 (~39%) phytoplankton species. Further species included were Copepods 272 (~32%), Diatoms 154 (~18%), Dinoflagelates 154 (~18%) and Coccolithophores 24 (~3%).';
-      break;
-    case 'RCP Scenarios general':
-      text = 'The Intergovernmental Panel on Climate Change provide policymakers with scientific assessments on climate change such as the published scenarios of greenhouse gas concentration and emission pathways called representative concentration pathways (RCPs). The different climate scenarios are labelled after their respective radiative forcing in the year 2100 (e.g. RCP8.5 Wm-2). At present, global carbon emissions are tracking just above the highest representative concentration pathway (RCP 8.5) while the RCP 2.6 scenario represents the lowest concentration pathway with high mitigation strategies.';
-      break;
-    case 'Earth System Models general':
-      text = 'Earth System Models (ESMs) are global climate models which represent biogeochemical processes that interact with the climate. The three different Earth System Models used are fully coupled models from the Coupled Model Inter- comparison Project (CMIP5) assessment.';
-      break;
-    case 'Diversity Indices':
-      text = diversityMessages[selectedDiversity];
-      break;
-    case 'Plankton Groups':
-      text = planktonMessages[selectedPlankton];
-      break;
-    case 'RCP Scenarios':
-      text = rcpMessages[selectedRCP];
-      break;
-    case 'Earth System Models':
-      text = modelMessages[selectedModel];
-      break;
-    default:
-      text = 'No information available';
-  }
-
-  setModalText(text);
-  setIsOpen(true);
-};
+    let text = '';
+    // Parameter-level help (ends with ' general')
+    if (category.endsWith(' general')) {
+      const key = category.replace(/ general$/, '');
+      switch (key) {
+        case 'Diversity Indices':
+          text = 'Different diversity indices based on the Habitat Suitability Index.';
+          break;
+        case 'Plankton Groups':
+          text = 'Marine taxonomic groupings important for global ecosystem services provided by our oceans.';
+          break;
+        case 'RCP Scenarios':
+          text = 'Representative Concentration Pathways describe greenhouse gas trajectories and radiative forcing scenarios.';
+          break;
+        case 'Earth System Models':
+          text = 'Earth System Models are coupled climate-biogeochemical models used for projecting environmental changes.';
+          break;
+        default:
+          text = 'No information available';
+      }
+    } else {
+      // Value-level help: look up in corresponding message maps
+      if (diversityMessages[category]) text = diversityMessages[category];
+      else if (planktonMessages[category]) text = planktonMessages[category];
+      else if (rcpMessages[category]) text = rcpMessages[category];
+      else if (modelMessages[category]) text = modelMessages[category];
+      else text = 'No information available';
+    }
+    setModalText(text);
+    setIsOpen(true);
+  };
 
   const closeModal = () => {
     setIsOpen(false);
   };
 
-  // Update the map instantly, update the globe and line plot after debounce
-  const handleSliderChange = (value) => {
-    setYear(value); // Update the map immediately
-    debouncedUpdateGlobe(value); // Trigger globe update after debounce
-    debouncedUpdateLinePlot(value); // Trigger line plot update after debounce
-  };
 
-  const handlePointClick = (x, y) => {
-    const point = { x, y };
-    selectedPointRef.current = { ...point, year };
-    setSelectedPoint({ ...point, year });
-  };
-
-  const [selectedPoint, setSelectedPoint] = useState({
-    x: null,
-    y: null,
-    year,
-  });
 
   return (
     <div className="App">
       {/* Header */}
       <header>
         <div className="header-content">
-          <h1>MAPMAKER</h1>
+          <h1>Marine Plankton diversity bioindicator scenarios for policy <b>MAKER</b>s, <b>MAPMAKER</b></h1>
         </div>
       </header>
 
-     {/* Sentence with Inline Dropdowns */}
-<div className="dropdown-sentence">
-  Show&nbsp;
-  <select
-    value={selectedDiversity}
-    onChange={(e) => setSelectedDiversity(e.target.value)}
-    className="inline-dropdown"
-  >
-    {diversityIndices.map((item) => (
-      <option key={item} value={item}>{item}</option>
-    ))}
-  </select>
-  &nbsp;and&nbsp;
-  <select
-    value={selectedPlankton}
-    onChange={(e) => setSelectedPlankton(e.target.value)}
-    className="inline-dropdown"
-  >
-    {filteredPlanktonGroups.map((item) => (
-      <option key={item} value={item}>{item}</option>
-    ))}
-  </select>
-  &nbsp;predicted by&nbsp;
-  <select
-    value={selectedRCP}
-    onChange={(e) => setSelectedRCP(e.target.value)}
-    className="inline-dropdown"
-  >
-    {filteredRcpScenarios.map((item) => (
-      <option key={item} value={item}>{item}</option>
-    ))}
-  </select>
-  &nbsp;on&nbsp;
-  <select
-    value={selectedModel}
-    onChange={(e) => setSelectedModel(e.target.value)}
-    className="inline-dropdown"
-  >
-    {filteredEarthModels.map((item) => (
-      <option key={item} value={item}>{item}</option>
-    ))}
-  </select>
-</div>
+      {/* Top summary panels removed */}
 
-
-      {/* Five Buttons Below */}
-      <div className="button-row">
-      <button
-        className="filter-button"
-        style={{ backgroundColor: '#4682B4' }} // Light Blue
-        onClick={() => openModal('Diversity Indices')}>
-        {selectedDiversity}
-      </button>
-      <button
-    className="filter-button"
-    style={{ backgroundColor: '#388E3C' }} // Bright Green
-    onClick={() => openModal('Plankton Groups')}>
-    {selectedPlankton}
-  </button>
-  <button
-    className="filter-button"
-    style={{ backgroundColor: '#F57C00' }} // Orange
-    onClick={() => openModal('RCP Scenarios')}>
-    {selectedRCP}
-  </button>
-  <button
-    className="filter-button"
-    style={{ backgroundColor: '#D84315' }} // Red
-    onClick={() => openModal('Earth System Models')}>
-    {selectedModel}
-  </button>
-  {/* <button
-    className="filter-button"
-    style={{ backgroundColor: '#A9A9A9' }} // Grey
-    onClick={() => openModal("General Info")}>
-    More Info
-  </button> */}
-      </div>
+      {/* Top filter buttons removed */}
 
       {/* Modal Popup */}
       <Modal isOpen={modalIsOpen} onRequestClose={closeModal} contentLabel="Information Modal">
         <h2>Explanation</h2>
         <p>{modalText}</p>
-        <div className="center-button">
-          <button onClick={closeModal}>Close</button>
-      </div>
+        <button onClick={closeModal}>Close</button>
       </Modal>
-      {/* Year Slider */}
-      <div className="slider-container">
-        <Slider
-          min={2012}
-          max={2100}
-          value={year}
-          onChange={handleSliderChange}
-          className="slider"
-        />
-        <div className="slider-labels">
-          <div className="slider-label" style={{ left: `${((year - 2012) / (2100 - 2012)) * 100}%` }}>
-            {year}
+
+      {/* Dual Data Panels */}
+      <div className="dual-display" style={{ display: 'flex', gap: '16px', marginTop: '16px' }}>
+        {/* Panel 1 */}
+        <div className="display-panel" style={{ flex: 1 }}>
+          <div className="panel-controls" style={{ marginBottom: '8px', color: 'white' }}>
+            {/* Data type selection */}
+            <select id="source1" value={panel1Source} onChange={e => setPanel1Source(e.target.value)} className="dropdown">
+              <option value="plankton">Plankton</option>
+              <option value="environmental">Environmental</option>
+            </select>
+            {/* View selection via radio buttons */}
+            <div className="radio-group">
+              <label><input type="radio" name="view1" value="map" checked={panel1View==='map'} onChange={e=>setPanel1View(e.target.value)} />Map</label>
+              <label><input type="radio" name="view1" value="globe" checked={panel1View==='globe'} onChange={e=>setPanel1View(e.target.value)} />Globe</label>
+            </div>
+            {panel1Source === 'plankton' && (
+              <>
+                <div className="input-with-icon">
+                  <label htmlFor="diversity1">Index:</label>
+                  <button className="icon-button" onClick={() => openModal('Diversity Indices general')}>?</button>
+                  <select id="diversity1" value={panel1Diversity} onChange={e => setPanel1Diversity(e.target.value)} className="dropdown">
+                    {diversityIndices.map(item => <option key={item} value={item}>{item}</option>)}
+                  </select>
+                  <button className="icon-button" onClick={() => openModal(panel1Diversity)}>?</button>
+                </div>
+                <div className="input-with-icon">
+                  <label htmlFor="group1">Group:</label>
+                  <button className="icon-button" onClick={() => openModal('Plankton Groups general')}>?</button>
+                  <select id="group1" value={panel1Group} onChange={e => setPanel1Group(e.target.value)} className="dropdown">
+                    {filteredGroupsPanel1.map(item => <option key={item} value={item}>{item}</option>)}
+                  </select>
+                  <button className="icon-button" onClick={() => openModal(panel1Group)}>?</button>
+                </div>
+                <div className="input-with-icon">
+                  <label htmlFor="rcp1">Scenario:</label>
+                  <button className="icon-button" onClick={() => openModal('RCP Scenarios general')}>?</button>
+                  <select id="rcp1" value={panel1RCP} onChange={e => setPanel1RCP(e.target.value)} className="dropdown">
+                    {filteredRcpScenariosPanel1.map(item => <option key={item} value={item}>{item}</option>)}
+                  </select>
+                  <button className="icon-button" onClick={() => openModal(panel1RCP)}>?</button>
+                </div>
+                <div className="input-with-icon">
+                  <label htmlFor="model1">Model:</label>
+                  <button className="icon-button" onClick={() => openModal('Earth System Models general')}>?</button>
+                  <select id="model1" value={panel1Model} onChange={e => setPanel1Model(e.target.value)} className="dropdown">
+                    {filteredModelsPanel1.map(item => <option key={item} value={item}>{item}</option>)}
+                  </select>
+                  <button className="icon-button" onClick={() => openModal(panel1Model)}>?</button>
+                </div>
+              </>
+            )}
+            {panel1Source === 'environmental' && (
+              <>
+                <label htmlFor="env1" style={{ margin: '0 4px' }}>Metric:</label>
+                <select id="env1" value={panel1EnvParam} onChange={e => setPanel1EnvParam(e.target.value)} className="dropdown">
+                  {environmentalParameters.map(param => (
+                    <option key={param} value={param}>{param}</option>
+                  ))}
+                </select>
+              </>
+            )}
+            {/* View selection via radio buttons */}
+            <div className="radio-group">
+              <label>
+                <input
+                  type="radio"
+                  name="view1"
+                  value="map"
+                  checked={panel1View === 'map'}
+                  onChange={e => setPanel1View(e.target.value)}
+                />
+                Map
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="view1"
+                  value="globe"
+                  checked={panel1View === 'globe'}
+                  onChange={e => setPanel1View(e.target.value)}
+                />
+                Globe
+              </label>
+            </div>
+        </div>
+        {/* Year Slider for Panel 1 */}
+        <div className="slider-container" style={{ marginBottom: '12px' }}>
+          <Slider
+            min={2012}
+            max={2100}
+            value={panel1Year}
+            onChange={value => { setPanel1Year(value); debouncedUpdatePanel1(value); }}
+            className="slider"
+            handleStyle={[{ borderColor: '#1890ff', borderWidth: 2 }, { borderColor: '#1890ff', borderWidth: 2 }]}
+          />
+          <div className="slider-labels">
+            <div className="slider-label" style={{ left: `${((panel1Year - 2012) / (2100 - 2012)) * 100}%` }}>
+              {panel1Year}
+            </div>
           </div>
         </div>
-      </div>
-      {/* Flat Map */}
-      <div className="map-display" >
-        <MapDisplay
-        year={year}
-        index={selectedDiversity}
-        group={selectedPlankton}
-        scenario={selectedRCP}
-        model={selectedModel}
-        view="flat" onPointClick={handlePointClick} />
-      </div>
-
-     {/* Globe and Line Plot (side-by-side) */}
-      <div className="visual-container">
-        <div className="globe-container" style={{ flex: 1 }}>
-        {/* Environmental Data Dropdown on top of the globe */}
-        <div className="globe-dropdown-container">
-          <label htmlFor="environmental-select">Environmental Data:</label>
-          <select
-            id="environmental-select"
-            value={selectedEnvParam}
-            onChange={(e) => setSelectedEnvParam(e.target.value)}
-            className="dropdown"
-          >
-            {environmentalParameters.map((param) => (
-              <option key={param} value={param}>
-                {param}
-              </option>
-            ))}
-          </select>
+          {/* Render Panel 1 content based on selection */}
+          {panel1Source === 'plankton' && panel1View === 'map' && (
+            <MapDisplay
+              year={panel1Year}
+              index={panel1Diversity}
+              group={panel1Group}
+              scenario={panel1RCP}
+              model={panel1Model}
+              sourceType="plankton"
+              onPointClick={handlePointClick}
+            />
+          )}
+          {panel1Source === 'plankton' && panel1View === 'globe' && (
+            <GlobeDisplay
+              year={panel1DebouncedYear}
+              index={panel1Diversity}
+              group={panel1Group}
+              scenario={panel1RCP}
+              model={panel1Model}
+              sourceType="plankton"
+            onPointClick={handlePointClick}
+            />
+          )}
+          {panel1Source === 'environmental' && panel1View === 'map' && (
+              <MapDisplay
+              year={panel1Year}
+              index={panel1EnvParam}
+              scenario={panel1RCP}
+              model={panel1Model}
+              sourceType="environmental"
+              onPointClick={handlePointClick}
+            />
+          )}
+          {panel1Source === 'environmental' && panel1View === 'globe' && (
+              <GlobeDisplay
+              year={panel1DebouncedYear}
+              index={panel1EnvParam}
+              scenario={panel1RCP}
+              model={panel1Model}
+              sourceType="environmental"
+            onPointClick={handlePointClick}
+            />
+          )}
         </div>
+        {/* Panel 2 */}
+        <div className="display-panel" style={{ flex: 1 }}>
+          <div className="panel-controls" style={{ marginBottom: '8px', color: 'white' }}>
+            {/* Data type selection */}
+            <select id="source2" value={panel2Source} onChange={e => setPanel2Source(e.target.value)} className="dropdown">
+              <option value="plankton">Plankton</option>
+              <option value="environmental">Environmental</option>
+            </select>
+            {/* View selection via radio buttons */}
+            <div className="radio-group">
+              <label><input type="radio" name="view2" value="map" checked={panel2View==='map'} onChange={e=>setPanel2View(e.target.value)} />Map</label>
+              <label><input type="radio" name="view2" value="globe" checked={panel2View==='globe'} onChange={e=>setPanel2View(e.target.value)} />Globe</label>
+            </div>
+            {panel2Source === 'plankton' && (
+              <>
+                <div className="input-with-icon">
+                  <label htmlFor="diversity2">Index:</label>
+                  <button className="icon-button" onClick={() => openModal('Diversity Indices general')}>?</button>
+                  <select id="diversity2" value={panel2Diversity} onChange={e => setPanel2Diversity(e.target.value)} className="dropdown">
+                    {diversityIndices.map(item => <option key={item} value={item}>{item}</option>)}
+                  </select>
+                  <button className="icon-button" onClick={() => openModal(panel2Diversity)}>?</button>
+                </div>
+                <div className="input-with-icon">
+                  <label htmlFor="group2">Group:</label>
+                  <button className="icon-button" onClick={() => openModal('Plankton Groups general')}>?</button>
+                  <select id="group2" value={panel2Group} onChange={e => setPanel2Group(e.target.value)} className="dropdown">
+                    {filteredGroupsPanel2.map(item => <option key={item} value={item}>{item}</option>)}
+                  </select>
+                  <button className="icon-button" onClick={() => openModal(panel2Group)}>?</button>
+                </div>
+                <div className="input-with-icon">
+                  <label htmlFor="rcp2">Scenario:</label>
+                  <button className="icon-button" onClick={() => openModal('RCP Scenarios general')}>?</button>
+                  <select id="rcp2" value={panel2RCP} onChange={e => setPanel2RCP(e.target.value)} className="dropdown">
+                    {filteredRcpScenariosPanel2.map(item => <option key={item} value={item}>{item}</option>)}
+                  </select>
+                  <button className="icon-button" onClick={() => openModal(panel2RCP)}>?</button>
+                </div>
+                <div className="input-with-icon">
+                  <label htmlFor="model2">Model:</label>
+                  <button className="icon-button" onClick={() => openModal('Earth System Models general')}>?</button>
+                  <select id="model2" value={panel2Model} onChange={e => setPanel2Model(e.target.value)} className="dropdown">
+                    {filteredModelsPanel2.map(item => <option key={item} value={item}>{item}</option>)}
+                  </select>
+                  <button className="icon-button" onClick={() => openModal(panel2Model)}>?</button>
+                </div>
+              </>
+            )}
+            {panel2Source === 'environmental' && (
+              <>
+                <label htmlFor="env2" style={{ margin: '0 4px' }}>Metric:</label>
+                <select id="env2" value={panel2EnvParam} onChange={e => setPanel2EnvParam(e.target.value)} className="dropdown">
+                  {environmentalParameters.map(param => (
+                    <option key={param} value={param}>{param}</option>
+                  ))}
+                </select>
+              </>
+            )}
+        </div>
+        {/* Year Slider for Panel 2 */}
+        <div className="slider-container" style={{ marginBottom: '12px' }}>
+          <Slider
+            min={2012}
+            max={2100}
+            value={panel2Year}
+            onChange={value => { setPanel2Year(value); debouncedUpdatePanel2(value); }}
+            className="slider"
+            handleStyle={[{ borderColor: '#1890ff', borderWidth: 2 }, { borderColor: '#1890ff', borderWidth: 2 }]}
+          />
+          <div className="slider-labels">
+            <div className="slider-label" style={{ left: `${((panel2Year - 2012) / (2100 - 2012)) * 100}%` }}>
+              {panel2Year}
+            </div>
+          </div>
+        </div>
+          {/* Render Panel 2 content based on selection */}
+          {panel2Source === 'plankton' && panel2View === 'map' && (
+            <MapDisplay
+              year={panel2Year}
+              index={panel2Diversity}
+              group={panel2Group}
+              scenario={panel2RCP}
+              model={panel2Model}
+              sourceType="plankton"
+              onPointClick={handlePointClick}
+            />
+          )}
+          {panel2Source === 'plankton' && panel2View === 'globe' && (
+            <GlobeDisplay
+              year={panel2DebouncedYear}
+              index={panel2Diversity}
+              group={panel2Group}
+              scenario={panel2RCP}
+              model={panel2Model}
+              sourceType="plankton"
+            onPointClick={handlePointClick}
+            />
+          )}
+          {panel2Source === 'environmental' && panel2View === 'map' && (
+            <MapDisplay
+              year={panel2Year}
+              index={panel2EnvParam}
+              scenario={panel2RCP}
+              model={panel2Model}
+              sourceType="environmental"
+              onPointClick={handlePointClick}
+            />
+          )}
+          {panel2Source === 'environmental' && panel2View === 'globe' && (
+            <GlobeDisplay
+              year={panel2DebouncedYear}
+              index={panel2EnvParam}
+              scenario={panel2RCP}
+              model={panel2Model}
+              sourceType="environmental"
+            onPointClick={handlePointClick}
+            />
+          )}
+        </div>
+      </div> {/* dual-display panels */}
 
-        {/* Render the globe using debounced year */}
-        <GlobeDisplay
-          year={debouncedYear}
-          index={selectedEnvParam} // Pass the environmental parameter to GlobeDisplay
-          // index={selectedDiversity}
-          // group={selectedPlankton}
-          scenario={selectedRCP}
-          model={selectedModel}
-          view="left"
-          onPointClick={handlePointClick}
+      {/* Combined line chart (full width) for both panel metrics at clicked point */}
+      <div className="combined-lineplot" style={{ width: '100%', marginTop: '24px' }}>
+        <CombinedLinePlot
+          point={selectedPoint}
+          leftSettings={{
+            source: panel1Source,
+            index: panel1Diversity,
+            group: panel1Group,
+            envParam: panel1EnvParam,
+            scenario: panel1RCP,
+            model: panel1Model,
+          }}
+          rightSettings={{
+            source: panel2Source,
+            index: panel2Diversity,
+            group: panel2Group,
+            envParam: panel2EnvParam,
+            scenario: panel2RCP,
+            model: panel2Model,
+          }}
+          startYear={2012}
+          endYear={2100}
         />
       </div>
 
-      <div className="line-plot-container" style={{ flex: 2 }}>
-        {selectedPoint.x !== null && selectedPoint.y !== null && (
-          <LinePlot
-            selectedPoint={selectedPoint}
-            startYear={selectedPoint.year}
-            endYear={endYear}
-            index={selectedDiversity}
-            group={selectedPlankton}
-            scenario={selectedRCP}
-            model={selectedModel}
-            envParam={selectedEnvParam}
-          />
-        )}
-      </div>
-    </div>
-
-	<Footer />
+      <Footer />
 
     </div>
   );

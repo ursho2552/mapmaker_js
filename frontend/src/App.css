@@ -1,38 +1,23 @@
-/* Base Design Tokens */
-:root {
-  --md-surface: #1c1b1f;
-  --md-on-surface: #ffffff;
-  --md-primary: #6750a4;
-  --md-on-primary: #ffffff;
-  --md-secondary: #625b71;
-  --md-on-secondary: #ffffff;
-  --md-border-radius: 12px;
-  --md-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  --md-transition: 0.3s ease-in-out;
-}
-
 /* General Styling */
 body, html {
   margin: 0;
   padding: 0;
   height: 100%;
-  background-color: var(--md-surface);
-  font-family: 'Roboto', sans-serif;
-  color: var(--md-on-surface);
+  background-color: #282c34; /* Set the background color */
 }
 
 .App {
   text-align: center;
+  background-color: #282c34; /* Make sure the background extends across the app */
   min-height: 100vh;
-  background-color: var(--md-surface);
+  color: white;
 }
 
 header {
-  padding: 16px;
-  background-color: var(--md-surface);
-  color: var(--md-on-surface);
-  border-bottom: 1px solid #3c3b40;
-  box-shadow: var(--md-shadow);
+  padding: 8px;
+  background-color: #282c34; /* Same background as the rest */
+  color: white;
+  border-bottom: 1px solid #ccc;
 }
 
 .header-content {
@@ -42,198 +27,222 @@ header {
 }
 
 h1 {
-  margin: 0 0 8px 0;
-  font-size: 32px;
-  font-weight: 600;
+  margin: 0 0 4px 0;
+  font-size: 28px;
 }
 
-/* Columns Layout */
+/* Four Columns Layout */
 .four-columns {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   margin: 20px 0;
-  padding: 0 16px;
+  padding: 0 10px;
 }
 
 .column {
-  display: flex;
-  flex-direction: column;
-  margin: 0 12px;
-  align-items: center;
-  height: 100%;
-  justify-content: center;
+  flex: 1;
+  margin: 0 10px;
+  text-align: left;
 }
 
 .column h3 {
-  font-size: 20px;
-  color: var(--md-on-surface);
-  font-weight: 500;
+  font-size: 18px;
+  color: #fff;
 }
 
-/* ====== Footer Styles ====== */
-.footer {
-  padding: 20px;
-  text-align: left;
+.dropdown {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  margin-top: 10px;
+  background-color: #e9ecef;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.info-button {
+  background-color: #1890ff;
   color: white;
-  margin-top: 20px;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  width: 100%;
+  font-size: 16px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
 }
 
-.footer-logo-container {
-  display: flex;
-  justify-content: left;
-  align-items: center;
-  gap: 20px;
-  margin-bottom: 20px;
+.info-button:hover {
+  background-color: #0056b3;
 }
-
-.footer-logo {
-  width: 150px;
-  height: 60px;
-}
-
-.footer-text-container {
-  margin-top: 20px;
-  text-align: left;
-  color: white;
-  margin-left: auto;
-  margin-right: auto;
-  font-size: 14px;
-}
-
-.footer-text-button {
+/* Inline icon-style help buttons */
+.icon-button {
   background: none;
   border: none;
   color: #1890ff;
-  text-decoration: underline;
-  cursor: pointer;
-  padding: 0;
-}
-
-/* Inputs */
-.dropdown {
-  width: 100%;
-  padding: 12px;
-  font-size: 16px;
-  margin-top: 12px;
-  background-color: #2c2b30;
-  border: 1px solid #4a4a4f;
-  border-radius: var(--md-border-radius);
-  color: var(--md-on-surface);
-}
-
-/* Buttons */
-.info-button, .filter-button, .ReactModal__Content button {
-  background-color: var(--md-primary);
-  color: var(--md-on-primary);
-  border: none;
-  padding: 12px 20px;
   cursor: pointer;
   font-size: 16px;
-  font-weight: 500;
-  border-radius: var(--md-border-radius);
-  box-shadow: var(--md-shadow);
-  transition: background-color var(--md-transition);
-  margin: 5px;
+  padding: 0 6px;
+  margin-left: 4px;
 }
-
-.info-button:hover,
-.filter-button:hover,
-.ReactModal__Content button:hover {
-  background-color: #7f67be;
-}
-
-.center-button {
+.input-with-icon {
   display: flex;
-  justify-content: center;
+  align-items: center;
+  margin-bottom: 12px;
+}
+/* Reset nested rule */
+.icon-button:hover {
+  color: #0056b3;
 }
 
-/* Button Row */
+/* Radio button group styling under panel controls */
+.radio-group {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+.radio-group label {
+  color: white;
+  font-size: 16px;
+}
+.radio-group input[type="radio"] {
+  margin-right: 4px;
+  cursor: pointer;
+}
+/* Ensure map/globe containers align by making panel-controls uniform height */
+.panel-controls {
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+.icon-button:hover {
+  color: #0056b3;
+}
+
+/* Button Row Below Columns */
 .button-row {
   display: flex;
   justify-content: center;
-  margin: 24px 0;
+  margin: 20px 0;
 }
 
-/* Modal */
+.filter-button {
+  background-color: #28a745;
+  color: white;
+  padding: 12px 20px;
+  margin: 0 10px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+  font-size: 16px;
+}
+
+.filter-button:hover {
+  background-color: #218838;
+}
+
+/* Modal Styling */
 .ReactModal__Overlay {
-  background-color: rgba(0, 0, 0, 0.6);
-  z-index: 1000;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000; /* High value to ensure modal stays on top */
 }
 
 .ReactModal__Content {
-  background: #2c2b30;
-  border-radius: var(--md-border-radius);
-  max-width: 50%;
-  max-height: 50%;
-  margin: auto;
-  width: fit-content;
-  height: fit-content;
-  overflow-y: auto;
-  color: black;
-  box-shadow: var(--md-shadow);
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  width: 50%;
+  margin: 10% auto;
+  z-index: 1001; /* Modal content is also high */
 }
 
 .ReactModal__Content h2 {
+  margin: 0 0 20px 0;
   font-size: 24px;
 }
 
 .ReactModal__Content p {
   font-size: 16px;
+  margin-bottom: 20px;
 }
 
-/* Map & Containers */
+.ReactModal__Content button {
+  background-color: #1890ff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.ReactModal__Content button:hover {
+  background-color: #0056b3;
+}
+
 .map-container {
-  width: 100%;
-  background-color: var(--md-surface);
+  width: 100%; /* Full width of the window */
   display: flex;
   justify-content: center;
   align-items: center;
+  background-color: #282c34; /* Ensure the map container has the same background color */
+  margin: 0; /* Remove margin around the map */
+  padding: 0;
+  height: 500px; /* Adjust height to fit the design */
 }
 
+.map-display {
+  width: 100%; /* Take the full width of the container */
+  height: 100%; /* Take the full height */
+  margin: 0 auto;
+  flex: 2;
+}
+
+/* Ensure the slider is centered */
 .slider-container {
   position: relative;
-  max-width: 800px;
-  margin: 24px auto;
-  z-index: 500;
+  width: 100%; /* Full width */
+  max-width: 800px; /* Optional: Limit max width */
+  margin: 20px auto; /* Center the slider */
+  padding: 0;
+  z-index: 500; /* Lower than modal */
 }
 
 .slider-labels {
-  position: relative;
+  position: absolute;
   top: 50%;
   width: 100%;
+  transform: translateY(-50%);
   display: flex;
   justify-content: space-between;
 }
 
 .slider-label {
   font-size: 14px;
-  color: var(--md-on-surface);
+  color: white;
+  position: absolute;
 }
 
-/* Visual Layout */
+/* Visualizations Container */
 .visual-container {
   display: flex;
   justify-content: space-between;
-  margin: 24px 0;
+  margin: 20px 0;
   padding: 0 20px;
 }
 
-/* Globe and Colorbar */
+/* General Styling */
 .globe-display-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: var(--md-surface);
-  position: relative;
+  padding: 0px;
+  background-color: #282c34; /* Set the background color */
 }
 
-.globe-dropdown-container {
-  padding: 10px;
-}
-
+/* Wrapper for Globe and Colorbar */
 .globe-colorbar-wrapper {
   display: flex;
   justify-content: space-between;
@@ -241,55 +250,89 @@ h1 {
   gap: 20px;
 }
 
+/* Globe Container Styling */
+.globe-container {
+  position: relative; /* Ensures the absolute positioning of the dropdown is relative to this container */
+}
+
+.globe-dropdown-container {
+  position: absolute;
+  top: 10px; /* Adjust this value to position the dropdown higher or lower */
+  left: 50%;
+  transform: translateX(-50%); /* Center the dropdown horizontally */
+  z-index: 10; /* Ensure the dropdown stays above the globe */
+  background-color: #282c34; /* Match background color */
+  padding: 5px;
+  border-radius: 5px;
+}
+
+.dropdown {
+  margin-top: 5px;
+  padding: 5px;
+}
+
+/* Colorbar Container */
 .colorbar-container {
   display: flex;
-  align-items: center;
-  gap: 10px;
+  align-items: center; /* Align items horizontally */
+  gap: 10px; /* Space between the colorbar and labels */
 }
 
 .colorbar {
   width: 20px;
   height: 300px;
-  border: 1px solid #444;
-  border-radius: 4px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  position: relative;
 }
 
 .colorbar-labels {
   display: flex;
-  flex-direction: column-reverse;
+  flex-direction: column-reverse; /* Reverse the order of labels */
   justify-content: space-between;
-  height: 300px;
+  height: 300px; /* Match the height of the colorbar */
 }
 
 .colorbar-label {
-  color: var(--md-on-surface);
+  color: white;
   font-size: 12px;
-  margin-left: 5px;
+  text-align: left; /* Align text to the left */
+  margin-left: 5px; /* Add space between the label and the colorbar */
 }
 
 .colorbar-title {
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
+  writing-mode: vertical-rl; /* Rotates the label vertically */
+  transform: rotate(180deg); /* Ensures the text is upright */
+  text-align: center;
   font-size: 14px;
-  color: var(--md-on-surface);
-  margin-top: 5px;
+  color: white;
+  margin-top: 5px; /* Adjust to your desired spacing */
 }
 
 /* Line Plot Container */
 .line-plot-container {
   width: 65%;
   flex: 2;
-  background-color: #2c2b30;
-  border-radius: var(--md-border-radius);
+  background-color: #282c34; /* Set the background color */
+  border-radius: 0px;
   padding: 30px;
-  box-shadow: var(--md-shadow);
+  box-shadow: 0 0 0px rgba(0, 0, 0, 0.1);
 }
 
-/* Responsive Breakpoints */
+/* Responsive Design */
+/* Adjustments for screens up to 1024px wide */
 @media (max-width: 1024px) {
-  .four-columns, .visual-container {
+  .four-columns {
     flex-direction: column;
-    padding: 0 10px;
+    margin: 20px 0;
+  }
+
+  .column {
+    margin-bottom: 20px;
+  }
+
+  .visual-container {
+    flex-direction: column;
   }
 
   .line-plot-container {
@@ -297,9 +340,24 @@ h1 {
   }
 }
 
+/* Adjustments for screens up to 768px wide */
 @media (max-width: 768px) {
   .slider-container {
     width: 80%;
+  }
+
+  .filter-button {
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  .map-container {
+    height: 300px; /* Reduce height for smaller screens */
+  }
+
+  .line-plot-container {
+    width: 100%;
+    padding: 20px;
   }
 
   .button-row {
@@ -312,41 +370,46 @@ h1 {
     width: 80%;
   }
 
-  .map-container {
-    height: 300px;
+  .four-columns {
+    padding: 0 10px;
+  }
+
+  .column {
+    margin: 10px 0;
+  }
+
+  .visual-container {
+    padding: 0 10px;
   }
 }
 
+/* Adjustments for screens up to 480px wide */
 @media (max-width: 480px) {
   h1 {
     font-size: 24px;
   }
 
-  .dropdown,
-  .info-button,
-  .filter-button {
+  .header-content {
+    padding: 0 10px;
+  }
+
+  .dropdown {
     font-size: 14px;
-    padding: 10px;
+    padding: 8px;
+  }
+
+  .info-button {
+    padding: 8px;
+    font-size: 14px;
+  }
+
+  .filter-button {
+    padding: 8px;
+    font-size: 14px;
   }
 
   .line-plot-container {
     padding: 15px;
   }
-
-  .dropdown-sentence {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    margin: 20px auto;
-    font-size: 1.1rem;
-    justify-content: center;
-    gap: 4px;
-  }
-  
-  .inline-dropdown {
-    font-size: 1rem;
-    padding: 4px 8px;
-    margin: 0 2px;
-  }
-  
 }
+

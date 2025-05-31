@@ -3,7 +3,7 @@ import Globe from 'react-globe.gl';
 import * as d3 from 'd3-scale-chromatic';
 import { scaleSequential } from 'd3-scale';
 
-const GlobeDisplay = ({ year, index, scenario, model, onPointClick }) => {
+const GlobeDisplay = ({ year, index, group, scenario, model, sourceType = 'environmental', onPointClick }) => {
   const [pointsData, setPointsData] = useState([]);
   const [error, setError] = useState(null);
   const [minValue, setMinValue] = useState(0);
@@ -34,9 +34,19 @@ const GlobeDisplay = ({ year, index, scenario, model, onPointClick }) => {
 
     console.log('Fetching globe data for year:', year);
     try {
-      const response = await fetch(
-        `/api/globe-data?year=${year}&index=${index}&scenario=${scenario}&model=${model}`
-      );
+      // Build URL based on sourceType: 'plankton' or 'environmental'
+      const isPlankton = sourceType === 'plankton';
+      const params = new URLSearchParams({
+        source: isPlankton ? 'plankton' : 'env',
+        year: year.toString(),
+        index,
+        scenario,
+        model
+      });
+      if (isPlankton) params.append('group', group);
+      const url = `/api/globe-data?${params.toString()}`;
+      console.log('Fetching globe data from', url);
+      const response = await fetch(url);
       if (!response.ok) throw new Error('Network response was not ok');
 
       const data = await response.json();
@@ -86,8 +96,9 @@ const GlobeDisplay = ({ year, index, scenario, model, onPointClick }) => {
   };
 
   useEffect(() => {
-    fetchData([year, index, scenario, model]);
-  }, [year, index, scenario, model]);
+    // Reload globe data when year, data params, or sourceType change
+    fetchData(year);
+  }, [year, index, group, scenario, model, sourceType]);
 
   // Viridis color scale function
   const getColorFromViridis = useMemo(() => {
