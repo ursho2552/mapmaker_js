@@ -27,14 +27,21 @@ const GlobeDisplay = ({
 
   const globeRef = useRef();
 
-  // Mapping for colorbar label
-  const colorbarLabelMapping = {
+  // Mapping for legend title (index to label + unit)
+  const legendLabelMapping = {
+    Biomes: 'Biome label',
+    'Species Richness': 'Species Richness [%]',
+    'Hotspots of Change in Diversity': 'Diversity changes [%]',
+    'Habitat Suitability Index (HSI)': 'HSI [%]',
+    'Change in HSI': 'ΔHSI [%]',
+    'Species Turnover': 'Jaccard Index [-]',
+    // Environmental parameters units
     Temperature: '°C',
-    Oxygen: 'mg/L',
     'Change in Temperature': 'Δ°C',
+    Oxygen: 'mg/L',
     'Chlorophyll-a Concentration': 'log(mg/m³)',
   };
-  const colorbarLabel = colorbarLabelMapping[index] || '';
+  const legendLabel = legendLabelMapping[index] || index;
 
   // Resize listener: measure container’s width/height
   useEffect(() => {
@@ -157,12 +164,14 @@ const GlobeDisplay = ({
     return () => cancelAnimationFrame(frame);
   }, [isHovered]);
 
-  // Generate a simple 4‐color gradient for a CSS colorbar
+  // Generate a simple 4-color gradient for a CSS colorbar
   const generateColorbarGradient = () => {
     const steps = 4;
+    const delta = maxValue - minValue;
     const stops = Array.from({ length: steps }, (_, i) => {
-      const v = i / (steps - 1);
-      return getColorFromViridis(minValue + v * (maxValue - minValue), minValue, maxValue);
+      // Handle case where all values are equal
+      const val = delta === 0 ? minValue : minValue + (i / (steps - 1)) * delta;
+      return getColorFromViridis(val, minValue, maxValue);
     });
     return `linear-gradient(to top, ${stops.join(', ')})`;
   };
@@ -209,53 +218,69 @@ const GlobeDisplay = ({
         />
       </div>
 
-      {/* Colorbar on the side */}
+      {/* Colorbar legend on the side */}
       <div
         style={{
           position: 'absolute',
           right: 8,
           top: 8,
           bottom: 8,
-          width: 20,
+          width: 60,
           display: 'flex',
           flexDirection: 'column',
-          justifyContent: 'space-between',
+          alignItems: 'center',
+          zIndex: 2,
+          pointerEvents: 'none',
         }}
       >
-        {/* Gradient stripe */}
+        {/* Gradient + ticks container */}
         <div
           style={{
             flex: 1,
-            background: generateColorbarGradient(),
-            borderRadius: 4,
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'stretch',
             marginBottom: 8,
           }}
-        />
-        {/* Numeric labels */}
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            height: '100%',
-          }}
         >
-          {labels.slice().reverse().map((lbl, i) => (
-            <div key={i} style={{ color: 'white', fontSize: '0.8rem' }}>
-              {lbl}
-            </div>
-          ))}
+          {/* Gradient stripe */}
+          <div
+            style={{
+              width: 20,
+              borderRadius: 4,
+              backgroundImage: generateColorbarGradient(),
+              backgroundRepeat: 'no-repeat',
+              backgroundSize: '100% 100%',
+            }}
+          />
+          {/* Numeric labels */}
+          <div
+            style={{
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              marginLeft: 8,
+            }}
+          >
+            {labels.slice().reverse().map((lbl, i) => (
+              <div key={i} style={{ color: 'white', fontSize: '0.8rem' }}>
+                {lbl}
+              </div>
+            ))}
+          </div>
         </div>
-        {/* Title below */}
+        {/* Legend title */}
         <div
           style={{
-            textAlign: 'center',
             color: 'white',
             fontSize: '0.8rem',
-            marginTop: 4,
+            writingMode: 'vertical-rl',
+            textOrientation: 'mixed',
+            whiteSpace: 'nowrap',
           }}
         >
-          {colorbarLabel}
+          {legendLabel}
         </div>
       </div>
     </div>

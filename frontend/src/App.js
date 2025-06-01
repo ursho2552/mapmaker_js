@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import GlobeDisplay     from './components/GlobeDisplay';
 import MapDisplay       from './components/MapDisplay';
@@ -61,7 +60,58 @@ const environmentalParameters = [
 
 /* -----------------------  INFO TOOLTIP CONTENT ---------------------- */
 const infoMessages = {
-  // (same content as before) …
+  // General descriptions
+  'Diversity Indices general':
+    'Select from several indices that capture different aspects of marine plankton biodiversity.',
+  'Plankton Groups general':
+    'Choose a plankton group category to filter data by specific taxonomic or functional groups.',
+  'RCP Scenarios general':
+    'Representative Concentration Pathways (RCP) describe greenhouse gas concentration trajectories adopted by the IPCC.',
+  'Earth System Models general':
+    'Select Earth System Models used to simulate climate and biogeochemical processes.',
+  'Environmental Parameters general':
+    'Environmental parameters include variables like temperature, oxygen concentration, and chlorophyll-a.',
+
+  // Diversity indices
+  'Biomes': 'Biomes refer to distinct biological communities that have formed in response to a shared physical climate.',
+  'Species Richness': 'Species richness is the number of different species represented in an ecological community, landscape or region.',
+  'Hotspots of Change in Diversity': 'Hotspots of change in diversity indicate areas where significant changes in species diversity are occurring.',
+  'Habitat Suitability Index (HSI)': 'HSI is an index that represents the suitability of a given habitat for a species or group of species.',
+  'Change in HSI': 'Change in Habitat Suitability Index tracks how suitable a habitat is for species over time.',
+  'Species Turnover': 'Species turnover refers to the rate at which one species replaces another in a community over time.',
+
+  // Plankton groups
+  'Total Plankton': 'Total Plankton includes all microscopic organisms, including both phytoplankton and zooplankton.',
+  'Zooplankton': 'Zooplankton are small drifting animals in the water, including species such as jellyfish and crustaceans.',
+  'Phytoplankton': 'Phytoplankton are microscopic marine algae that form the foundation of the ocean food web.',
+  'Copepods': 'Copepods are a type of small crustacean found in nearly every freshwater and saltwater habitat.',
+  'Diatoms': 'Diatoms are a group of microalgae that are known for their unique silica-based cell walls.',
+  'Dinoflagellates': 'Dinoflagellates are a type of plankton responsible for phenomena like red tides and bioluminescence.',
+  'Coccolithophores': 'Coccolithophores are single-celled marine algae surrounded by a microscopic plating made of calcium carbonate.',
+
+  // RCP scenarios
+  'RCP 2.6 (Paris Agreement)': 'RCP 2.6 is a scenario that assumes global annual greenhouse gas emissions peak between 2010–2020 and decline substantially thereafter.',
+  'RCP 4.5': 'RCP 4.5 is an intermediate scenario where emissions peak around 2040, then decline.',
+  'RCP 8.5 (Business as Usual)': 'RCP 8.5 is a high greenhouse gas emission scenario often considered the "business as usual" pathway.',
+  'RCP 8.5 - RCP2.6': 'This difference shows the projected climate outcomes between the high-emission RCP 8.5 and the low-emission RCP 2.6 scenario.',
+  'RCP 8.5 - RCP 4.5': 'This scenario shows the differences between the high-emission RCP 8.5 and moderate-emission RCP 4.5 pathways.',
+  'RCP 4.5 - RCP 2.6': 'This scenario compares the moderate-emission RCP 4.5 and low-emission RCP 2.6 pathways.',
+
+  // Earth system models
+  'Model Mean': 'The Model Mean represents the average outcome across multiple climate models, providing a consensus projection.',
+  'CNRM-CM5': 'CNRM-CM5 is a global climate model developed by Météo-France in collaboration with other research institutions.',
+  'GFDL-ESM2M': 'GFDL-ESM2M is a coupled climate model developed by NOAA’s Geophysical Fluid Dynamics Laboratory.',
+  'IPSL-CMSA-LR': 'IPSL-CMSA-LR is a climate model developed by the Institut Pierre-Simon Laplace, used for climate projections.',
+
+  // Environmental parameters
+  Temperature:
+    'Sea Surface Temperature (SST) in degrees Celsius.',
+  Oxygen:
+    'Dissolved oxygen concentration in mg/L.',
+  'Change in Temperature':
+    'Difference in sea surface temperature compared to baseline conditions.',
+  'Chlorophyll-a Concentration':
+    'Chlorophyll-a concentration in mg/m³ on a logarithmic scale.',
 };
 
 /* ====================================================================
@@ -175,14 +225,25 @@ const App = () => {
                 value={panel1.view}
                 onChange={(e) => setPanel1({ ...panel1, view: e.target.value })}
               >
-                <FormControlLabel value="map"   control={<Radio />} label={<Typography color="white">Map</Typography>} />
-                <FormControlLabel value="globe" control={<Radio />} label={<Typography color="white">Globe</Typography>} />
+                <FormControlLabel
+                  value="map"
+                  control={<Radio sx={{ color: 'white', '&.Mui-checked': { color: 'white' } }} />}
+                  label={<Typography color="white">Map</Typography>}
+                />
+                <FormControlLabel
+                  value="globe"
+                  control={<Radio sx={{ color: 'white', '&.Mui-checked': { color: 'white' } }} />}
+                  label={<Typography color="white">Globe</Typography>}
+                />
               </RadioGroup>
             </FormControl>
           </Box>
 
           {/* YEAR SLIDER */}
           <Box sx={{ mb: 2, px: 1 }}>
+            <Typography color="white" variant="subtitle2" gutterBottom>
+              Year: {panel1.year}
+            </Typography>
             <MuiSlider
               min={2012}
               max={2100}
@@ -277,14 +338,25 @@ const App = () => {
                 value={panel2.view}
                 onChange={(e) => setPanel2({ ...panel2, view: e.target.value })}
               >
-                <FormControlLabel value="map"   control={<Radio />} label={<Typography color="white">Map</Typography>} />
-                <FormControlLabel value="globe" control={<Radio />} label={<Typography color="white">Globe</Typography>} />
+                <FormControlLabel
+                  value="map"
+                  control={<Radio sx={{ color: 'white', '&.Mui-checked': { color: 'white' } }} />}
+                  label={<Typography color="white">Map</Typography>}
+                />
+                <FormControlLabel
+                  value="globe"
+                  control={<Radio sx={{ color: 'white', '&.Mui-checked': { color: 'white' } }} />}
+                  label={<Typography color="white">Globe</Typography>}
+                />
               </RadioGroup>
             </FormControl>
           </Box>
 
           {/* YEAR SLIDER */}
           <Box sx={{ mb: 2, px: 1 }}>
+            <Typography color="white" variant="subtitle2" gutterBottom>
+              Year: {panel2.year}
+            </Typography>
             <MuiSlider
               min={2012}
               max={2100}

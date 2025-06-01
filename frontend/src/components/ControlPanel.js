@@ -79,12 +79,12 @@ const ControlPanel = ({
         <RadioGroup row name="source" value={source} onChange={onSourceChange}>
           <FormControlLabel
             value="plankton"
-            control={<Radio />}
+            control={<Radio sx={{ color: 'white', '&.Mui-checked': { color: 'white' } }} />}
             label={<Typography color="white">Plankton</Typography>}
           />
           <FormControlLabel
             value="environmental"
-            control={<Radio />}
+            control={<Radio sx={{ color: 'white', '&.Mui-checked': { color: 'white' } }} />}
             label={<Typography color="white">Environmental</Typography>}
           />
         </RadioGroup>
@@ -93,69 +93,57 @@ const ControlPanel = ({
 
     {/* ── INDEX / METRIC ROW ─────────────────────────────────────────── */}
     <Box sx={{ display: 'flex', mb: 1, gap: 1 }}>
+      {/* Label and general info */}
       <Box sx={labelColumn}>
-        {source === 'plankton' ? (
-          <>
-            <IconButton
-              onClick={() => openInfoModal('Diversity Indices general')}
-              size="small"
-              sx={{ color: 'white', p: 0 }}
-            >
-              <InfoOutlinedIcon fontSize="small" />
-            </IconButton>
-            <Typography color="white" sx={{ mr: 0.5 }}>
-              Index:
-            </Typography>
-          </>
-        ) : (
-          <Typography color="white">Metric:</Typography>
-        )}
+        <IconButton
+          onClick={() =>
+            openInfoModal(
+              source === 'plankton'
+                ? 'Diversity Indices general'
+                : 'Environmental Parameters general'
+            )
+          }
+          size="small"
+          sx={{ color: 'white', p: 0 }}
+        >
+          <InfoOutlinedIcon fontSize="small" />
+        </IconButton>
+        <Typography color="white" sx={{ ml: 0.5 }}>
+          {source === 'plankton' ? 'Index:' : 'Metric:'}
+        </Typography>
       </Box>
 
+      {/* Dropdown input */}
       <Box sx={inputColumn}>
-        {source === 'plankton' ? (
-          <FormControl
-            variant="outlined"
-            size="small"
-            fullWidth
-            sx={{ minWidth: 180, backgroundColor: 'white', borderRadius: 1 }}
+        <FormControl
+          variant="outlined"
+          size="small"
+          fullWidth
+          sx={{ minWidth: 180, backgroundColor: 'white', borderRadius: 1 }}
+        >
+          <Select
+            id={source === 'plankton' ? 'diversity' : 'env-param'}
+            value={source === 'plankton' ? diversity : envParam}
+            onChange={source === 'plankton' ? onDiversityChange : onEnvParamChange}
           >
-            <Select id="diversity" value={diversity} onChange={onDiversityChange}>
-              {diversityIndices.map((opt) => (
-                <MenuItem key={opt} value={opt}>
-                  {opt}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        ) : (
-          <FormControl
-            variant="outlined"
-            size="small"
-            fullWidth
-            sx={{ minWidth: 180, backgroundColor: 'white', borderRadius: 1 }}
-          >
-            <Select id="env-param" value={envParam} onChange={onEnvParamChange}>
-              {environmentalParameters.map((opt) => (
-                <MenuItem key={opt} value={opt}>
-                  {opt}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        )}
+            {(source === 'plankton' ? diversityIndices : environmentalParameters).map((opt) => (
+              <MenuItem key={opt} value={opt}>
+                {opt}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
       </Box>
 
+      {/* Specific info for selected option */}
       <Box sx={iconColumn}>
-        {source === 'plankton' && (
-          <IconButton
-            onClick={() => openInfoModal(diversity)}
-            size="small"
-            sx={{ color: 'white', p: 0 }}
-          >
-            <InfoOutlinedIcon fontSize="small" />
-          </IconButton>
-        )}
+        <IconButton
+          onClick={() => openInfoModal(source === 'plankton' ? diversity : envParam)}
+          size="small"
+          sx={{ color: 'white', p: 0 }}
+        >
+          <InfoOutlinedIcon fontSize="small" />
+        </IconButton>
       </Box>
     </Box>
 
