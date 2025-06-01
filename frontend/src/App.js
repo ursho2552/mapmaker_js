@@ -331,7 +331,7 @@ const App = () => {
           />
 
           {/* VIEW SWITCH */}
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 3 }}>
             <FormControl component="fieldset">
               <RadioGroup
                 row
