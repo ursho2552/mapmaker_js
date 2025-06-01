@@ -644,7 +644,6 @@ const App = () => {
                       id="diversity1"
                       value={panel1Diversity}
                       onChange={(e) => setPanel1Diversity(e.target.value)}
-                      label="Select Index"
                     >
                       {diversityIndices.map((item) => (
                         <MenuItem key={item} value={item}>
@@ -666,7 +665,6 @@ const App = () => {
                       id="env1"
                       value={panel1EnvParam}
                       onChange={(e) => setPanel1EnvParam(e.target.value)}
-                      label="Select Metric"
                     >
                       {environmentalParameters.map((param) => (
                         <MenuItem key={param} value={param}>
@@ -723,9 +721,7 @@ const App = () => {
                       labelId="group1-label"
                       id="group1"
                       value={panel1Group}
-                      onChange={(e) => setPanel1Group(e.target.value)}
-                      label="Select Group"
-                    >
+                      onChange={(e) => setPanel1Group(e.target.value)}                    >
                       {filteredGroupsPanel1.map((item) => (
                         <MenuItem key={item} value={item}>
                           {item}
@@ -779,9 +775,7 @@ const App = () => {
                       labelId="rcp1-label"
                       id="rcp1"
                       value={panel1RCP}
-                      onChange={(e) => setPanel1RCP(e.target.value)}
-                      label="Select Scenario"
-                    >
+                      onChange={(e) => setPanel1RCP(e.target.value)}                    >
                       {filteredRcpScenariosPanel1.map((item) => (
                         <MenuItem key={item} value={item}>
                           {item}
@@ -835,9 +829,7 @@ const App = () => {
                       labelId="model1-label"
                       id="model1"
                       value={panel1Model}
-                      onChange={(e) => setPanel1Model(e.target.value)}
-                      label="Select Model"
-                    >
+                      onChange={(e) => setPanel1Model(e.target.value)}                    >
                       {filteredModelsPanel1.map((item) => (
                         <MenuItem key={item} value={item}>
                           {item}
@@ -1037,9 +1029,7 @@ const App = () => {
                       labelId="diversity2-label"
                       id="diversity2"
                       value={panel2Diversity}
-                      onChange={(e) => setPanel2Diversity(e.target.value)}
-                      label="Select Index"
-                    >
+                      onChange={(e) => setPanel2Diversity(e.target.value)}                    >
                       {diversityIndices.map((item) => (
                         <MenuItem key={item} value={item}>
                           {item}
@@ -1059,9 +1049,7 @@ const App = () => {
                       labelId="env2-label"
                       id="env2"
                       value={panel2EnvParam}
-                      onChange={(e) => setPanel2EnvParam(e.target.value)}
-                      label="Select Metric"
-                    >
+                      onChange={(e) => setPanel2EnvParam(e.target.value)}                    >
                       {environmentalParameters.map((param) => (
                         <MenuItem key={param} value={param}>
                           {param}
@@ -1117,9 +1105,7 @@ const App = () => {
                       labelId="group2-label"
                       id="group2"
                       value={panel2Group}
-                      onChange={(e) => setPanel2Group(e.target.value)}
-                      label="Select Group"
-                    >
+                      onChange={(e) => setPanel2Group(e.target.value)}                    >
                       {filteredGroupsPanel2.map((item) => (
                         <MenuItem key={item} value={item}>
                           {item}
@@ -1173,9 +1159,7 @@ const App = () => {
                       labelId="rcp2-label"
                       id="rcp2"
                       value={panel2RCP}
-                      onChange={(e) => setPanel2RCP(e.target.value)}
-                      label="Select Scenario"
-                    >
+                      onChange={(e) => setPanel2RCP(e.target.value)}                    >
                       {filteredRcpScenariosPanel2.map((item) => (
                         <MenuItem key={item} value={item}>
                           {item}
@@ -1229,9 +1213,7 @@ const App = () => {
                       labelId="model2-label"
                       id="model2"
                       value={panel2Model}
-                      onChange={(e) => setPanel2Model(e.target.value)}
-                      label="Select Model"
-                    >
+                      onChange={(e) => setPanel2Model(e.target.value)}                    >
                       {filteredModelsPanel2.map((item) => (
                         <MenuItem key={item} value={item}>
                           {item}
@@ -1241,7 +1223,7 @@ const App = () => {
                   </FormControl>
                 </Box>
 
-                {/* “Specific” info icon */}
+                {/* Specific info icon */}
                 <Box sx={ICON_COLUMN}>
                   <IconButton
                     onClick={() => openInfoModal(panel2Model)}
