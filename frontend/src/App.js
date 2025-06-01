@@ -610,7 +610,7 @@ const App = () => {
                       size="small"
                       sx={{ color: 'white', p: 0 }}
                     >
-                      <InfoOutlinedIcon fontSize="medium" />
+                      <InfoOutlinedIcon fontSize="small" />
                     </IconButton>
                     <Typography color="white" sx={{ mr: 0.5 }}>
                        Index:
