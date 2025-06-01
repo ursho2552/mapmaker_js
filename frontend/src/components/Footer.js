@@ -1,4 +1,3 @@
-// Footer.js
 import React from 'react';
 import { Box, Paper } from '@mui/material';
 import { alpha } from '@mui/material/styles';

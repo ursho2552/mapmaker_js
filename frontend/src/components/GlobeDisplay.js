@@ -1,4 +1,3 @@
-// GlobeDisplay.js
 import React, { useEffect, useState, useRef, useMemo } from 'react';
 import Globe from 'react-globe.gl';
 import * as d3 from 'd3-scale-chromatic';

@@ -1,4 +1,3 @@
-// App.js
 import React, { useState, useMemo } from 'react';
 import GlobeDisplay from './components/GlobeDisplay';
 import MapDisplay from './components/MapDisplay';
@@ -29,9 +28,7 @@ import {
 } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
-// -----------------------------------------------------------------------------
-// DROPDOWN OPTIONS (unchanged)
-// -----------------------------------------------------------------------------
+// DROPDOWN OPTIONS
 const diversityIndices = [
   'Biomes',
   'Species Richness',
