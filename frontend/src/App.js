@@ -585,14 +585,7 @@ const App = () => {
                 >
                   <FormControlLabel
                     value="plankton"
-                    control={<Radio 
-                      sx={{
-                        color: 'blue', // <-- color when NOT selected
-                        '&.Mui-checked': {
-                          color: 'blue', // <-- color when selected
-                        },
-                      }}
-                    />}
+                    control={<Radio />}
                     label={<Typography color="white">Plankton</Typography>}
                   />
                   <FormControlLabel
