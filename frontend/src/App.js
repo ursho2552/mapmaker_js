@@ -63,7 +63,7 @@ const environmentalParameters = [
 ];
 
 // -----------------------------------------------------------------------------
-// “Explanation” HELP TEXT (unchanged)
+// “Explanation” HELP TEXT
 // -----------------------------------------------------------------------------
 const diversityMessages = {
   Biomes:
@@ -216,7 +216,7 @@ const App = () => {
   const openRefsModal = () => setRefsModalOpen(true);
   const closeRefsModal = () => setRefsModalOpen(false);
 
-  // ── Filtering logic for “Biomes” (unchanged) ──
+  // ── Filtering logic for Biomes ──
   const filteredRcpScenarios = selectedDiversity === 'Biomes' ? rcpScenarios.slice(0, 3) : rcpScenarios;
   const filteredEarthModels = selectedDiversity === 'Biomes' ? earthModels.slice(0, 1) : earthModels;
   const filteredPlanktonGroups = selectedDiversity === 'Biomes' ? planktonGroups.slice(0, 1) : planktonGroups;
@@ -585,7 +585,14 @@ const App = () => {
                 >
                   <FormControlLabel
                     value="plankton"
-                    control={<Radio />}
+                    control={<Radio 
+                      sx={{
+                        color: 'blue', // <-- color when NOT selected
+                        '&.Mui-checked': {
+                          color: 'blue', // <-- color when selected
+                        },
+                      }}
+                    />}
                     label={<Typography color="white">Plankton</Typography>}
                   />
                   <FormControlLabel
@@ -605,7 +612,7 @@ const App = () => {
               <Box sx={LABEL_COLUMN}>
                 {panel1Source === 'plankton' ? (
                   <>
-                                        <IconButton
+                    <IconButton
                       onClick={() => openInfoModal('Diversity Indices general')}
                       size="small"
                       sx={{ color: 'white', p: 0 }}
