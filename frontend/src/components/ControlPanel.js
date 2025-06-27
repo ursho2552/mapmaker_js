@@ -91,7 +91,6 @@ const ControlPanel = ({
       </FormControl>
     </Box>
 
-    {/* ── INDEX / METRIC ROW ─────────────────────────────────────────── */}
     <Box sx={{ display: 'flex', mb: 1, gap: 1 }}>
       {/* Label and general info */}
       <Box sx={labelColumn}>
@@ -108,7 +107,7 @@ const ControlPanel = ({
         >
           <InfoOutlinedIcon fontSize="small" />
         </IconButton>
-        <Typography color="white" sx={{ ml: 0.5 }}>
+        <Typography color="white" sx={{ mr: 0.5 }}>
           {source === 'plankton' ? 'Index:' : 'Metric:'}
         </Typography>
       </Box>
