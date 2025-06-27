@@ -135,8 +135,6 @@ const MapDisplay = ({
           ]}
           layout={{
             ...layout,
-            // We remove any hard-coded width/height from layout, because
-            // style + useResizeHandler will make Plotly fill the container.
             autosize: true,
           }}
           useResizeHandler={true}

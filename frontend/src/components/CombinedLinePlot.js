@@ -1,22 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Plot from 'react-plotly.js';
 
-// Maps for axis labels
-const diversityLabels = {
-  'Biomes': 'Biome label',
-  'Species Richness': 'Species Richness [%]',
-  'Hotspots of Change in Diversity': 'Diversity changes [%]',
-  'Habitat Suitability Index (HSI)': 'HSI [%]',
-  'Change in HSI': 'ΔHSI [%]',
-  'Species Turnover': 'Jaccard Index [-]',
-};
-const envLabels = {
-  'Temperature': 'Temperature (°C)',
-  'Oxygen': 'Oxygen (ml/L)',
-  'Change in Temperature': 'ΔTemperature (°C)',
-  'Chlorophyll-a Concentration': 'Chl-a log(mg/m³)',
-};
-
 /**
  * CombinedLinePlot
  * Props:
@@ -48,14 +32,14 @@ const CombinedLinePlot = ({ point, leftSettings, rightSettings, startYear, endYe
       fetch(buildUrl(leftSettings)).then(r => r.json()),
       fetch(buildUrl(rightSettings)).then(r => r.json()),
     ])
-    .then(([d1, d2]) => {
-      // Choose primary trace: index for plankton source, envParam for environmental source
-      const leftTrace = leftSettings.source === 'plankton' ? d1.data[0] : d1.data[1];
-      const rightTrace = rightSettings.source === 'plankton' ? d2.data[0] : d2.data[1];
-      setLeftData(leftTrace);
-      setRightData(rightTrace);
-    })
-    .catch(err => setError(err.toString()));
+      .then(([d1, d2]) => {
+        // Choose primary trace: index for plankton source, envParam for environmental source
+        const leftTrace = leftSettings.source === 'plankton' ? d1.data[0] : d1.data[1];
+        const rightTrace = rightSettings.source === 'plankton' ? d2.data[0] : d2.data[1];
+        setLeftData(leftTrace);
+        setRightData(rightTrace);
+      })
+      .catch(err => setError(err.toString()));
   }, [point, leftSettings, rightSettings, startYear, endYear]);
 
   if (error) return <div style={{ color: 'red' }}>Error loading chart: {error}</div>;

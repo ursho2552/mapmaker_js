@@ -27,21 +27,21 @@ const GlobeDisplay = ({
 
   const globeRef = useRef();
 
-  // Mapping for legend title (index to label + unit)
-  const legendLabelMapping = {
-    Biomes: 'Biome label',
+  // Maps for axis labels 
+  const colorbarLabelMapping = {
+    'Biomes': '[INSERT BIOMES LABEL]',
     'Species Richness': 'Species Richness [%]',
     'Hotspots of Change in Diversity': 'Diversity changes [%]',
     'Habitat Suitability Index (HSI)': 'HSI [%]',
     'Change in HSI': 'ΔHSI [%]',
     'Species Turnover': 'Jaccard Index [-]',
-    // Environmental parameters units
-    Temperature: '°C',
-    'Change in Temperature': 'Δ°C',
-    Oxygen: 'mg/L',
-    'Chlorophyll-a Concentration': 'log(mg/m³)',
+    'Temperature': 'Temperature [°C]',
+    'Change in Temperature': 'ΔTemperature [Δ°C]',
+    'Oxygen': 'Oxygen [mg/L]',
+    'Chlorophyll-a Concentration': 'Chlorophyll-a Concentration [log(mg/m³)]',
   };
-  const legendLabel = legendLabelMapping[index] || index;
+
+  const legendLabel = colorbarLabelMapping[index] || index;
 
   // Resize listener: measure container’s width/height
   useEffect(() => {
@@ -227,12 +227,13 @@ const GlobeDisplay = ({
           bottom: 8,
           width: 60,
           display: 'flex',
-          flexDirection: 'column',
+          flexDirection: 'row',
           alignItems: 'center',
           zIndex: 2,
           pointerEvents: 'none',
         }}
       >
+
         {/* Gradient + ticks container */}
         <div
           style={{
@@ -240,19 +241,20 @@ const GlobeDisplay = ({
             display: 'flex',
             flexDirection: 'row',
             alignItems: 'stretch',
-            marginBottom: 8,
+            height: '100%',
           }}
         >
+
           {/* Gradient stripe */}
           <div
             style={{
               width: 20,
               borderRadius: 4,
               backgroundImage: generateColorbarGradient(),
-              backgroundRepeat: 'no-repeat',
-              backgroundSize: '100% 100%',
+              height: '100%',
             }}
           />
+
           {/* Numeric labels */}
           <div
             style={{
@@ -270,14 +272,14 @@ const GlobeDisplay = ({
             ))}
           </div>
         </div>
-        {/* Legend title */}
+        {/* Legend title to the right */}
         <div
           style={{
-            color: 'white',
-            fontSize: '0.8rem',
-            writingMode: 'vertical-rl',
-            textOrientation: 'mixed',
+            font: { color: 'white', size: 16 },
             whiteSpace: 'nowrap',
+            writingMode: 'vertical-rl',
+            transform: 'rotate(180deg)',
+            marginTop: 8,
           }}
         >
           {legendLabel}
