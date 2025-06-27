@@ -125,5 +125,10 @@ export const logos = [
         src: '/assets/CMIP5_Data_Archive_3.png',
         href: 'https://esgf-node.llnl.gov/search/cmip5/',
     },
+    {
+        alt: 'Appsilon',
+        src: '/assets/Appsilon_logo.png',
+        href: 'https://www.appsilon.com/',
+    }
 ];
 
