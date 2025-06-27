@@ -1,7 +1,5 @@
 import React, { useEffect, useState, useRef, useMemo } from 'react';
 import Globe from 'react-globe.gl';
-import * as d3 from 'd3-scale-chromatic';
-import { scaleSequential } from 'd3-scale';
 
 const GlobeDisplay = ({
   year,
@@ -13,11 +11,9 @@ const GlobeDisplay = ({
   onPointClick,
 }) => {
   const containerRef = useRef(null);
+  const globeRef = useRef();
 
-  // State for container dimensions
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
-
-  // State for fetched data
   const [pointsData, setPointsData] = useState([]);
   const [error, setError] = useState(null);
   const [minValue, setMinValue] = useState(0);
@@ -25,9 +21,6 @@ const GlobeDisplay = ({
   const [cachedData, setCachedData] = useState({});
   const [isHovered, setIsHovered] = useState(false);
 
-  const globeRef = useRef();
-
-  // Maps for axis labels 
   const colorbarLabelMapping = {
     'Biomes': 'Biome [INSERT BIOMES LABEL]',
     'Species Richness': 'Species Richness [%]',
@@ -43,7 +36,6 @@ const GlobeDisplay = ({
 
   const legendLabel = colorbarLabelMapping[index] || index;
 
-  // Resize listener: measure container’s width/height
   useEffect(() => {
     const updateDimensions = () => {
       if (containerRef.current) {
@@ -51,16 +43,25 @@ const GlobeDisplay = ({
         setDimensions({ width: offsetWidth, height: offsetHeight });
       }
     };
-
-    // Initial measurement
     updateDimensions();
-
-    // Listen to window resize
     window.addEventListener('resize', updateDimensions);
     return () => window.removeEventListener('resize', updateDimensions);
   }, []);
 
-  // Fetch (and cache) data per year
+  const getColorFromBin = useMemo(() => {
+    const colors = ['#440154', '#3b528b', '#21918c', '#5ec962', '#fde725'];
+    return (value, min, max) => {
+      if (isNaN(value) || value == null) return 'rgba(0,0,0,0)';
+      const binSize = (max - min) / 5;
+      if (binSize === 0) return colors[0];
+      if (value < min + binSize) return colors[0];
+      if (value < min + 2 * binSize) return colors[1];
+      if (value < min + 3 * binSize) return colors[2];
+      if (value < min + 4 * binSize) return colors[3];
+      return colors[4];
+    };
+  }, []);
+
   const fetchData = async (yr) => {
     if (cachedData[yr]) {
       setPointsData(cachedData[yr].pointsData);
@@ -85,12 +86,10 @@ const GlobeDisplay = ({
       if (!response.ok) throw new Error('Network response was not ok');
       const data = await response.json();
 
-      // Flatten the 2D variable array to compute min/max
       const flatData = data.variable.flat();
       const minVal = Math.min(...flatData.filter((v) => !isNaN(v) && v != null));
       const maxVal = Math.max(...flatData.filter((v) => !isNaN(v) && v != null));
 
-      // Build pointsData (subsample every other row/col as before)
       const transformed = data.lats
         .filter((_, latIdx) => latIdx % 2 === 0)
         .map((lat, latIdx) => {
@@ -105,7 +104,7 @@ const GlobeDisplay = ({
                 lat,
                 lng: lon,
                 size: value !== 0 ? 0.01 : 0,
-                color: getColorFromViridis(value, minVal, maxVal),
+                color: getColorFromBin(value, minVal, maxVal),
               };
             });
         })
@@ -126,23 +125,10 @@ const GlobeDisplay = ({
     }
   };
 
-  // Memoized Viridis color‐scale function
-  const getColorFromViridis = useMemo(() => {
-    return (value, min, max) => {
-      if (isNaN(value) || value == null) return 'rgba(0,0,0,0)';
-      const t = (value - min) / (max - min);
-      const scale = scaleSequential(d3.interpolateViridis).domain([0, 1]);
-      return scale(t);
-    };
-  }, []);
-
-  // Whenever year (or any of the dependencies) changes, fetch new data
   useEffect(() => {
     fetchData(year);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [year, index, group, scenario, model, sourceType]);
 
-  // Limit zoom—once globeRef is set
   useEffect(() => {
     if (globeRef.current) {
       globeRef.current.controls().minDistance = 250;
@@ -150,38 +136,23 @@ const GlobeDisplay = ({
     }
   }, []);
 
-  // Auto-rotate logic
-  const rotateGlobe = () => {
-    if (!isHovered && globeRef.current) {
-      globeRef.current.controls().autoRotate = true;
-      globeRef.current.controls().autoRotateSpeed = 1;
-    } else if (globeRef.current) {
-      globeRef.current.controls().autoRotate = false;
-    }
-  };
   useEffect(() => {
-    const frame = requestAnimationFrame(rotateGlobe);
+    const frame = requestAnimationFrame(() => {
+      if (!isHovered && globeRef.current) {
+        globeRef.current.controls().autoRotate = true;
+        globeRef.current.controls().autoRotateSpeed = 1;
+      } else if (globeRef.current) {
+        globeRef.current.controls().autoRotate = false;
+      }
+    });
     return () => cancelAnimationFrame(frame);
   }, [isHovered]);
 
-  // Generate a simple 4-color gradient for a CSS colorbar
-  const generateColorbarGradient = () => {
-    const steps = 4;
-    const delta = maxValue - minValue;
-    const stops = Array.from({ length: steps }, (_, i) => {
-      // Handle case where all values are equal
-      const val = delta === 0 ? minValue : minValue + (i / (steps - 1)) * delta;
-      return getColorFromViridis(val, minValue, maxValue);
-    });
-    return `linear-gradient(to top, ${stops.join(', ')})`;
-  };
-
-  const labels = React.useMemo(() => {
-    const count = 5;
-    const range = maxValue - minValue;
-    if (count < 2 || range === 0) return [Math.round(minValue), Math.round(maxValue)];
-    const step = range / (count - 1);
-    return Array.from({ length: count }, (_, i) => Math.round(minValue + i * step));
+  const labels = useMemo(() => {
+    const binSize = (maxValue - minValue) / 5;
+    return Array.from({ length: 5 }, (_, i) =>
+      Math.round(minValue + i * binSize)
+    ).reverse();
   }, [minValue, maxValue]);
 
   return (
@@ -218,7 +189,6 @@ const GlobeDisplay = ({
         />
       </div>
 
-      {/* Colorbar legend on the side */}
       <div
         style={{
           position: 'absolute',
@@ -233,8 +203,6 @@ const GlobeDisplay = ({
           pointerEvents: 'none',
         }}
       >
-
-        {/* Gradient + ticks container */}
         <div
           style={{
             flex: 1,
@@ -244,18 +212,28 @@ const GlobeDisplay = ({
             height: '100%',
           }}
         >
-
-          {/* Gradient stripe */}
           <div
             style={{
               width: 20,
               borderRadius: 4,
-              backgroundImage: generateColorbarGradient(),
               height: '100%',
+              display: 'flex',
+              flexDirection: 'column',
             }}
-          />
-
-          {/* Numeric labels */}
+          >
+            {['#440154', '#3b528b', '#21918c', '#5ec962', '#fde725']
+              .slice()
+              .reverse()
+              .map((color, i) => (
+                <div
+                  key={i}
+                  style={{
+                    flex: 1,
+                    backgroundColor: color,
+                  }}
+                />
+              ))}
+          </div>
           <div
             style={{
               flex: 1,
@@ -265,14 +243,13 @@ const GlobeDisplay = ({
               marginLeft: 8,
             }}
           >
-            {labels.slice().reverse().map((lbl, i) => (
+            {labels.map((lbl, i) => (
               <div key={i} style={{ color: 'white', fontSize: '0.8rem' }}>
                 {lbl}
               </div>
             ))}
           </div>
         </div>
-        {/* Legend title to the right */}
         <div
           style={{
             font: { color: 'white', size: 16 },
@@ -290,4 +267,3 @@ const GlobeDisplay = ({
 };
 
 export default GlobeDisplay;
-
