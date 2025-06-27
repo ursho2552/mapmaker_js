@@ -11,6 +11,25 @@ const MapDisplay = ({
   sourceType = 'plankton',
   onPointClick,
 }) => {
+  const [lats, setLats] = useState([]);
+  const [lons, setLons] = useState([]);
+  const [data, setData] = useState([]);
+  const [colorscale, setColorscale] = useState([
+    [0.0, '#440154'],
+    [0.2, '#440154'],
+    [0.2, '#3b528b'],
+    [0.4, '#3b528b'],
+    [0.4, '#21918c'],
+    [0.6, '#21918c'],
+    [0.6, '#5ec962'],
+    [0.8, '#5ec962'],
+    [0.8, '#fde725'],
+    [1.0, '#fde725'],
+  ]);
+  const [minValue, setMinValue] = useState(null);
+  const [maxValue, setMaxValue] = useState(null);
+  const [error, setError] = useState(null);
+  const [selectedPoint, setSelectedPoint] = useState(null);
 
   const layout = {
     title: {
@@ -50,21 +69,32 @@ const MapDisplay = ({
     ],
   };
 
-  const [lats, setLats] = useState([]);
-  const [lons, setLons] = useState([]);
-  const [data, setData] = useState([]);
-  const [, setColorbar] = useState('Viridis');
-  const [minValue, setMinValue] = useState(null);
-  const [maxValue, setMaxValue] = useState(null);
-  const [error, setError] = useState(null);
-  const [selectedPoint, setSelectedPoint] = useState(null);
-
-
   useEffect(() => {
     const isEnv = sourceType === 'environmental';
     const url = isEnv
       ? `/api/globe-data?source=env&year=${year}&index=${index}&scenario=${scenario}&model=${model}`
       : `/api/map-data?year=${year}&index=${index}&group=${group}&scenario=${scenario}&model=${model}`;
+
+    if (index.includes('Change')) {
+      setColorscale([
+        [0.0, '#0000ff'],
+        [0.5, '#ffffff'],
+        [1.0, '#ff0000'],
+      ]);
+    } else {
+      setColorscale([
+        [0.0, '#440154'],
+        [0.2, '#440154'],
+        [0.2, '#3b528b'],
+        [0.4, '#3b528b'],
+        [0.4, '#21918c'],
+        [0.6, '#21918c'],
+        [0.6, '#5ec962'],
+        [0.8, '#5ec962'],
+        [0.8, '#fde725'],
+        [1.0, '#fde725'],
+      ]);
+    }
 
     fetch(url)
       .then((response) => {
@@ -75,7 +105,7 @@ const MapDisplay = ({
         setLats(json.lats);
         setLons(json.lons);
         setData(json.variable);
-        setColorbar(json.colorscale);
+        // Optionally ignore json.colorscale or merge with state
         setMinValue(json.minValue);
         setMaxValue(json.maxValue);
         setError(null);
@@ -90,7 +120,6 @@ const MapDisplay = ({
     <div style={{ width: '100%', height: '100%' }}>
       {error && <div style={{ color: 'red' }}>{error}</div>}
 
-      {/* WRAP Plot in an absolutely‐positioned container so it can fill parent */}
       <div
         style={{
           position: 'absolute',
@@ -107,18 +136,7 @@ const MapDisplay = ({
               z: data,
               x: lons,
               y: lats,
-              colorscale: [
-                [0.0, '#440154'],
-                [0.2, '#440154'],
-                [0.2, '#3b528b'],
-                [0.4, '#3b528b'],
-                [0.4, '#21918c'],
-                [0.6, '#21918c'],
-                [0.6, '#5ec962'],
-                [0.8, '#5ec962'],
-                [0.8, '#fde725'],
-                [1.0, '#fde725'],
-              ],
+              colorscale: colorscale,
               zsmooth: false,
               zmin: minValue,
               zmax: maxValue,

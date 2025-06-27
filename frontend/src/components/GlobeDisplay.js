@@ -21,7 +21,7 @@ const GlobeDisplay = ({
   const [maxValue, setMaxValue] = useState(1);
   const [cachedData, setCachedData] = useState({});
   const [isHovered, setIsHovered] = useState(false);
-  const [selectedPoint, setSelectedPoint] = useState(null); // <-- added
+  const [selectedPoint, setSelectedPoint] = useState(null);
 
   const legendLabel = colorbarLabelMapping[index] || index;
 
@@ -52,18 +52,54 @@ const GlobeDisplay = ({
   }, []);
 
   const getColorFromBin = useMemo(() => {
-    const colors = ['#440154', '#3b528b', '#21918c', '#5ec962', '#fde725'];
+    const divergingColors = ['#0000ff', '#ffffff', '#ff0000'];
+    const sequentialColors = ['#440154', '#3b528b', '#21918c', '#5ec962', '#fde725'];
+    const interpolateColor = (color1, color2, ratio) => {
+      const hexToRgb = (hex) => {
+        const bigint = parseInt(hex.slice(1), 16);
+        return [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255];
+      };
+      const rgbToHex = (r, g, b) =>
+        '#' +
+        [r, g, b]
+          .map((x) => {
+            const hex = x.toString(16);
+            return hex.length === 1 ? '0' + hex : hex;
+          })
+          .join('');
+      const c1 = hexToRgb(color1);
+      const c2 = hexToRgb(color2);
+      const r = Math.round(c1[0] + (c2[0] - c1[0]) * ratio);
+      const g = Math.round(c1[1] + (c2[1] - c1[1]) * ratio);
+      const b = Math.round(c1[2] + (c2[2] - c1[2]) * ratio);
+      return rgbToHex(r, g, b);
+    };
+
+    const colors = index.includes('Change') ? divergingColors : sequentialColors;
+
     return (value, min, max) => {
       if (isNaN(value) || value == null) return 'rgba(0,0,0,0)';
-      const binSize = (max - min) / 5;
-      if (binSize === 0) return colors[0];
-      if (value < min + binSize) return colors[0];
-      if (value < min + 2 * binSize) return colors[1];
-      if (value < min + 3 * binSize) return colors[2];
-      if (value < min + 4 * binSize) return colors[3];
-      return colors[4];
+      if (min === max) return colors[0];
+
+      if (colors.length === 3) {
+        const norm = (value - min) / (max - min);
+        if (norm <= 0.5) {
+          const ratio = norm / 0.5;
+          return interpolateColor(colors[0], colors[1], ratio);
+        } else {
+          const ratio = (norm - 0.5) / 0.5;
+          return interpolateColor(colors[1], colors[2], ratio);
+        }
+      } else {
+        const binSize = (max - min) / 5;
+        if (value < min + binSize) return colors[0];
+        if (value < min + 2 * binSize) return colors[1];
+        if (value < min + 3 * binSize) return colors[2];
+        if (value < min + 4 * binSize) return colors[3];
+        return colors[4];
+      }
     };
-  }, []);
+  }, [index]);
 
   const fetchData = async (yr) => {
     if (cachedData[yr]) {
@@ -158,7 +194,14 @@ const GlobeDisplay = ({
     ).reverse();
   }, [minValue, maxValue]);
 
-  // Handle click on globe points or globe surface
+  const legendColors = index.includes('Change')
+    ? ['#0000ff', '#ffffff', '#ff0000']
+    : ['#440154', '#3b528b', '#21918c', '#5ec962', '#fde725'];
+
+  const legendLabels = index.includes('Change')
+    ? [minValue.toFixed(2), ((minValue + maxValue) / 2).toFixed(2), maxValue.toFixed(2)]
+    : labels.map((l) => l.toFixed(2));
+
   const handlePointClick = (lng, lat) => {
     setSelectedPoint({ lng, lat });
     if (onPointClick) onPointClick(lng, lat);
@@ -232,45 +275,65 @@ const GlobeDisplay = ({
               borderRadius: 4,
               height: '100%',
               display: 'flex',
-              flexDirection: 'column',
+              flexDirection: index.includes('Change') ? 'column' : 'column',
+              background: index.includes('Change')
+                ? 'linear-gradient( #ff0000, #ffffff 50%, #0000ff)'
+                : 'none',
             }}
           >
-            {['#440154', '#3b528b', '#21918c', '#5ec962', '#fde725']
-              .slice()
-              .reverse()
-              .map((color, i) => (
-                <div
-                  key={i}
-                  style={{
-                    flex: 1,
-                    backgroundColor: color,
-                  }}
-                />
-              ))}
+            {/* For sequential, show discrete color blocks */}
+            {!index.includes('Change') &&
+              legendColors
+                .slice()
+                .map((color, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      flex: 1,
+                      backgroundColor: color,
+                    }}
+                  />
+                ))}
           </div>
+
           <div
             style={{
               flex: 1,
               display: 'flex',
               flexDirection: 'column',
-              justifyContent: 'space-between',
+              justifyContent: index.includes('Change') ? 'space-between' : 'space-between',
               marginLeft: 8,
+              height: '100%',
             }}
           >
-            {labels.map((lbl, i) => (
-              <div key={i} style={{ color: 'white', fontSize: '0.8rem' }}>
-                {lbl}
-              </div>
-            ))}
+            {index.includes('Change')
+              ? legendLabels.map((lbl, i) => (
+                <div
+                  key={i}
+                  style={{ color: 'white', fontSize: '0.8rem', userSelect: 'none' }}
+                >
+                  {lbl}
+                </div>
+              ))
+              : legendLabels.map((lbl, i) => (
+                <div
+                  key={i}
+                  style={{ color: 'white', fontSize: '0.8rem', userSelect: 'none' }}
+                >
+                  {lbl}
+                </div>
+              ))}
           </div>
         </div>
         <div
           style={{
-            font: { color: 'white', size: 16 },
+            color: 'white',
             whiteSpace: 'nowrap',
             writingMode: 'vertical-rl',
             transform: 'rotate(180deg)',
             marginTop: 8,
+            fontSize: 16,
+            userSelect: 'none',
           }}
         >
           {legendLabel}
