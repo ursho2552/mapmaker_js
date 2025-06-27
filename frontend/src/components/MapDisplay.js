@@ -10,18 +10,18 @@ const MapDisplay = ({
   sourceType = 'plankton',
   onPointClick,
 }) => {
+  // Maps for axis labels 
   const colorbarLabelMapping = {
-    Biomes: 'Biome label',
+    'Biomes': 'Biome [INSERT BIOMES LABEL]',
     'Species Richness': 'Species Richness [%]',
     'Hotspots of Change in Diversity': 'Diversity changes [%]',
     'Habitat Suitability Index (HSI)': 'HSI [%]',
     'Change in HSI': 'ΔHSI [%]',
     'Species Turnover': 'Jaccard Index [-]',
-    // Environmental metrics
-    Temperature: '°C',
-    'Change in Temperature': 'Δ°C',
-    Oxygen: 'mg/L',
-    'Chlorophyll-a Concentration': 'log(mg/m³)',
+    'Temperature': 'Temperature [°C]',
+    'Change in Temperature': 'ΔTemperature [Δ°C]',
+    'Oxygen': 'Oxygen [mg/L]',
+    'Chlorophyll-a Concentration': 'Chlorophyll-a Concentration [log(mg/m³)]',
   };
 
   const layout = {
@@ -120,6 +120,7 @@ const MapDisplay = ({
               colorscale: colorbar,
               zmin: minValue,
               zmax: maxValue,
+              hovertemplate: `Longitude: %{x}<br>Latitude: %{y}<br>${index}: %{z}<extra></extra>`,
               colorbar: {
                 title: {
                   text: colorbarLabelMapping[index] || '',

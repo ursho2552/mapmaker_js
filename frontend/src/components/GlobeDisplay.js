@@ -29,7 +29,7 @@ const GlobeDisplay = ({
 
   // Maps for axis labels 
   const colorbarLabelMapping = {
-    'Biomes': '[INSERT BIOMES LABEL]',
+    'Biomes': 'Biome [INSERT BIOMES LABEL]',
     'Species Richness': 'Species Richness [%]',
     'Hotspots of Change in Diversity': 'Diversity changes [%]',
     'Habitat Suitability Index (HSI)': 'HSI [%]',
