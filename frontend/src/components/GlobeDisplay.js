@@ -21,8 +21,23 @@ const GlobeDisplay = ({
   const [maxValue, setMaxValue] = useState(1);
   const [cachedData, setCachedData] = useState({});
   const [isHovered, setIsHovered] = useState(false);
+  const [selectedPoint, setSelectedPoint] = useState(null); // <-- added
 
   const legendLabel = colorbarLabelMapping[index] || index;
+
+  const createHtmlElement = (d) => {
+    const el = document.createElement('div');
+    el.style.color = 'red';
+    el.style.fontSize = '24px';
+    el.style.pointerEvents = 'none';
+    el.style.userSelect = 'none';
+    el.style.transform = 'translate(-50%, -100%)';
+    el.style.whiteSpace = 'nowrap';
+    el.setAttribute('aria-label', 'Selected Point Pin');
+    el.setAttribute('title', 'Selected Point');
+    el.textContent = '📍';
+    return el;
+  };
 
   useEffect(() => {
     const updateDimensions = () => {
@@ -143,6 +158,12 @@ const GlobeDisplay = ({
     ).reverse();
   }, [minValue, maxValue]);
 
+  // Handle click on globe points or globe surface
+  const handlePointClick = (lng, lat) => {
+    setSelectedPoint({ lng, lat });
+    if (onPointClick) onPointClick(lng, lat);
+  };
+
   return (
     <div
       ref={containerRef}
@@ -156,7 +177,9 @@ const GlobeDisplay = ({
       onMouseLeave={() => setIsHovered(false)}
     >
       {error && (
-        <div style={{ position: 'absolute', top: 0, left: 0, color: 'red', zIndex: 2 }}>
+        <div
+          style={{ position: 'absolute', top: 0, left: 0, color: 'red', zIndex: 2 }}
+        >
           {error}
         </div>
       )}
@@ -173,10 +196,13 @@ const GlobeDisplay = ({
           pointAltitude="size"
           pointColor="color"
           pointRadius={0.9}
-          onPointClick={(pt) => onPointClick(pt.lng, pt.lat)}
+          onPointClick={(pt) => handlePointClick(pt.lng, pt.lat)}
+          htmlElementsData={selectedPoint ? [selectedPoint] : []}
+          htmlElement={createHtmlElement}
         />
       </div>
 
+      {/* Legend */}
       <div
         style={{
           position: 'absolute',
