@@ -1,37 +1,14 @@
 import React from 'react';
 import { Box, Paper } from '@mui/material';
 import { alpha } from '@mui/material/styles';
+import { logos } from '../constants';
 
 const Footer = () => {
-  // Logo definitions
-  const logos = [
-    {
-      alt: 'ETH Zurich',
-      src: '/assets/ETH_logo.png',
-      href: 'https://up.ethz.ch/research/ongoing-projects.html',
-    },
-    {
-      alt: 'GSPI',
-      src: '/assets/GSPI_logo.png',
-      href: 'https://gspi.ch/collaboration_projec/marine-plankton-diversity-bioindicator-scenarios-for-policy-makers-mapmaker/',
-    },
-    {
-      alt: 'IUCN',
-      src: '/assets/IUCN_logo.png',
-      href: 'https://www.iucn.org/theme/marine-and-polar',
-    },
-    {
-      alt: 'CMIP5 Data Archive',
-      src: '/assets/CMIP5_Data_Archive_3.png',
-      href: 'https://esgf-node.llnl.gov/search/cmip5/',
-    },
-  ];
-
   return (
     <Box
       component="footer"
       sx={{
-        backgroundColor: '#ffffff',   // White panel
+        backgroundColor: '#ffffff',
         py: 3,
         px: 2,
         mt: 4,
@@ -58,8 +35,8 @@ const Footer = () => {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              width: 180,    // fixed card width
-              height: 80,    // fixed card height
+              width: 180,
+              height: 80,
               backgroundColor: '#f9f9f9',
               borderRadius: 2,
               textDecoration: 'none',

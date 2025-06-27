@@ -1,14 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Plot from 'react-plotly.js';
 
-/**
- * CombinedLinePlot
- * Props:
- *  point: { x, y }
- *  leftSettings: { source, index, group, envParam, scenario, model }
- *  rightSettings: same shape
- *  startYear, endYear
- */
 const CombinedLinePlot = ({ point, leftSettings, rightSettings, startYear, endYear }) => {
   const [leftData, setLeftData] = useState(null);
   const [rightData, setRightData] = useState(null);

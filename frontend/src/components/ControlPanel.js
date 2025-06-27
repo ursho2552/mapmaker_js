@@ -1,37 +1,3 @@
-/**
- * ControlPanel – generic selector block used by each display panel.
- *
- * Required props
- * ──────────────────────────────────────────────────────────────────────────────
- * source            ("plankton" | "environmental")
- * onSourceChange    (event)        → void
- *
- * diversity         (string)       – selected diversity index
- * onDiversityChange (event)        → void
- *
- * envParam          (string)       – selected environmental parameter
- * onEnvParamChange  (event)        → void
- *
- * group             (string)       – selected plankton group
- * onGroupChange     (event)        → void
- *
- * rcp               (string)       – selected RCP scenario
- * onRcpChange       (event)        → void
- *
- * model             (string)       – selected earth-system model
- * onModelChange     (event)        → void
- *
- * filteredGroups    (string[])     – group options after “Biomes” filtering
- * filteredScenarios (string[])     – scenario options after “Biomes” filtering
- * filteredModels    (string[])     – model options after “Biomes” filtering
- *
- * openInfoModal     (label:string) → void
- *
- * labelColumn       — style object shared from parent
- * inputColumn       — style object shared from parent
- * iconColumn        — style object shared from parent
- */
-
 import React from 'react';
 import {
   Box,
@@ -47,7 +13,6 @@ import {
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
 const ControlPanel = ({
-  /* mandatory props */
   source,
   onSourceChange,
   diversity,
@@ -64,11 +29,9 @@ const ControlPanel = ({
   filteredScenarios,
   filteredModels,
   openInfoModal,
-  /* shared layout styles */
   labelColumn,
   inputColumn,
   iconColumn,
-  /* option arrays (passed via parent to avoid local imports) */
   diversityIndices,
   environmentalParameters,
 }) => (
@@ -146,7 +109,7 @@ const ControlPanel = ({
       </Box>
     </Box>
 
-    {/* ── GROUP ROW (plankton only) ───────────────────────────────────── */}
+    {/* Group Row (plankton only) */}
     {source === 'plankton' && (
       <Box sx={{ display: 'flex', mb: 1, gap: 1 }}>
         <Box sx={labelColumn}>
@@ -191,7 +154,7 @@ const ControlPanel = ({
       </Box>
     )}
 
-    {/* ── Scenario ──────────────────────────────────────────────────── */}
+    {/* Scenario */}
     <Box sx={{ display: 'flex', mb: 1, gap: 1 }}>
       <Box sx={labelColumn}>
         <IconButton onClick={() => openInfoModal('RCP Scenarios general')} size="small" sx={{ color: 'white', p: 0 }}>
@@ -214,7 +177,7 @@ const ControlPanel = ({
     </Box>
 
 
-    {/* ── Model ──────────────────────────────────────────────────────── */}
+    {/* Model */}
     <Box sx={{ display: 'flex', mb: 1, gap: 1 }}>
       <Box sx={labelColumn}>
         <IconButton onClick={() => openInfoModal('Earth System Models general')} size="small" sx={{ color: 'white', p: 0 }}>
