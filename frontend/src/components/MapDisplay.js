@@ -117,7 +117,19 @@ const MapDisplay = ({
               z: data,
               x: lons,
               y: lats,
-              colorscale: colorbar,
+              colorscale: [
+                [0.0, '#440154'],
+                [0.2, '#440154'],
+                [0.2, '#3b528b'],
+                [0.4, '#3b528b'],
+                [0.4, '#21918c'],
+                [0.6, '#21918c'],
+                [0.6, '#5ec962'],
+                [0.8, '#5ec962'],
+                [0.8, '#fde725'],
+                [1.0, '#fde725'],
+              ],
+              zsmooth: false,
               zmin: minValue,
               zmax: maxValue,
               hovertemplate: `Longitude: %{x}<br>Latitude: %{y}<br>${index}: %{z}<extra></extra>`,
@@ -131,7 +143,6 @@ const MapDisplay = ({
                 tickcolor: 'white',
                 tickfont: { color: 'white' },
               },
-              zsmooth: 'best',
             },
           ]}
           layout={{
