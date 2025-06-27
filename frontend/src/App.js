@@ -1,11 +1,11 @@
 import React, { useState, useMemo } from 'react';
-import GlobeDisplay     from './components/GlobeDisplay';
-import MapDisplay       from './components/MapDisplay';
+import GlobeDisplay from './components/GlobeDisplay';
+import MapDisplay from './components/MapDisplay';
 import CombinedLinePlot from './components/CombinedLinePlot';
-import Footer           from './components/Footer';
+import Footer from './components/Footer';
 import ReferencesButton from './components/ReferencesButton';
-import ControlPanel     from './components/ControlPanel';
-import _                from 'lodash';
+import ControlPanel from './components/ControlPanel';
+import _ from 'lodash';
 import './App.css';
 
 /* -------------------------------  MUI ------------------------------- */
@@ -114,9 +114,6 @@ const infoMessages = {
     'Chlorophyll-a concentration in mg/m³ on a logarithmic scale.',
 };
 
-/* ====================================================================
- *                               APP
- * ================================================================== */
 const App = () => {
   /* --------------  Top-level state  ------------------------------- */
   const [infoModalOpen, setInfoModalOpen] = useState(false);
@@ -156,26 +153,26 @@ const App = () => {
 
   const LABEL_COLUMN = { width: '100px', display: 'flex', alignItems: 'center', gap: 1 };
   const INPUT_COLUMN = { flexGrow: 1, display: 'flex', alignItems: 'center' };
-  const ICON_COLUMN  = { width: '62px', display: 'flex', justifyContent: 'flex-start', alignItems: 'center' };
+  const ICON_COLUMN = { width: '62px', display: 'flex', justifyContent: 'flex-start', alignItems: 'center' };
 
   /* -------------------  Filter helpers (biomes) -------------------- */
   const filterBiomes = (diversity) => ({
-    groups:  diversity === 'Biomes' ? planktonGroups.slice(0, 1) : planktonGroups,
-    rcp:     diversity === 'Biomes' ? rcpScenarios.slice(0, 3)   : rcpScenarios,
-    models:  diversity === 'Biomes' ? earthModels.slice(0, 1)    : earthModels,
+    groups: diversity === 'Biomes' ? planktonGroups.slice(0, 1) : planktonGroups,
+    rcp: diversity === 'Biomes' ? rcpScenarios.slice(0, 3) : rcpScenarios,
+    models: diversity === 'Biomes' ? earthModels.slice(0, 1) : earthModels,
   });
 
-  /* =================================================================
-   *                               RENDER
-   * =============================================================== */
   return (
     <Box className="App" sx={{ backgroundColor: '#f5f5f5', minHeight: '100vh', p: 0 }}>
-      {/* ------------------------- HEADER ---------------------------- */}
+      {/* Header */}
       <Box component="header" sx={{ backgroundColor: '#fff', py: 2, px: 4, position: 'relative', textAlign: 'center', fontcolor: "black" }}>
         <Typography variant="h1" sx={{ fontSize: '3.5rem', fontWeight: 'bold', color: "black" }}>
           MAPMAKER
         </Typography>
-        <ReferencesButton sx={{ position: 'absolute', top: '50%', right: 16, transform: 'translateY(-50%)' }} />
+        <Typography variant="h6" sx={{ fontSize: '1.25rem', color: 'gray', mt: 1 }}>
+          Marine Plankton diversity bioindicator scenarios for policy MAKERs
+        </Typography>
+        <ReferencesButton sx={{ position: 'absolute', top: '30%', right: 16, transform: 'translateY(-50%)' }} />
       </Box>
 
       {/* ---------------------- INFO MODAL --------------------------- */}
@@ -420,31 +417,31 @@ const App = () => {
 
       {/* ----------------- COMBINED LINE PLOT ------------------------ */}
       <Box sx={{ width: '100%', p: 2, backgroundColor: '#1e1e1e', borderRadius: 1, mt: 3 }}>
-<CombinedLinePlot
-  point={selectedPoint}
-  leftSettings={{
-    source:    panel1.source,
-    index:     panel1.diversity,
-    group:     panel1.group,
-    scenario:  panel1.rcp,
-    model:     panel1.model,
-    envParam:  panel1.envParam
-  }}
-  rightSettings={{
-    source:    panel2.source,
-    index:     panel2.diversity,
-    group:     panel2.group,
-    scenario:  panel2.rcp,
-    model:     panel2.model,
-    envParam:  panel2.envParam
-  }}
-                  startYear={2012}
-                  endYear={2100}
-                />
-              </Box>
+        <CombinedLinePlot
+          point={selectedPoint}
+          leftSettings={{
+            source: panel1.source,
+            index: panel1.diversity,
+            group: panel1.group,
+            scenario: panel1.rcp,
+            model: panel1.model,
+            envParam: panel1.envParam
+          }}
+          rightSettings={{
+            source: panel2.source,
+            index: panel2.diversity,
+            group: panel2.group,
+            scenario: panel2.rcp,
+            model: panel2.model,
+            envParam: panel2.envParam
+          }}
+          startYear={2012}
+          endYear={2100}
+        />
+      </Box>
 
 
-      {/* -------------------------- FOOTER --------------------------- */}
+      {/* Footer */}
       <Box sx={{ mt: 2 }}>
         <Footer />
       </Box>
