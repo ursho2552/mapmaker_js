@@ -73,19 +73,19 @@ const ControlPanel = ({
   environmentalParameters,
 }) => (
   <Box className="panel-controls" sx={{ mb: 1, minHeight: 300 }}>
-    {/* ── DATA SOURCE RADIO ROW ──────────────────────────────────────── */}
+    {/* Data Source Row */}
     <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, justifyContent: 'space-between' }}>
       <FormControl component="fieldset" sx={{ color: 'white' }}>
         <RadioGroup row name="source" value={source} onChange={onSourceChange}>
           <FormControlLabel
             value="plankton"
             control={<Radio sx={{ color: 'white', '&.Mui-checked': { color: 'white' } }} />}
-            label={<Typography color="white">Plankton</Typography>}
+            label={<Typography color="white">Plankton Diversity</Typography>}
           />
           <FormControlLabel
             value="environmental"
             control={<Radio sx={{ color: 'white', '&.Mui-checked': { color: 'white' } }} />}
-            label={<Typography color="white">Environmental</Typography>}
+            label={<Typography color="white">Environmental Conditions</Typography>}
           />
         </RadioGroup>
       </FormControl>
@@ -191,50 +191,50 @@ const ControlPanel = ({
       </Box>
     )}
 
-       {/* ── Scenario ──────────────────────────────────────────────────── */}
-            <Box sx={{ display: 'flex', mb: 1, gap: 1 }}>
-              <Box sx={labelColumn}>
-                <IconButton onClick={() => openInfoModal('RCP Scenarios general')} size="small" sx={{ color: 'white', p: 0 }}>
-                  <InfoOutlinedIcon fontSize="small" />
-                </IconButton>
-                <Typography color="white" sx={{ mr: 0.5 }}>Scenario:</Typography>
-              </Box>
-              <Box sx={inputColumn}>
-                <FormControl variant="outlined" size="small" fullWidth sx={{ minWidth: 180, backgroundColor: 'white', borderRadius: 1 }}>
-                  <Select id="rcp" value={rcp} onChange={onRcpChange}>
-                    {filteredScenarios.map((opt) => <MenuItem key={opt} value={opt}>{opt}</MenuItem>)}
-                  </Select>
-                </FormControl>
-              </Box>
-              <Box sx={iconColumn}>
-                <IconButton onClick={() => openInfoModal(rcp)} size="small" sx={{ color: 'white', p: 0 }}>
-                  <InfoOutlinedIcon fontSize="small" />
-                </IconButton>
-              </Box>
-            </Box>
+    {/* ── Scenario ──────────────────────────────────────────────────── */}
+    <Box sx={{ display: 'flex', mb: 1, gap: 1 }}>
+      <Box sx={labelColumn}>
+        <IconButton onClick={() => openInfoModal('RCP Scenarios general')} size="small" sx={{ color: 'white', p: 0 }}>
+          <InfoOutlinedIcon fontSize="small" />
+        </IconButton>
+        <Typography color="white" sx={{ mr: 0.5 }}>Scenario:</Typography>
+      </Box>
+      <Box sx={inputColumn}>
+        <FormControl variant="outlined" size="small" fullWidth sx={{ minWidth: 180, backgroundColor: 'white', borderRadius: 1 }}>
+          <Select id="rcp" value={rcp} onChange={onRcpChange}>
+            {filteredScenarios.map((opt) => <MenuItem key={opt} value={opt}>{opt}</MenuItem>)}
+          </Select>
+        </FormControl>
+      </Box>
+      <Box sx={iconColumn}>
+        <IconButton onClick={() => openInfoModal(rcp)} size="small" sx={{ color: 'white', p: 0 }}>
+          <InfoOutlinedIcon fontSize="small" />
+        </IconButton>
+      </Box>
+    </Box>
 
 
-   {/* ── Model ──────────────────────────────────────────────────────── */}
-            <Box sx={{ display: 'flex', mb: 1, gap: 1 }}>
-              <Box sx={labelColumn}>
-                <IconButton onClick={() => openInfoModal('Earth System Models general')} size="small" sx={{ color: 'white', p: 0 }}>
-                  <InfoOutlinedIcon fontSize="small" />
-                </IconButton>
-                <Typography color="white" sx={{ mr: 0.5 }}>Model:</Typography>
-              </Box>
-              <Box sx={inputColumn}>
-                <FormControl variant="outlined" size="small" fullWidth sx={{ minWidth: 180, backgroundColor: 'white', borderRadius: 1 }}>
-                  <Select id="model" value={model} onChange={onModelChange}>
-                    {filteredModels.map((opt) => <MenuItem key={opt} value={opt}>{opt}</MenuItem>)}
-                  </Select>
-                </FormControl>
-              </Box>
-              <Box sx={iconColumn}>
-                <IconButton onClick={() => openInfoModal(model)} size="small" sx={{ color: 'white', p: 0 }}>
-                  <InfoOutlinedIcon fontSize="small" />
-                </IconButton>
-              </Box>
-               </Box>
+    {/* ── Model ──────────────────────────────────────────────────────── */}
+    <Box sx={{ display: 'flex', mb: 1, gap: 1 }}>
+      <Box sx={labelColumn}>
+        <IconButton onClick={() => openInfoModal('Earth System Models general')} size="small" sx={{ color: 'white', p: 0 }}>
+          <InfoOutlinedIcon fontSize="small" />
+        </IconButton>
+        <Typography color="white" sx={{ mr: 0.5 }}>Model:</Typography>
+      </Box>
+      <Box sx={inputColumn}>
+        <FormControl variant="outlined" size="small" fullWidth sx={{ minWidth: 180, backgroundColor: 'white', borderRadius: 1 }}>
+          <Select id="model" value={model} onChange={onModelChange}>
+            {filteredModels.map((opt) => <MenuItem key={opt} value={opt}>{opt}</MenuItem>)}
+          </Select>
+        </FormControl>
+      </Box>
+      <Box sx={iconColumn}>
+        <IconButton onClick={() => openInfoModal(model)} size="small" sx={{ color: 'white', p: 0 }}>
+          <InfoOutlinedIcon fontSize="small" />
+        </IconButton>
+      </Box>
+    </Box>
   </Box>
 );
 
