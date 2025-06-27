@@ -53,10 +53,12 @@ const MapDisplay = ({
   const [lats, setLats] = useState([]);
   const [lons, setLons] = useState([]);
   const [data, setData] = useState([]);
-  const [_, setColorbar] = useState('Viridis');
+  const [, setColorbar] = useState('Viridis');
   const [minValue, setMinValue] = useState(null);
   const [maxValue, setMaxValue] = useState(null);
   const [error, setError] = useState(null);
+  const [selectedPoint, setSelectedPoint] = useState(null);
+
 
   useEffect(() => {
     const isEnv = sourceType === 'environmental';
@@ -132,7 +134,19 @@ const MapDisplay = ({
                 tickfont: { color: 'white' },
               },
             },
-          ]}
+            selectedPoint && {
+              type: 'scatter',
+              mode: 'text',
+              x: [selectedPoint.x],
+              y: [selectedPoint.y],
+              text: ['📍'],
+              textposition: 'middle center',
+              textfont: {
+                size: 18,
+              },
+              hoverinfo: 'skip',
+            },
+          ].filter(Boolean)}
           layout={{
             ...layout,
             autosize: true,
@@ -142,6 +156,7 @@ const MapDisplay = ({
           onClick={(evt) => {
             if (evt.points?.length > 0) {
               const { x, y } = evt.points[0];
+              setSelectedPoint({ x, y });
               onPointClick(x, y);
             }
           }}
