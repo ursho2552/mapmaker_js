@@ -12,7 +12,6 @@ export const colorbarLabelMapping = {
     'Chlorophyll-a Concentration': 'Chlorophyll-a Concentration [log(mg/m³)]',
 };
 
-
 export const diversityIndices = [
     'Biomes',
     'Species Richness',

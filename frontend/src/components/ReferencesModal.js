@@ -1,7 +1,4 @@
 /**
- * Dialog listing all literature references and data acknowledgements.
- * Pure presentational component – visibility is controlled by its parent.
- *
  * Usage:
  *   <ReferencesModal open={open} onClose={handleClose} />
  */
@@ -33,7 +30,7 @@ const ReferencesModal = ({ open, onClose }) => (
       <Typography variant="body2" paragraph>
         Damiano&nbsp;Righetti&nbsp;et&nbsp;al.&nbsp;
         <em>PhytoBase: A global synthesis of open-ocean phytoplankton
-        occurrences</em>,&nbsp;in <em>Earth System Science Data</em> (2020),
+          occurrences</em>,&nbsp;in <em>Earth System Science Data</em> (2020),
         pp.&nbsp;907–933,&nbsp;doi:&nbsp;
         <Link
           href="https://doi.org/10.5194/essd-12-907-2020"
@@ -62,7 +59,7 @@ const ReferencesModal = ({ open, onClose }) => (
       </Typography>
       <Typography variant="body2" paragraph>
         Benedetti&nbsp;et&nbsp;al.&nbsp;<em>Major restructuring of marine
-        plankton assemblages under global warming</em>&nbsp;(under&nbsp;review)
+          plankton assemblages under global warming</em>&nbsp;(under&nbsp;review)
         <br />
         E.&nbsp;T.&nbsp;Buitenhuis&nbsp;et&nbsp;al.&nbsp;
         <em>MAREDAT: towards a world atlas of MARine Ecosystem&nbsp;DATa</em>,
@@ -87,7 +84,7 @@ const ReferencesModal = ({ open, onClose }) => (
       <Typography variant="body2" paragraph sx={{ mt: 1 }}>
         Damiano&nbsp;Righetti&nbsp;et&nbsp;al.&nbsp;
         <em>Global pattern of phytoplankton diversity driven by temperature and
-        environmental variability</em>, in <em>Science&nbsp;Advances</em>
+          environmental variability</em>, in <em>Science&nbsp;Advances</em>
         (2019), doi:&nbsp;
         <Link
           href="https://doi.org/10.1126/sciadv.aau6253"
@@ -122,11 +119,11 @@ const ReferencesModal = ({ open, onClose }) => (
 
       <Typography variant="body2" paragraph>
         Benedetti&nbsp;et&nbsp;al.&nbsp;<em>Major restructuring of marine
-        plankton assemblages under global warming</em>&nbsp;(under&nbsp;review)
+          plankton assemblages under global warming</em>&nbsp;(under&nbsp;review)
         <br />
         Urs&nbsp;Hofmann&nbsp;Elizondo&nbsp;et&nbsp;al.&nbsp;
         <em>Biome partitioning of the global ocean based on phytoplankton
-        biogeography</em>, in <em>Progress in Oceanography</em> (2021),
+          biogeography</em>, in <em>Progress in Oceanography</em> (2021),
         p.&nbsp;102530,&nbsp;doi:&nbsp;
         <Link
           href="https://doi.org/10.1016/j.pocean.2021.102530"
@@ -189,7 +186,7 @@ const ReferencesModal = ({ open, onClose }) => (
       <Typography variant="body2" paragraph sx={{ mt: 1 }}>
         Aurore&nbsp;Voldoire&nbsp;et&nbsp;al.&nbsp;
         <em>The CNRM-CM5.1 global climate model: description and basic
-        evaluation</em>, in <em>Climate Dynamics</em> (May&nbsp;2013),
+          evaluation</em>, in <em>Climate Dynamics</em> (May&nbsp;2013),
         pp.&nbsp;2091–2121, doi:&nbsp;
         <Link
           href="https://doi.org/10.1007/S00382-011-1259-Y"
@@ -215,7 +212,7 @@ const ReferencesModal = ({ open, onClose }) => (
       <Typography variant="body2" paragraph>
         Jean-Louis&nbsp;Dufresne&nbsp;et&nbsp;al.&nbsp;
         <em>Climate change projections using the IPSL-CM5 Earth System Model:
-        from CMIP3 to CMIP5</em>, in <em>Climate Dynamics</em> (2013),
+          from CMIP3 to CMIP5</em>, in <em>Climate Dynamics</em> (2013),
         pp.&nbsp;2123–2165,&nbsp;doi:&nbsp;
         <Link
           href="https://doi.org/10.1007/S00382-012-1636-1"
@@ -241,7 +238,7 @@ const ReferencesModal = ({ open, onClose }) => (
       <Typography variant="body2" paragraph>
         Thomas&nbsp;L.&nbsp;Delworth&nbsp;et&nbsp;al.&nbsp;
         <em>GFDL’s CM2 Global Coupled Climate Models. Part&nbsp;I: Formulation
-        and Simulation Characteristics</em>, in <em>Journal of Climate</em>
+          and Simulation Characteristics</em>, in <em>Journal of Climate</em>
         (2006), pp.&nbsp;643–674,&nbsp;doi:&nbsp;
         <Link
           href="https://doi.org/10.1175/JCLI3629.1"

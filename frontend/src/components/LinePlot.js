@@ -1,47 +1,30 @@
 import React, { useEffect, useState } from 'react';
 import Plot from 'react-plotly.js';
 
-
 const LinePlot = ({ selectedPoint, startYear, endYear, index, group, scenario, model, envParam }) => {
-
-  const yAxisLabelMapping = {
-    'Biomes': 'Biome label',
-    'Species Richness': 'Species Richness [%]',
-    'Hotspots of Change in Diversity': 'Diversity changes [%]',
-    'Habitat Suitability Index (HSI)': 'HSI [%]',
-    'Change in HSI': 'ΔHSI [%]',
-    'Species Turnover': 'Jaccard Index [-]',
-  };
-
-  const envParamLabelMapping = {
-    'Temperature': '°C',
-    'Oxygen': 'ml/l',
-    'Change in Temperature': 'Δ°C',
-    'Chlorophyll-a Concentration': 'log(mg/m³)',
-  };
 
   const layout = {
     title: `${selectedPoint.x}°E/${selectedPoint.y}°N from ${startYear} to ${endYear}`,
     font: {
-      color: 'white',  // Set title text color to white
+      color: 'white',
     },
-    margin: { l: 50, r: 70, t: 30, b: 30 },  // Increased right margin to 70
-    paper_bgcolor: '#282c34',  // Set background color of the plot
-    plot_bgcolor: '#282c34',   // Set background color for the plot area
+    margin: { l: 50, r: 70, t: 30, b: 30 },
+    paper_bgcolor: '#282c34',
+    plot_bgcolor: '#282c34',
     xaxis: { title: 'Year' },
     yaxis: { title: yAxisLabelMapping[index] },
-    yaxis2: {  // Add the second Y-axis
-      title: envParamLabelMapping[envParam],  // Replace with the appropriate label
+    yaxis2: {
+      title: envParamLabelMapping[envParam],
       overlaying: 'y',
       side: 'right',
       showgrid: true,
     },
     legend: {
-      x: 1.05,  // Move legend outside the plot to the right
+      x: 1.05,
       y: 1,
       xanchor: 'left',
       yanchor: 'top',
-      bgcolor: 'rgba(0,0,0,0)',  // Transparent background for the legend
+      bgcolor: 'rgba(0,0,0,0)',
       font: {
         color: 'white'
       }
@@ -81,36 +64,32 @@ const LinePlot = ({ selectedPoint, startYear, endYear, index, group, scenario, m
       {/* <h2>Line Plot for Point ({selectedPoint.x}, {selectedPoint.y}) from {startYear} to {endYear}:</h2> */}
       {lineData && (
         <Plot
-        data={[
-          {
-            ...lineData.data[0],  // Trace for the first line (left Y-axis)
-            name: index,  // Name based on the index
-            // line: { color: 'white' },
-            yaxis: 'y'  // Assign to the left Y-axis
-          },
-          {
-            ...lineData.data[2],  // Trace for the first line (left Y-axis)
-            name: index + ' Trend',  // Name based on the index
-            // line: { color: 'white' },
-            yaxis: 'y'  // Assign to the left Y-axis
-          },
-          {
-            ...lineData.data[1],  // Trace for the second line (right Y-axis)
-            name: envParam,  // Name based on the environmental parameter
-            // line: { color: color },  // Different color for the second line
-            yaxis: 'y2'  // Assign to the right Y-axis
-          },
-          {
-            ...lineData.data[3],  // Trace for the second line (right Y-axis)
-            name: envParam + ' Trend',  // Name based on the environmental parameter
-            // line: { color: color },  // Different color for the second line
-            yaxis: 'y2'  // Assign to the right Y-axis
-          }
-        ]}
+          data={[
+            {
+              ...lineData.data[0],
+              name: index,
+              yaxis: 'y'
+            },
+            {
+              ...lineData.data[2],
+              name: index + ' Trend',
+              yaxis: 'y'
+            },
+            {
+              ...lineData.data[1],
+              name: envParam,
+              yaxis: 'y2'
+            },
+            {
+              ...lineData.data[3],
+              name: envParam + ' Trend',
+              yaxis: 'y2'
+            }
+          ]}
           layout={layout}
-        config={{ displayModeBar: false }} // Hide the mode bar
-        useResizeHandler={true}
-        style={{ width: '100%', height: '80%' }} // Ensure it uses full container space
+          config={{ displayModeBar: false }}
+          useResizeHandler={true}
+          style={{ width: '100%', height: '80%' }}
 
         />
       )}

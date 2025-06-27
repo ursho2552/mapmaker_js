@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef, useMemo } from 'react';
 import Globe from 'react-globe.gl';
+import { colorbarLabelMapping } from '../constants';
 
 const GlobeDisplay = ({
   year,
@@ -20,19 +21,6 @@ const GlobeDisplay = ({
   const [maxValue, setMaxValue] = useState(1);
   const [cachedData, setCachedData] = useState({});
   const [isHovered, setIsHovered] = useState(false);
-
-  const colorbarLabelMapping = {
-    'Biomes': 'Biome [INSERT BIOMES LABEL]',
-    'Species Richness': 'Species Richness [% species]',
-    'Hotspots of Change in Diversity': 'Diversity changes [%]',
-    'Habitat Suitability Index (HSI)': 'HSI [%]',
-    'Change in HSI': 'ΔHSI [%]',
-    'Species Turnover': 'Jaccard Index [-]',
-    'Temperature': 'Temperature [°C]',
-    'Change in Temperature': 'ΔTemperature [Δ°C]',
-    'Oxygen': 'Oxygen [mg/L]',
-    'Chlorophyll-a Concentration': 'Chlorophyll-a Concentration [log(mg/m³)]',
-  };
 
   const legendLabel = colorbarLabelMapping[index] || index;
 

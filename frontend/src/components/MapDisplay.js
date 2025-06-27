@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Plot from 'react-plotly.js';
+import { colorbarLabelMapping } from '../constants';
 
 const MapDisplay = ({
   year,
@@ -10,19 +11,6 @@ const MapDisplay = ({
   sourceType = 'plankton',
   onPointClick,
 }) => {
-  // Maps for axis labels 
-  const colorbarLabelMapping = {
-    'Biomes': 'Biome [INSERT BIOMES LABEL]',
-    'Species Richness': 'Species Richness [%]',
-    'Hotspots of Change in Diversity': 'Diversity changes [%]',
-    'Habitat Suitability Index (HSI)': 'HSI [%]',
-    'Change in HSI': 'ΔHSI [%]',
-    'Species Turnover': 'Jaccard Index [-]',
-    'Temperature': 'Temperature [°C]',
-    'Change in Temperature': 'ΔTemperature [Δ°C]',
-    'Oxygen': 'Oxygen [mg/L]',
-    'Chlorophyll-a Concentration': 'Chlorophyll-a Concentration [log(mg/m³)]',
-  };
 
   const layout = {
     title: {
