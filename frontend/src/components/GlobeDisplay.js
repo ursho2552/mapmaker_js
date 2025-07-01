@@ -254,7 +254,7 @@ const GlobeDisplay = ({
           right: 8,
           top: 8,
           bottom: 8,
-          width: 60,
+          width: 90,
           display: 'flex',
           flexDirection: 'row',
           alignItems: 'center',
