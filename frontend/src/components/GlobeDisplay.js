@@ -25,6 +25,10 @@ const GlobeDisplay = ({
 
   const legendLabel = colorbarLabelMapping[index] || index;
 
+  const readableIndex = colorbarLabelMapping[index] || index;
+  const readableGroup = group ? ` and ${group}` : '';
+  const fullTitle = `${readableIndex} ${readableGroup} predicted by <br> ${scenario} on ${model} in ${year}`;
+
   const createHtmlElement = (d) => {
     const el = document.createElement('div');
     el.style.color = 'red';
@@ -202,7 +206,7 @@ const GlobeDisplay = ({
 
   const legendLabels = index.includes('Change')
     ? [minValue.toFixed(2), ((minValue + maxValue) / 2).toFixed(2), maxValue.toFixed(2)]
-    : labels.map((l) => l.toFixed(2));
+    : labels.map((l) => l.toFixed(0));
 
   const handlePointClick = (lng, lat) => {
     setSelectedPoint({ lng, lat });
@@ -216,19 +220,40 @@ const GlobeDisplay = ({
         width: '100%',
         height: '100%',
         position: 'relative',
+        backgroundColor: '#282c34',
         overflow: 'hidden',
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
+      {/* Title */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 13,
+          left: 20,
+          color: 'white',
+          fontSize: 17,
+          fontWeight: 'normal',
+          textAlign: 'center',
+          pointerEvents: 'none',
+          userSelect: 'none',
+          zIndex: 10,
+          whiteSpace: 'normal',
+          lineHeight: 1.3,
+        }}
+        dangerouslySetInnerHTML={{ __html: fullTitle }}
+      />
+
       {error && (
         <div
-          style={{ position: 'absolute', top: 0, left: 0, color: 'red', zIndex: 2 }}
+          style={{ position: 'absolute', top: 0, left: 0, color: 'red', zIndex: 11 }}
         >
           {error}
         </div>
       )}
 
+      {/* Globe */}
       <div style={{ width: '100%', height: '100%' }}>
         <Globe
           ref={globeRef}
@@ -247,102 +272,66 @@ const GlobeDisplay = ({
         />
       </div>
 
-      {/* Legend */}
+      {/* Legend (Colorbar) */}
       <div
         style={{
           position: 'absolute',
-          right: 8,
-          top: 8,
-          bottom: 8,
-          width: 90,
+          top: 60,
+          right: 10,
+          width: 65,
+          height: 'calc(100% - 80px)',
           display: 'flex',
           flexDirection: 'row',
           alignItems: 'center',
-          zIndex: 2,
           pointerEvents: 'none',
+          zIndex: 10,
         }}
       >
         <div
           style={{
             flex: 1,
             display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'stretch',
-            height: '100%',
+            flexDirection: 'column',
+            height: '90%',
+            borderRadius: 4,
+            background: index.includes('Change')
+              ? 'linear-gradient(to top, #0000ff 0%, #ffffff 50%, #ff0000 100%)'
+              : 'none',
           }}
         >
-          <div
-            style={{
-              width: 20,
-              borderRadius: 4,
-              height: '100%',
-              display: 'flex',
-              flexDirection: index.includes('Change') ? 'column' : 'column',
-              background: index.includes('Change')
-                ? 'linear-gradient( #ff0000, #ffffff 50%, #0000ff)'
-                : 'none',
-            }}
-          >
-            {/* For sequential, show discrete color blocks */}
-            {!index.includes('Change') &&
-              legendColors
-                .slice()
-                .map((color, i) => (
-                  <div
-                    key={i}
-                    style={{
-                      flex: 1,
-                      backgroundColor: color,
-                    }}
-                  />
-                ))}
-          </div>
-
-          <div
-            style={{
-              flex: 1,
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: index.includes('Change') ? 'space-between' : 'space-between',
-              marginLeft: 8,
-              height: '100%',
-            }}
-          >
-            {index.includes('Change')
-              ? legendLabels.map((lbl, i) => (
-                <div
-                  key={i}
-                  style={{ color: 'white', fontSize: '0.8rem', userSelect: 'none' }}
-                >
-                  {lbl}
-                </div>
-              ))
-              : legendLabels.map((lbl, i) => (
-                <div
-                  key={i}
-                  style={{ color: 'white', fontSize: '0.8rem', userSelect: 'none' }}
-                >
-                  {lbl}
-                </div>
-              ))}
-          </div>
+          {!index.includes('Change') &&
+            legendColors.map((color, i) => (
+              <div
+                key={i}
+                style={{
+                  flex: 1,
+                  backgroundColor: color,
+                }}
+              />
+            ))}
         </div>
+
         <div
           style={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            marginLeft: 1,
+            height: '90%',
             color: 'white',
-            whiteSpace: 'nowrap',
-            writingMode: 'vertical-rl',
-            transform: 'rotate(180deg)',
-            marginTop: 8,
-            fontSize: 16,
+            fontSize: 12,
             userSelect: 'none',
           }}
         >
-          {legendLabel}
+          {legendLabels.map((lbl, i) => (
+            <div key={i}>{`- ${lbl}`}</div>
+          ))}
         </div>
       </div>
     </div>
   );
+
 };
 
 export default GlobeDisplay;
