@@ -95,7 +95,7 @@ const App = () => {
         </DialogActions>
       </Dialog>
 
-      {/* ==================== DUAL DISPLAY PANELS ==================== */}
+      {/* Dual Display Panels */}
       <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', p: 2 }}>
         {/* ######################## PANEL 1 ########################## */}
         <Box sx={{ flex: 1, minWidth: 300, p: 2, backgroundColor: 'black', borderRadius: 1 }}>
@@ -210,7 +210,7 @@ const App = () => {
           </Box>
         </Box>
 
-        {/* ######################## PANEL 2 ########################## */}
+        {/* Panel */}
         <Box sx={{ flex: 1, minWidth: 300, p: 2, backgroundColor: 'black', borderRadius: 1 }}>
           <ControlPanel
             source={panel2.source}
@@ -324,8 +324,14 @@ const App = () => {
         </Box>
       </Box>
 
-      {/* ----------------- COMBINED LINE PLOT ------------------------ */}
-      <Box sx={{ width: '100%', p: 2, backgroundColor: '#1e1e1e', borderRadius: 1, mt: 3 }}>
+      {/* Combined Line Plot */}
+      <Box sx={{
+        backgroundColor: '#1e1e1e',
+        borderRadius: 2,
+        height: '100%',
+        mx: 2,
+      }}>
+
         <CombinedLinePlot
           point={selectedPoint}
           leftSettings={{
