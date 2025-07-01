@@ -30,15 +30,20 @@ const MapDisplay = ({
   const [maxValue, setMaxValue] = useState(null);
   const [error, setError] = useState(null);
   const [selectedPoint, setSelectedPoint] = useState(null);
+  const readableIndex = colorbarLabelMapping[index] || index;
+  const readableGroup = group ? ` and ${group}` : '';
+
+  const fullTitle = `${readableIndex}${readableGroup} predicted by <br> ${scenario} on ${model} in ${year}`;
 
   const layout = {
     title: {
-      text: `Year: ${year}`,
+      text: fullTitle,
       font: {
         color: 'white',
+        size: 16,
       },
     },
-    margin: { l: 0, r: 0, t: 30, b: 0 },
+    margin: { l: 5, r: 5, t: 60, b: 5 },
     paper_bgcolor: '#282c34',
     plot_bgcolor: '#282c34',
     xaxis: {
@@ -105,7 +110,6 @@ const MapDisplay = ({
         setLats(json.lats);
         setLons(json.lons);
         setData(json.variable);
-        // Optionally ignore json.colorscale or merge with state
         setMinValue(json.minValue);
         setMaxValue(json.maxValue);
         setError(null);
