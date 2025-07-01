@@ -42,7 +42,7 @@ const CombinedLinePlot = ({ point, leftSettings, rightSettings, startYear, endYe
   const rightName = rightSettings.source === 'plankton' ? rightSettings.index : rightSettings.envParam;
   const layout = {
     title: {
-      text: `Time series at ${point.x.toFixed(2)}°E, ${point.y.toFixed(2)}°N`,
+      text: `${leftName} and ${rightName} at ${point.x.toFixed(2)}°E, ${point.y.toFixed(2)}°N`,
       font: { color: 'white' }
     },
     paper_bgcolor: '#282c34',
