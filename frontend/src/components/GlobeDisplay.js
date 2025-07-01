@@ -27,7 +27,7 @@ const GlobeDisplay = ({
 
   const readableIndex = colorbarLabelMapping[index] || index;
   const readableGroup = group ? ` and ${group}` : '';
-  const fullTitle = `${readableIndex} ${readableGroup} predicted by <br> ${scenario} on ${model} in ${year}`;
+  const fullTitle = `${readableIndex} ${readableGroup} predicted by ${scenario} on ${model} in ${year}`;
 
   const createHtmlElement = (d) => {
     const el = document.createElement('div');
@@ -226,107 +226,121 @@ const GlobeDisplay = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Title */}
       <div
+        ref={containerRef}
         style={{
-          position: 'absolute',
-          top: 13,
-          left: 20,
-          color: 'white',
-          fontSize: 17,
-          fontWeight: 'normal',
-          textAlign: 'center',
-          pointerEvents: 'none',
-          userSelect: 'none',
-          zIndex: 10,
-          whiteSpace: 'normal',
-          lineHeight: 1.3,
-        }}
-        dangerouslySetInnerHTML={{ __html: fullTitle }}
-      />
-
-      {error && (
-        <div
-          style={{ position: 'absolute', top: 0, left: 0, color: 'red', zIndex: 11 }}
-        >
-          {error}
-        </div>
-      )}
-
-      {/* Globe */}
-      <div style={{ width: '100%', height: '100%' }}>
-        <Globe
-          ref={globeRef}
-          width={dimensions.width}
-          height={dimensions.height}
-          globeImageUrl="//unpkg.com/three-globe/example/img/earth-water.png"
-          showAtmosphere={false}
-          backgroundColor="#282c34"
-          pointsData={pointsData}
-          pointAltitude="size"
-          pointColor="color"
-          pointRadius={0.9}
-          onPointClick={(pt) => handlePointClick(pt.lng, pt.lat)}
-          htmlElementsData={selectedPoint ? [selectedPoint] : []}
-          htmlElement={createHtmlElement}
-        />
-      </div>
-
-      {/* Legend (Colorbar) */}
-      <div
-        style={{
-          position: 'absolute',
-          top: 60,
-          right: 10,
-          width: 65,
-          height: 'calc(100% - 80px)',
+          width: '100%',
+          height: '100%',
           display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'center',
-          pointerEvents: 'none',
-          zIndex: 10,
+          flexDirection: 'column',
+          backgroundColor: '#282c34',
         }}
       >
+        {/* Title */}
         <div
           style={{
-            flex: 1,
-            display: 'flex',
-            flexDirection: 'column',
-            height: '90%',
-            borderRadius: 4,
-            background: index.includes('Change')
-              ? 'linear-gradient(to top, #0000ff 0%, #ffffff 50%, #ff0000 100%)'
-              : 'none',
+            position: 'absolute',
+            top: 13,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: '90%',
+            color: 'white',
+            height: 60,
+            fontSize: 17,
+            fontWeight: 'normal',
+            textAlign: 'center',
+            pointerEvents: 'none',
+            userSelect: 'none',
+            zIndex: 10,
+            whiteSpace: 'normal',
+            lineHeight: 1.3,
           }}
-        >
-          {!index.includes('Change') &&
-            legendColors.map((color, i) => (
-              <div
-                key={i}
-                style={{
-                  flex: 1,
-                  backgroundColor: color,
-                }}
-              />
-            ))}
+          dangerouslySetInnerHTML={{ __html: fullTitle }}
+        />
+
+        {error && (
+          <div
+            style={{ position: 'absolute', top: 0, left: 0, color: 'red', zIndex: 11 }}
+          >
+            {error}
+          </div>
+        )}
+
+        {/* Globe */}
+        <div style={{ width: '100%', height: '100%' }}>
+          <Globe
+            ref={globeRef}
+            width={dimensions.width}
+            height={dimensions.height}
+            globeImageUrl="//unpkg.com/three-globe/example/img/earth-water.png"
+            showAtmosphere={false}
+            backgroundColor="#282c34"
+            pointsData={pointsData}
+            pointAltitude="size"
+            pointColor="color"
+            pointRadius={0.9}
+            onPointClick={(pt) => handlePointClick(pt.lng, pt.lat)}
+            htmlElementsData={selectedPoint ? [selectedPoint] : []}
+            htmlElement={createHtmlElement}
+          />
         </div>
 
+        {/* Legend (Colorbar) */}
         <div
           style={{
-            flex: 1,
+            position: 'absolute',
+            top: 60,
+            right: 10,
+            width: 65,
+            height: 'calc(100% - 80px)',
             display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            marginLeft: 1,
-            height: '90%',
-            color: 'white',
-            fontSize: 12,
-            userSelect: 'none',
+            flexDirection: 'row',
+            alignItems: 'center',
+            pointerEvents: 'none',
+            zIndex: 10,
           }}
         >
-          {legendLabels.map((lbl, i) => (
-            <div key={i}>{`- ${lbl}`}</div>
-          ))}
+          <div
+            style={{
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              height: '90%',
+              borderRadius: 4,
+              background: index.includes('Change')
+                ? 'linear-gradient(to top, #0000ff 0%, #ffffff 50%, #ff0000 100%)'
+                : 'none',
+            }}
+          >
+            {!index.includes('Change') &&
+              legendColors.map((color, i) => (
+                <div
+                  key={i}
+                  style={{
+                    flex: 1,
+                    backgroundColor: color,
+                  }}
+                />
+              ))}
+          </div>
+
+          <div
+            style={{
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              marginLeft: 1,
+              height: '90%',
+              color: 'white',
+              fontSize: 12,
+              userSelect: 'none',
+            }}
+          >
+            {legendLabels.map((lbl, i) => (
+              <div key={i}>{`- ${lbl}`}</div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
