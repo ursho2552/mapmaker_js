@@ -102,10 +102,12 @@ const GlobeDisplay = ({
   }, [index]);
 
   const fetchData = async (yr) => {
-    if (cachedData[yr]) {
-      setPointsData(cachedData[yr].pointsData);
-      setMinValue(cachedData[yr].minValue);
-      setMaxValue(cachedData[yr].maxValue);
+    const cacheKey = `${yr}_${index}_${group}_${scenario}_${model}_${sourceType}`;
+
+    if (cachedData[cacheKey]) {
+      setPointsData(cachedData[cacheKey].pointsData);
+      setMinValue(cachedData[cacheKey].minValue);
+      setMaxValue(cachedData[cacheKey].maxValue);
       return;
     }
 
@@ -152,7 +154,7 @@ const GlobeDisplay = ({
 
       setCachedData((prev) => ({
         ...prev,
-        [yr]: { pointsData: transformed, minValue: minVal, maxValue: maxVal },
+        [cacheKey]: { pointsData: transformed, minValue: minVal, maxValue: maxVal },
       }));
       setPointsData(transformed);
       setMinValue(minVal);
