@@ -43,7 +43,7 @@ const MapDisplay = ({
         size: 16,
       },
     },
-    margin: { l: 5, r: 5, t: 60, b: 5 },
+    margin: { l: 10, r: 0, t: 60, b: 10 },
     paper_bgcolor: '#282c34',
     plot_bgcolor: '#282c34',
     xaxis: {
@@ -146,12 +146,6 @@ const MapDisplay = ({
               zmax: maxValue,
               hovertemplate: `Longitude: %{x}<br>Latitude: %{y}<br>${index}: %{z}<extra></extra>`,
               colorbar: {
-                title: {
-                  text: colorbarLabelMapping[index] || '',
-                  side: 'right',
-                  font: { color: 'white', size: 16 },
-                  textangle: 90,
-                },
                 tickcolor: 'white',
                 tickfont: { color: 'white' },
               },

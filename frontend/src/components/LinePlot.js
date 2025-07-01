@@ -53,7 +53,7 @@ const LinePlot = ({ selectedPoint, startYear, endYear, index, group, scenario, m
           setError(error.message);
         });
     }
-  }, [selectedPoint, startYear, endYear, index, group, scenario, model, envParam]); // Update whenever selectedPoint or years change
+  }, [selectedPoint, startYear, endYear, index, group, scenario, model, envParam]);
 
   if (error) {
     return <div>Error: {error}</div>;
