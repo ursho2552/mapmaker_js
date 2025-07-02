@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Plot from 'react-plotly.js';
-import { colorbarLabelMapping } from '../constants';
+import { colorbarLabelMapping, mapGlobeTitleStyle } from '../constants';
 
 const MapDisplay = ({
   year,
@@ -33,16 +33,9 @@ const MapDisplay = ({
   const readableIndex = colorbarLabelMapping[index] || index;
   const readableGroup = group ? ` and ${group}` : '';
 
-  const fullTitle = `${readableIndex}${readableGroup} predicted by <br> ${scenario} on ${model} in ${year}`;
+  const fullTitle = `${readableIndex}${readableGroup} predicted by ${scenario} on ${model} in ${year}`;
 
   const layout = {
-    title: {
-      text: fullTitle,
-      font: {
-        color: 'white',
-        size: 16,
-      },
-    },
     margin: { l: 10, r: 0, t: 60, b: 10 },
     paper_bgcolor: '#282c34',
     plot_bgcolor: '#282c34',
@@ -121,13 +114,18 @@ const MapDisplay = ({
   }, [year, index, group, scenario, model, sourceType]);
 
   return (
-    <div style={{ width: '100%', height: '100%' }}>
+    <div style={{ width: '100%', height: '100%', position: 'relative', backgroundColor: '#282c34' }}>
       {error && <div style={{ color: 'red' }}>{error}</div>}
+
+      {/* Title Box */}
+      <div style={mapGlobeTitleStyle}>
+        {fullTitle}
+      </div>
 
       <div
         style={{
           position: 'absolute',
-          top: 0,
+          top: 5,
           left: 0,
           width: '100%',
           height: '100%',
@@ -165,6 +163,7 @@ const MapDisplay = ({
           ].filter(Boolean)}
           layout={{
             ...layout,
+            title: undefined, // Remove internal title
             autosize: true,
           }}
           useResizeHandler={true}

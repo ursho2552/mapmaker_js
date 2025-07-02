@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useMemo } from 'react';
 import Globe from 'react-globe.gl';
-import { colorbarLabelMapping } from '../constants';
+import { colorbarLabelMapping, mapGlobeTitleStyle } from '../constants';
 
 const GlobeDisplay = ({
   year,
@@ -238,23 +238,7 @@ const GlobeDisplay = ({
       >
         {/* Title */}
         <div
-          style={{
-            position: 'absolute',
-            top: 13,
-            left: '50%',
-            transform: 'translateX(-50%)',
-            width: '90%',
-            color: 'white',
-            height: 60,
-            fontSize: 17,
-            fontWeight: 'normal',
-            textAlign: 'center',
-            pointerEvents: 'none',
-            userSelect: 'none',
-            zIndex: 10,
-            whiteSpace: 'normal',
-            lineHeight: 1.3,
-          }}
+          style={mapGlobeTitleStyle}
           dangerouslySetInnerHTML={{ __html: fullTitle }}
         />
 

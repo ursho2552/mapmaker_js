@@ -132,3 +132,20 @@ export const logos = [
     }
 ];
 
+export const mapGlobeTitleStyle = {
+    position: 'absolute',
+    top: 13,
+    left: '50%',
+    transform: 'translateX(-50%)',
+    width: '90%',
+    color: 'white',
+    height: 60,
+    fontSize: 17,
+    fontWeight: 'normal',
+    textAlign: 'center',
+    pointerEvents: 'none',
+    userSelect: 'none',
+    zIndex: 10,
+    whiteSpace: 'normal',
+    lineHeight: 1.3,
+};
