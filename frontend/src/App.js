@@ -50,8 +50,15 @@ const App = () => {
   const [projectModalOpen, setProjectModalOpen] = useState(true);
 
   // Debounce helpers
-  const debouncedUpdateYear = useMemo(
-    () => _.debounce((setter, y) => setter(y), 500),
+  const [debouncedYear1, setDebouncedYear1] = useState(2012);
+  const [debouncedYear2, setDebouncedYear2] = useState(2012);
+  const debouncedUpdateYear1 = useMemo(
+    () => _.debounce((y) => setDebouncedYear1(y), 500),
+    []
+  );
+
+  const debouncedUpdateYear2 = useMemo(
+    () => _.debounce((y) => setDebouncedYear2(y), 500),
     []
   );
 
@@ -95,7 +102,7 @@ const App = () => {
         <ReferencesButton sx={{ position: 'absolute', top: '30%', right: 16, transform: 'translateY(-50%)' }} />
       </Box>
 
-      {/* ---------------------- INFO MODAL --------------------------- */}
+      {/* Info Modal */}
       <Dialog open={infoModalOpen} onClose={closeInfoModal} maxWidth="sm" fullWidth>
         <DialogTitle>Explanation</DialogTitle>
         <DialogContent dividers>
@@ -108,7 +115,7 @@ const App = () => {
 
       {/* Dual Display Panels */}
       <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', p: 2 }}>
-        {/* ######################## PANEL 1 ########################## */}
+        {/* PANEL 1 */}
         <Box sx={{ flex: 1, minWidth: 300, p: 2, backgroundColor: 'black', borderRadius: 1 }}>
           <ControlPanel
             source={panel1.source}
@@ -134,7 +141,7 @@ const App = () => {
             iconColumn={ICON_COLUMN}
           />
 
-          {/* VIEW SWITCH */}
+          {/* View Switch */}
           <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 3 }}>
             <FormControl component="fieldset">
               <RadioGroup
@@ -156,7 +163,7 @@ const App = () => {
             </FormControl>
           </Box>
 
-          {/* YEAR SLIDER */}
+          {/* Year Slider */}
           <Box sx={{ mb: 2, px: 1 }}>
             <Typography color="white" variant="subtitle2" gutterBottom>
               Year: {panel1.year}
@@ -166,19 +173,19 @@ const App = () => {
               max={2100}
               value={panel1.year}
               onChange={(e, v) => {
-                setPanel1({ ...panel1, year: v });
-                debouncedUpdateYear((y) => setPanel1({ ...panel1, debouncedYear: y }), v);
+                setPanel1(prev => ({ ...prev, year: v }));
+                debouncedUpdateYear1(v);
               }}
               valueLabelDisplay="auto"
               sx={{ color: '#1976d2' }}
             />
           </Box>
 
-          {/* PANEL 1 DISPLAY */}
+          {/* Panel 1 Display */}
           <Box sx={{ width: '100%', height: 400, position: 'relative' }}>
             {panel1.source === 'plankton' && panel1.view === 'map' && (
               <MapDisplay
-                year={panel1.year}
+                year={debouncedYear1}
                 index={panel1.diversity}
                 group={panel1.group}
                 scenario={panel1.rcp}
@@ -189,7 +196,7 @@ const App = () => {
             )}
             {panel1.source === 'plankton' && panel1.view === 'globe' && (
               <GlobeDisplay
-                year={panel1.debouncedYear}
+                year={debouncedYear1}
                 index={panel1.diversity}
                 group={panel1.group}
                 scenario={panel1.rcp}
@@ -200,7 +207,7 @@ const App = () => {
             )}
             {panel1.source === 'environmental' && panel1.view === 'map' && (
               <MapDisplay
-                year={panel1.year}
+                year={debouncedYear1}
                 index={panel1.envParam}
                 scenario={panel1.rcp}
                 model={panel1.model}
@@ -210,7 +217,7 @@ const App = () => {
             )}
             {panel1.source === 'environmental' && panel1.view === 'globe' && (
               <GlobeDisplay
-                year={panel1.debouncedYear}
+                year={debouncedYear1}
                 index={panel1.envParam}
                 scenario={panel1.rcp}
                 model={panel1.model}
@@ -247,7 +254,7 @@ const App = () => {
             iconColumn={ICON_COLUMN}
           />
 
-          {/* VIEW SWITCH */}
+          {/* View Switch */}
           <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 3 }}>
             <FormControl component="fieldset">
               <RadioGroup
@@ -269,7 +276,7 @@ const App = () => {
             </FormControl>
           </Box>
 
-          {/* YEAR SLIDER */}
+          {/* Year Slider */}
           <Box sx={{ mb: 2, px: 1 }}>
             <Typography color="white" variant="subtitle2" gutterBottom>
               Year: {panel2.year}
@@ -279,8 +286,8 @@ const App = () => {
               max={2100}
               value={panel2.year}
               onChange={(e, v) => {
-                setPanel2({ ...panel2, year: v });
-                debouncedUpdateYear((y) => setPanel2({ ...panel2, debouncedYear: y }), v);
+                setPanel2(prev => ({ ...prev, year: v }));
+                debouncedUpdateYear2(v);
               }}
               valueLabelDisplay="auto"
               sx={{ color: '#1976d2' }}
@@ -291,7 +298,7 @@ const App = () => {
           <Box sx={{ width: '100%', height: 400, position: 'relative' }}>
             {panel2.source === 'plankton' && panel2.view === 'map' && (
               <MapDisplay
-                year={panel2.year}
+                year={debouncedYear2}
                 index={panel2.diversity}
                 group={panel2.group}
                 scenario={panel2.rcp}
@@ -302,7 +309,7 @@ const App = () => {
             )}
             {panel2.source === 'plankton' && panel2.view === 'globe' && (
               <GlobeDisplay
-                year={panel2.debouncedYear}
+                year={debouncedYear2}
                 index={panel2.diversity}
                 group={panel2.group}
                 scenario={panel2.rcp}
@@ -313,7 +320,7 @@ const App = () => {
             )}
             {panel2.source === 'environmental' && panel2.view === 'map' && (
               <MapDisplay
-                year={panel2.year}
+                year={debouncedYear2}
                 index={panel2.envParam}
                 scenario={panel2.rcp}
                 model={panel2.model}
@@ -323,7 +330,7 @@ const App = () => {
             )}
             {panel2.source === 'environmental' && panel2.view === 'globe' && (
               <GlobeDisplay
-                year={panel2.debouncedYear}
+                year={debouncedYear2}
                 index={panel2.envParam}
                 scenario={panel2.rcp}
                 model={panel2.model}
