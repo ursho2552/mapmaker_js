@@ -1,10 +1,11 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import GlobeDisplay from './components/GlobeDisplay';
 import MapDisplay from './components/MapDisplay';
 import CombinedLinePlot from './components/CombinedLinePlot';
 import Footer from './components/Footer';
 import ReferencesButton from './components/ReferencesButton';
 import ControlPanel from './components/ControlPanel';
+import ProjectExplanationModal from './components/ProjectExplanationModal';
 import _ from 'lodash';
 import './App.css';
 import {
@@ -46,14 +47,15 @@ const App = () => {
 
   const [panel1, setPanel1] = useState(createPanelState);
   const [panel2, setPanel2] = useState({ ...createPanelState(), source: 'environmental', view: 'globe' });
+  const [projectModalOpen, setProjectModalOpen] = useState(true);
 
-  /* --------------  Debounce helpers  ------------------------------- */
+  // Debounce helpers
   const debouncedUpdateYear = useMemo(
     () => _.debounce((setter, y) => setter(y), 500),
     []
   );
 
-  /* ---------------------------  Helpers  --------------------------- */
+  // Helpers
   const openInfoModal = (key) => {
     setInfoModalText(infoMessages[key] ?? 'No information available');
     setInfoModalOpen(true);
@@ -64,15 +66,24 @@ const App = () => {
   const INPUT_COLUMN = { flexGrow: 1, display: 'flex', alignItems: 'center' };
   const ICON_COLUMN = { width: '62px', display: 'flex', justifyContent: 'flex-start', alignItems: 'center' };
 
-  /* -------------------  Filter helpers (biomes) -------------------- */
+  // Filter helpers (biomes)
   const filterBiomes = (diversity) => ({
     groups: diversity === 'Biomes' ? planktonGroups.slice(0, 1) : planktonGroups,
     rcp: diversity === 'Biomes' ? rcpScenarios.slice(0, 3) : rcpScenarios,
     models: diversity === 'Biomes' ? earthModels.slice(0, 1) : earthModels,
   });
 
+  useEffect(() => {
+    setProjectModalOpen(true);
+  }, []);
+
   return (
     <Box className="App" sx={{ backgroundColor: '#f5f5f5', minHeight: '100vh', p: 0 }}>
+      <ProjectExplanationModal
+        open={projectModalOpen}
+        onClose={() => setProjectModalOpen(false)}
+      />
+
       {/* Header */}
       <Box component="header" sx={{ backgroundColor: '#fff', py: 2, px: 4, position: 'relative', textAlign: 'center', fontcolor: "black" }}>
         <Typography variant="h1" sx={{ fontSize: '3.5rem', fontWeight: 'bold', color: "black" }}>
