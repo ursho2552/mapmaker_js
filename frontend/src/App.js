@@ -1,21 +1,14 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import GlobeDisplay from './components/GlobeDisplay';
-import MapDisplay from './components/MapDisplay';
 import CombinedLinePlot from './components/CombinedLinePlot';
 import Footer from './components/Footer';
 import ReferencesButton from './components/ReferencesButton';
-import ControlPanel from './components/ControlPanel';
+import DataPanel from './components/DataPanel';
 import ProjectExplanationModal from './components/ProjectExplanationModal';
 import _ from 'lodash';
 import './App.css';
 import {
   Box,
   Typography,
-  FormControl,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
-  Slider as MuiSlider,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -113,233 +106,35 @@ const App = () => {
         </DialogActions>
       </Dialog>
 
-      {/* Dual Display Panels */}
       <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', p: 2 }}>
-        {/* PANEL 1 */}
-        <Box sx={{ flex: 1, minWidth: 300, p: 2, backgroundColor: 'black', borderRadius: 1 }}>
-          <ControlPanel
-            source={panel1.source}
-            onSourceChange={(e) => setPanel1({ ...panel1, source: e.target.value })}
-            diversity={panel1.diversity}
-            onDiversityChange={(e) => setPanel1({ ...panel1, diversity: e.target.value })}
-            envParam={panel1.envParam}
-            onEnvParamChange={(e) => setPanel1({ ...panel1, envParam: e.target.value })}
-            group={panel1.group}
-            onGroupChange={(e) => setPanel1({ ...panel1, group: e.target.value })}
-            rcp={panel1.rcp}
-            onRcpChange={(e) => setPanel1({ ...panel1, rcp: e.target.value })}
-            model={panel1.model}
-            onModelChange={(e) => setPanel1({ ...panel1, model: e.target.value })}
-            filteredGroups={filterBiomes(panel1.diversity).groups}
-            filteredScenarios={filterBiomes(panel1.diversity).rcp}
-            filteredModels={filterBiomes(panel1.diversity).models}
-            diversityIndices={diversityIndices}
-            environmentalParameters={environmentalParameters}
-            openInfoModal={openInfoModal}
-            labelColumn={LABEL_COLUMN}
-            inputColumn={INPUT_COLUMN}
-            iconColumn={ICON_COLUMN}
-          />
-
-          {/* View Switch */}
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 3 }}>
-            <FormControl component="fieldset">
-              <RadioGroup
-                row
-                value={panel1.view}
-                onChange={(e) => setPanel1({ ...panel1, view: e.target.value })}
-              >
-                <FormControlLabel
-                  value="map"
-                  control={<Radio sx={{ color: 'white', '&.Mui-checked': { color: 'white' } }} />}
-                  label={<Typography color="white">Map</Typography>}
-                />
-                <FormControlLabel
-                  value="globe"
-                  control={<Radio sx={{ color: 'white', '&.Mui-checked': { color: 'white' } }} />}
-                  label={<Typography color="white">Globe</Typography>}
-                />
-              </RadioGroup>
-            </FormControl>
-          </Box>
-
-          {/* Year Slider */}
-          <Box sx={{ mb: 2, px: 1 }}>
-            <Typography color="white" variant="subtitle2" gutterBottom>
-              Year: {panel1.year}
-            </Typography>
-            <MuiSlider
-              min={2012}
-              max={2100}
-              value={panel1.year}
-              onChange={(e, v) => {
-                setPanel1(prev => ({ ...prev, year: v }));
-                debouncedUpdateYear1(v);
-              }}
-              valueLabelDisplay="auto"
-              sx={{ color: '#1976d2' }}
-            />
-          </Box>
-
-          {/* Panel 1 Display */}
-          <Box sx={{ width: '100%', height: 400, position: 'relative' }}>
-            {panel1.source === 'plankton' && panel1.view === 'map' && (
-              <MapDisplay
-                year={debouncedYear1}
-                index={panel1.diversity}
-                group={panel1.group}
-                scenario={panel1.rcp}
-                model={panel1.model}
-                sourceType="plankton"
-                onPointClick={(x, y) => setSelectedPoint({ x, y })}
-              />
-            )}
-            {panel1.source === 'plankton' && panel1.view === 'globe' && (
-              <GlobeDisplay
-                year={debouncedYear1}
-                index={panel1.diversity}
-                group={panel1.group}
-                scenario={panel1.rcp}
-                model={panel1.model}
-                sourceType="plankton"
-                onPointClick={(x, y) => setSelectedPoint({ x, y })}
-              />
-            )}
-            {panel1.source === 'environmental' && panel1.view === 'map' && (
-              <MapDisplay
-                year={debouncedYear1}
-                index={panel1.envParam}
-                scenario={panel1.rcp}
-                model={panel1.model}
-                sourceType="environmental"
-                onPointClick={(x, y) => setSelectedPoint({ x, y })}
-              />
-            )}
-            {panel1.source === 'environmental' && panel1.view === 'globe' && (
-              <GlobeDisplay
-                year={debouncedYear1}
-                index={panel1.envParam}
-                scenario={panel1.rcp}
-                model={panel1.model}
-                sourceType="environmental"
-                onPointClick={(x, y) => setSelectedPoint({ x, y })}
-              />
-            )}
-          </Box>
-        </Box>
-
-        {/* Panel */}
-        <Box sx={{ flex: 1, minWidth: 300, p: 2, backgroundColor: 'black', borderRadius: 1 }}>
-          <ControlPanel
-            source={panel2.source}
-            onSourceChange={(e) => setPanel2({ ...panel2, source: e.target.value })}
-            diversity={panel2.diversity}
-            onDiversityChange={(e) => setPanel2({ ...panel2, diversity: e.target.value })}
-            envParam={panel2.envParam}
-            onEnvParamChange={(e) => setPanel2({ ...panel2, envParam: e.target.value })}
-            group={panel2.group}
-            onGroupChange={(e) => setPanel2({ ...panel2, group: e.target.value })}
-            rcp={panel2.rcp}
-            onRcpChange={(e) => setPanel2({ ...panel2, rcp: e.target.value })}
-            model={panel2.model}
-            onModelChange={(e) => setPanel2({ ...panel2, model: e.target.value })}
-            filteredGroups={filterBiomes(panel2.diversity).groups}
-            filteredScenarios={filterBiomes(panel2.diversity).rcp}
-            filteredModels={filterBiomes(panel2.diversity).models}
-            diversityIndices={diversityIndices}
-            environmentalParameters={environmentalParameters}
-            openInfoModal={openInfoModal}
-            labelColumn={LABEL_COLUMN}
-            inputColumn={INPUT_COLUMN}
-            iconColumn={ICON_COLUMN}
-          />
-
-          {/* View Switch */}
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 3 }}>
-            <FormControl component="fieldset">
-              <RadioGroup
-                row
-                value={panel2.view}
-                onChange={(e) => setPanel2({ ...panel2, view: e.target.value })}
-              >
-                <FormControlLabel
-                  value="map"
-                  control={<Radio sx={{ color: 'white', '&.Mui-checked': { color: 'white' } }} />}
-                  label={<Typography color="white">Map</Typography>}
-                />
-                <FormControlLabel
-                  value="globe"
-                  control={<Radio sx={{ color: 'white', '&.Mui-checked': { color: 'white' } }} />}
-                  label={<Typography color="white">Globe</Typography>}
-                />
-              </RadioGroup>
-            </FormControl>
-          </Box>
-
-          {/* Year Slider */}
-          <Box sx={{ mb: 2, px: 1 }}>
-            <Typography color="white" variant="subtitle2" gutterBottom>
-              Year: {panel2.year}
-            </Typography>
-            <MuiSlider
-              min={2012}
-              max={2100}
-              value={panel2.year}
-              onChange={(e, v) => {
-                setPanel2(prev => ({ ...prev, year: v }));
-                debouncedUpdateYear2(v);
-              }}
-              valueLabelDisplay="auto"
-              sx={{ color: '#1976d2' }}
-            />
-          </Box>
-
-          {/* PANEL 2 DISPLAY */}
-          <Box sx={{ width: '100%', height: 400, position: 'relative' }}>
-            {panel2.source === 'plankton' && panel2.view === 'map' && (
-              <MapDisplay
-                year={debouncedYear2}
-                index={panel2.diversity}
-                group={panel2.group}
-                scenario={panel2.rcp}
-                model={panel2.model}
-                sourceType="plankton"
-                onPointClick={(x, y) => setSelectedPoint({ x, y })}
-              />
-            )}
-            {panel2.source === 'plankton' && panel2.view === 'globe' && (
-              <GlobeDisplay
-                year={debouncedYear2}
-                index={panel2.diversity}
-                group={panel2.group}
-                scenario={panel2.rcp}
-                model={panel2.model}
-                sourceType="plankton"
-                onPointClick={(x, y) => setSelectedPoint({ x, y })}
-              />
-            )}
-            {panel2.source === 'environmental' && panel2.view === 'map' && (
-              <MapDisplay
-                year={debouncedYear2}
-                index={panel2.envParam}
-                scenario={panel2.rcp}
-                model={panel2.model}
-                sourceType="environmental"
-                onPointClick={(x, y) => setSelectedPoint({ x, y })}
-              />
-            )}
-            {panel2.source === 'environmental' && panel2.view === 'globe' && (
-              <GlobeDisplay
-                year={debouncedYear2}
-                index={panel2.envParam}
-                scenario={panel2.rcp}
-                model={panel2.model}
-                sourceType="environmental"
-                onPointClick={(x, y) => setSelectedPoint({ x, y })}
-              />
-            )}
-          </Box>
-        </Box>
+        <DataPanel
+          panel={panel1}
+          setPanel={setPanel1}
+          debouncedYear={debouncedYear1}
+          debouncedUpdateYear={debouncedUpdateYear1}
+          filterBiomes={filterBiomes}
+          diversityIndices={diversityIndices}
+          environmentalParameters={environmentalParameters}
+          openInfoModal={openInfoModal}
+          LABEL_COLUMN={LABEL_COLUMN}
+          INPUT_COLUMN={INPUT_COLUMN}
+          ICON_COLUMN={ICON_COLUMN}
+          setSelectedPoint={setSelectedPoint}
+        />
+        <DataPanel
+          panel={panel2}
+          setPanel={setPanel2}
+          debouncedYear={debouncedYear2}
+          debouncedUpdateYear={debouncedUpdateYear2}
+          filterBiomes={filterBiomes}
+          diversityIndices={diversityIndices}
+          environmentalParameters={environmentalParameters}
+          openInfoModal={openInfoModal}
+          LABEL_COLUMN={LABEL_COLUMN}
+          INPUT_COLUMN={INPUT_COLUMN}
+          ICON_COLUMN={ICON_COLUMN}
+          setSelectedPoint={setSelectedPoint}
+        />
       </Box>
 
       {/* Combined Line Plot */}
