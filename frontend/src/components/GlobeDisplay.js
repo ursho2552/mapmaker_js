@@ -10,6 +10,7 @@ const GlobeDisplay = ({
   model,
   sourceType = 'environmental',
   onPointClick,
+  selectedPoint,
 }) => {
   const containerRef = useRef(null);
   const globeRef = useRef();
@@ -21,10 +22,10 @@ const GlobeDisplay = ({
   const [maxValue, setMaxValue] = useState(1);
   const [cachedData, setCachedData] = useState({});
   const [isHovered, setIsHovered] = useState(false);
-  const [selectedPoint, setSelectedPoint] = useState(null);
   const readableIndex = colorbarLabelMapping[index] || index;
   const readableGroup = group ? ` and ${group}` : '';
   const fullTitle = `${readableIndex} ${readableGroup} predicted by ${scenario} on ${model} in ${year}`;
+  const normalizedSelectedPoint = selectedPoint ? { lat: selectedPoint.y, lng: selectedPoint.x } : null;
 
   const createHtmlElement = (d) => {
     const el = document.createElement('div');
@@ -206,7 +207,6 @@ const GlobeDisplay = ({
     : labels.map((l) => l.toFixed(0));
 
   const handlePointClick = (lng, lat) => {
-    setSelectedPoint({ lng, lat });
     if (onPointClick) onPointClick(lng, lat);
   };
 
@@ -261,7 +261,7 @@ const GlobeDisplay = ({
             pointColor="color"
             pointRadius={0.9}
             onPointClick={(pt) => handlePointClick(pt.lng, pt.lat)}
-            htmlElementsData={selectedPoint ? [selectedPoint] : []}
+            htmlElementsData={normalizedSelectedPoint ? [normalizedSelectedPoint] : []}
             htmlElement={createHtmlElement}
           />
         </div>

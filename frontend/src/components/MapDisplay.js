@@ -10,6 +10,7 @@ const MapDisplay = ({
   model,
   sourceType = 'plankton',
   onPointClick,
+  selectedPoint,
 }) => {
   const [lats, setLats] = useState([]);
   const [lons, setLons] = useState([]);
@@ -29,7 +30,6 @@ const MapDisplay = ({
   const [minValue, setMinValue] = useState(null);
   const [maxValue, setMaxValue] = useState(null);
   const [error, setError] = useState(null);
-  const [selectedPoint, setSelectedPoint] = useState(null);
   const readableIndex = colorbarLabelMapping[index] || index;
   const readableGroup = group ? ` and ${group}` : '';
 
@@ -163,7 +163,6 @@ const MapDisplay = ({
           ].filter(Boolean)}
           layout={{
             ...layout,
-            title: undefined, // Remove internal title
             autosize: true,
           }}
           useResizeHandler={true}
@@ -171,10 +170,10 @@ const MapDisplay = ({
           onClick={(evt) => {
             if (evt.points?.length > 0) {
               const { x, y } = evt.points[0];
-              setSelectedPoint({ x, y });
               onPointClick(x, y);
             }
           }}
+
           config={{ displayModeBar: false, responsive: true }}
         />
       </div>

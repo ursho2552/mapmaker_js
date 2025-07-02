@@ -25,6 +25,7 @@ const DataPanel = ({
     INPUT_COLUMN,
     ICON_COLUMN,
     setSelectedPoint,
+    selectedPoint,
 }) => {
     return (
         <Box sx={{ flex: 1, minWidth: 300, p: 2, backgroundColor: 'black', borderRadius: 1 }}>
@@ -79,6 +80,7 @@ const DataPanel = ({
                         model={panel.model}
                         sourceType="plankton"
                         onPointClick={(x, y) => setSelectedPoint({ x, y })}
+                        selectedPoint={selectedPoint}
                     />
                 )}
                 {panel.source === 'plankton' && panel.view === 'globe' && (
@@ -90,6 +92,7 @@ const DataPanel = ({
                         model={panel.model}
                         sourceType="plankton"
                         onPointClick={(x, y) => setSelectedPoint({ x, y })}
+                        selectedPoint={selectedPoint}
                     />
                 )}
                 {panel.source === 'environmental' && panel.view === 'map' && (
@@ -100,6 +103,7 @@ const DataPanel = ({
                         model={panel.model}
                         sourceType="environmental"
                         onPointClick={(x, y) => setSelectedPoint({ x, y })}
+                        selectedPoint={selectedPoint}
                     />
                 )}
                 {panel.source === 'environmental' && panel.view === 'globe' && (
@@ -110,6 +114,7 @@ const DataPanel = ({
                         model={panel.model}
                         sourceType="environmental"
                         onPointClick={(x, y) => setSelectedPoint({ x, y })}
+                        selectedPoint={selectedPoint}
                     />
                 )}
             </Box>

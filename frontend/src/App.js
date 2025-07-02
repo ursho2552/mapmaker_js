@@ -23,7 +23,7 @@ const App = () => {
   const [infoModalText, setInfoModalText] = useState('');
 
   // Clicked point for line plot
-  const [selectedPoint, setSelectedPoint] = useState({ x: null, y: null });
+  const [selectedPoint, setSelectedPoint] = useState({ x: 0, y: 0 });
 
   // Panel specific states
   const createPanelState = () => ({
@@ -111,7 +111,7 @@ const App = () => {
         backgroundColor: '#1e1e1e',
         borderRadius: 2,
         height: '100%',
-        mx: 2,
+        m: 2,
       }}>
 
         <CombinedLinePlot
@@ -151,6 +151,7 @@ const App = () => {
           INPUT_COLUMN={INPUT_COLUMN}
           ICON_COLUMN={ICON_COLUMN}
           setSelectedPoint={setSelectedPoint}
+          selectedPoint={selectedPoint}
         />
         <DataPanel
           panel={panel2}
@@ -165,13 +166,12 @@ const App = () => {
           INPUT_COLUMN={INPUT_COLUMN}
           ICON_COLUMN={ICON_COLUMN}
           setSelectedPoint={setSelectedPoint}
+          selectedPoint={selectedPoint}
         />
       </Box>
 
       {/* Footer */}
-      <Box sx={{ mt: 2 }}>
-        <Footer />
-      </Box>
+      <Footer />
     </Box>
   );
 };
