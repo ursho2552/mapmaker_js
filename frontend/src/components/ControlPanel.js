@@ -35,7 +35,7 @@ const ControlPanel = ({
   diversityIndices,
   environmentalParameters,
 }) => (
-  <Box className="panel-controls" sx={{ mb: 1, minHeight: 300 }}>
+  <Box className="panel-controls" sx={{ mt: 1, minHeight: 200 }}>
     {/* Data Source Row */}
     <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, justifyContent: 'space-between' }}>
       <FormControl component="fieldset" sx={{ color: 'white' }}>

@@ -22,9 +22,6 @@ const GlobeDisplay = ({
   const [cachedData, setCachedData] = useState({});
   const [isHovered, setIsHovered] = useState(false);
   const [selectedPoint, setSelectedPoint] = useState(null);
-
-  const legendLabel = colorbarLabelMapping[index] || index;
-
   const readableIndex = colorbarLabelMapping[index] || index;
   const readableGroup = group ? ` and ${group}` : '';
   const fullTitle = `${readableIndex} ${readableGroup} predicted by ${scenario} on ${model} in ${year}`;

@@ -106,37 +106,6 @@ const App = () => {
         </DialogActions>
       </Dialog>
 
-      <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', p: 2 }}>
-        <DataPanel
-          panel={panel1}
-          setPanel={setPanel1}
-          debouncedYear={debouncedYear1}
-          debouncedUpdateYear={debouncedUpdateYear1}
-          filterBiomes={filterBiomes}
-          diversityIndices={diversityIndices}
-          environmentalParameters={environmentalParameters}
-          openInfoModal={openInfoModal}
-          LABEL_COLUMN={LABEL_COLUMN}
-          INPUT_COLUMN={INPUT_COLUMN}
-          ICON_COLUMN={ICON_COLUMN}
-          setSelectedPoint={setSelectedPoint}
-        />
-        <DataPanel
-          panel={panel2}
-          setPanel={setPanel2}
-          debouncedYear={debouncedYear2}
-          debouncedUpdateYear={debouncedUpdateYear2}
-          filterBiomes={filterBiomes}
-          diversityIndices={diversityIndices}
-          environmentalParameters={environmentalParameters}
-          openInfoModal={openInfoModal}
-          LABEL_COLUMN={LABEL_COLUMN}
-          INPUT_COLUMN={INPUT_COLUMN}
-          ICON_COLUMN={ICON_COLUMN}
-          setSelectedPoint={setSelectedPoint}
-        />
-      </Box>
-
       {/* Combined Line Plot */}
       <Box sx={{
         backgroundColor: '#1e1e1e',
@@ -168,6 +137,36 @@ const App = () => {
         />
       </Box>
 
+      <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', p: 2 }}>
+        <DataPanel
+          panel={panel1}
+          setPanel={setPanel1}
+          debouncedYear={debouncedYear1}
+          debouncedUpdateYear={debouncedUpdateYear1}
+          filterBiomes={filterBiomes}
+          diversityIndices={diversityIndices}
+          environmentalParameters={environmentalParameters}
+          openInfoModal={openInfoModal}
+          LABEL_COLUMN={LABEL_COLUMN}
+          INPUT_COLUMN={INPUT_COLUMN}
+          ICON_COLUMN={ICON_COLUMN}
+          setSelectedPoint={setSelectedPoint}
+        />
+        <DataPanel
+          panel={panel2}
+          setPanel={setPanel2}
+          debouncedYear={debouncedYear2}
+          debouncedUpdateYear={debouncedUpdateYear2}
+          filterBiomes={filterBiomes}
+          diversityIndices={diversityIndices}
+          environmentalParameters={environmentalParameters}
+          openInfoModal={openInfoModal}
+          LABEL_COLUMN={LABEL_COLUMN}
+          INPUT_COLUMN={INPUT_COLUMN}
+          ICON_COLUMN={ICON_COLUMN}
+          setSelectedPoint={setSelectedPoint}
+        />
+      </Box>
 
       {/* Footer */}
       <Box sx={{ mt: 2 }}>

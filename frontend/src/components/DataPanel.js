@@ -28,32 +28,8 @@ const DataPanel = ({
 }) => {
     return (
         <Box sx={{ flex: 1, minWidth: 300, p: 2, backgroundColor: 'black', borderRadius: 1 }}>
-            <ControlPanel
-                source={panel.source}
-                onSourceChange={(e) => setPanel({ ...panel, source: e.target.value })}
-                diversity={panel.diversity}
-                onDiversityChange={(e) => setPanel({ ...panel, diversity: e.target.value })}
-                envParam={panel.envParam}
-                onEnvParamChange={(e) => setPanel({ ...panel, envParam: e.target.value })}
-                group={panel.group}
-                onGroupChange={(e) => setPanel({ ...panel, group: e.target.value })}
-                rcp={panel.rcp}
-                onRcpChange={(e) => setPanel({ ...panel, rcp: e.target.value })}
-                model={panel.model}
-                onModelChange={(e) => setPanel({ ...panel, model: e.target.value })}
-                filteredGroups={filterBiomes(panel.diversity).groups}
-                filteredScenarios={filterBiomes(panel.diversity).rcp}
-                filteredModels={filterBiomes(panel.diversity).models}
-                diversityIndices={diversityIndices}
-                environmentalParameters={environmentalParameters}
-                openInfoModal={openInfoModal}
-                labelColumn={LABEL_COLUMN}
-                inputColumn={INPUT_COLUMN}
-                iconColumn={ICON_COLUMN}
-            />
-
             {/* View Switch */}
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 3 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
                 <FormControl component="fieldset">
                     <RadioGroup
                         row
@@ -75,7 +51,7 @@ const DataPanel = ({
             </Box>
 
             {/* Year Slider */}
-            <Box sx={{ mb: 2, px: 1 }}>
+            <Box sx={{ mb: 1, px: 1 }}>
                 <Typography color="white" variant="subtitle2" gutterBottom>
                     Year: {panel.year}
                 </Typography>
@@ -137,6 +113,30 @@ const DataPanel = ({
                     />
                 )}
             </Box>
+
+            <ControlPanel
+                source={panel.source}
+                onSourceChange={(e) => setPanel({ ...panel, source: e.target.value })}
+                diversity={panel.diversity}
+                onDiversityChange={(e) => setPanel({ ...panel, diversity: e.target.value })}
+                envParam={panel.envParam}
+                onEnvParamChange={(e) => setPanel({ ...panel, envParam: e.target.value })}
+                group={panel.group}
+                onGroupChange={(e) => setPanel({ ...panel, group: e.target.value })}
+                rcp={panel.rcp}
+                onRcpChange={(e) => setPanel({ ...panel, rcp: e.target.value })}
+                model={panel.model}
+                onModelChange={(e) => setPanel({ ...panel, model: e.target.value })}
+                filteredGroups={filterBiomes(panel.diversity).groups}
+                filteredScenarios={filterBiomes(panel.diversity).rcp}
+                filteredModels={filterBiomes(panel.diversity).models}
+                diversityIndices={diversityIndices}
+                environmentalParameters={environmentalParameters}
+                openInfoModal={openInfoModal}
+                labelColumn={LABEL_COLUMN}
+                inputColumn={INPUT_COLUMN}
+                iconColumn={ICON_COLUMN}
+            />
         </Box>
     );
 };
