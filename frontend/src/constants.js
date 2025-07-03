@@ -49,6 +49,16 @@ export const environmentalParameters = [
     'Chlorophyll-a Concentration',
 ];
 
+export const projectDescription =
+    "Global marine biodiversity supplies essential ecosystem services to human societies. " +
+    "Marine plankton ecosystems fuel ocean productivity, drive global biogeochemical cycles and regulate the Earth's climate. " +
+    "Climate-mediated loss of biodiversity has been suggested to negatively impact ocean ecosystem services, but future projections of climate change impacts on biodiversity and ecosystem function are poorly constrained due to a lack of observational data. " +
+    "Hence, policy makers lack quantitative evidence on the vulnerability of marine ecosystems. " +
+    "The MArine Plankton diversity bioindicator scenarios for policy MAKERs project is a collaboration between IUCN Global Marine and Polar Programme and ETH Environmental Physics Group (UP) to inform data-driven decision-making on marine biodiversity protection at the international policy level and was financed through the Geneva Science Policy Interface (GSPI). " +
+    "Based on observational data and novel machine learning algorithms we have mapped the biogeography of 859 plankton species. " +
+    "We defined ocean biomes, projected future changes in biodiversity and identified hotspots of diversity change. " +
+    "The interactive web tool for policy makers visualizes the results on a global map and is the first step in narrowing the gap between science and policy makers in regard to plankton diversity and their impact on ecosystem functions to be incorporated in marine management decisions.";
+
 export const infoMessages = {
     // General descriptions
     'Diversity Indices general':
