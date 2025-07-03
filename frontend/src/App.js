@@ -137,7 +137,7 @@ const App = () => {
         />
       </Box>
 
-      <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', p: 2 }}>
+      <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', px: 2 }}>
         <DataPanel
           panel={panel1}
           setPanel={setPanel1}
