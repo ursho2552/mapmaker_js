@@ -90,7 +90,7 @@ const App = () => {
           MAPMAKER
         </Typography>
         <Typography variant="h6" sx={{ fontSize: '1.25rem', color: 'gray', mt: 1 }}>
-          Marine Plankton diversity bioindicator scenarios for policy MAKERs
+          MArine Plankton diversity bioindicator scenarios for policy MAKERs
         </Typography>
         <ReferencesButton sx={{ position: 'absolute', top: '30%', right: 16, transform: 'translateY(-50%)' }} />
       </Box>
