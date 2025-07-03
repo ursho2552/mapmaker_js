@@ -54,22 +54,27 @@ export const projectDescription = "Global marine biodiversity supplies essential
 export const infoMessages = {
     // General descriptions
     'Diversity Indices general':
-        'Select from several indices that capture different aspects of marine plankton biodiversity.',
+        'Different diversity indices based on the Habitat Suitability Index.',
     'Plankton Groups general':
-        '"Marine taxonomic groupings important for global ecosystem services provided by our oceans. Total number of different species included were 859. Thereof 523 (~61%) zooplankton and 336 (~39%) phytoplankton species. Further species included were Copepods 272 (~32%), Diatoms 154 (~18%), Dinoflagelates 154 (~18%) and Coccolithophores 24 (~3%).',
+        'Marine taxonomic groupings important for global ecosystem services provided by our oceans. Total number of different species included were 859. Thereof 523 (~61%) zooplankton and 336 (~39%) phytoplankton species. Further species included were Copepods 272 (~32%), Diatoms 154 (~18%), Dinoflagelates 154 (~18%) and Coccolithophores 24 (~3%).',
     'RCP Scenarios general':
-        'Representative Concentration Pathways (RCP) describe greenhouse gas concentration trajectories adopted by the IPCC.',
+        'The Intergovernmental Panel on Climate Change provide policymakers with scientific assessments on climate change such as the published scenarios of greenhouse gas concentration and emission pathways called representative concentration pathways (RCPs). The different climate scenarios are labelled after their respective radiative forcing in the year 2100 (e.g. RCP8.5 Wm-2). At present, global carbon emissions are tracking just above the highest representative concentration pathway (RCP 8.5) while the RCP 2.6 scenario represents the lowest concentration pathway with high mitigation strategies.',
     'Earth System Models general':
-        'Select Earth System Models used to simulate climate and biogeochemical processes.',
+        'Earth System Models (ESMs) are global climate models which represent biogeochemical processes that interact with the climate. The three different Earth System Models used are fully coupled models from the Coupled Model Inter- comparison Project (CMIP5) assessment.',
     'Environmental Parameters general':
         'Environmental parameters include variables like temperature, oxygen concentration, and chlorophyll-a.',
 
     // Diversity indices
-    'Biomes': 'Biomes refer to distinct biological communities that have formed in response to a shared physical climate.',
-    'Species Richness': 'Species richness is the number of different species represented in an ecological community, landscape or region.',
-    'Hotspots of Change in Diversity': 'Hotspots of change in diversity indicate areas where significant changes in species diversity are occurring.',
-    'Habitat Suitability Index (HSI)': 'HSI is an index that represents the suitability of a given habitat for a species or group of species.',
-    'Change in HSI': 'Change in Habitat Suitability Index tracks how suitable a habitat is for species over time.',
+    'Biomes':
+        "The biomes were constructed based on yearly distribution maps of plankton species' presence derived from statistical species distribtuion model ensembles. This procedure was developed by Urs Hofmann Elizondo (2021) and partitions the open ocean into ecologically relevant biomes based on plankton species biogeography using self-organizing maps and hierarchical clustering.",
+    'Species Richness':
+        "Species richness displays the percentage of species present in regard to the selected plankton group. To display this biodiversity index, the habitat suitability index had to be transformed to presence and absence entries. To do so, we used the cut off threshold of the True Skill Statistic which was derived from the species distribution models. To convert each species to a presence or absence entry we use three trhesholds, namely the 25th, median and 75th percentile, derived from three different SDMs (Generalized Linear Model, Generalized Additive Model, Neural Network) that computed five evaluation runs each. We add the presences and computed the average of the new presence table.",
+    'Hotspots of Change in Diversity':
+        "This change in diversity is derived from the presence-absence converted data. To assess the change from the beginning until the end of the 21st century, we used a base diversity estimate that has been averaged over a period of eighteen years (2012-2030) that was subtracted from each year, 2012 - 2100. Therefore it shows the yearly difference in the relative number of species when comparing to our base diversity estimate and gives information on how species richness is about to change until the end of the century in regard to the chosen RCP emission scenario.",
+    'Habitat Suitability Index (HSI)':
+        "The Habitat Suitability Index (HSI) hypothesizes species-habitat relationships and is a numerical index that represents the capacity of a habitat to support a selected species. The species distribution framework used in this analysis was developed by Righetti et al. (2019) and Benedetti et al. (2018) to estimate plankton diversity patterns from an ensemble forecasting approach using three different algorithms namely Generalized Linear Models, Generalized Additive Models and Artificial Neural Networks. Depending on the group that is selected, the HSI has been summed up and divided by the total number of species in that particular group in order to scale it between zero and one. It therefore represents the averaged HSI for each group selected.",
+    'Change in HSI':
+        "This change in diversity is derived from the Habitat Suitability Index. To assess the change from the beginning until the end of the 21st century, we used a base Habitat Suitability Index estimate that has been averaged over a period of eighteen years (2012-2030) that was subtracted from each year, 2012 - 2100. Therefore it shows the yearly difference in the Habitat Suitability Index when comparing to our base Habitat Suitability Index estimate and gives information on how much this index is about to change until the end of the century in regard to the chosen RCP emission scenario.",
     'Species Turnover': 'Species turnover refers to the rate at which one species replaces another in a community over time.',
 
     // Plankton groups
