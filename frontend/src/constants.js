@@ -12,6 +12,10 @@ export const colorbarLabelMapping = {
     'Chlorophyll-a Concentration': 'Chlorophyll-a Concentration [log(mg/m³)]',
 };
 
+// Color palettes
+export const divergingColors = ['#0000ff', '#ff0000'];
+export const sequentialColors = ['#440154', '#3b528b', '#21918c', '#5ec962', '#fde725'];
+
 export const diversityIndices = [
     'Biomes',
     'Species Richness',

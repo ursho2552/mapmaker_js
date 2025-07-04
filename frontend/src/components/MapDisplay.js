@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Plot from 'react-plotly.js';
-import { colorbarLabelMapping, mapGlobeTitleStyle } from '../constants';
+import { colorbarLabelMapping, mapGlobeTitleStyle, divergingColors, sequentialColors } from '../constants';
 
 const MapDisplay = ({
   year,
@@ -15,18 +15,6 @@ const MapDisplay = ({
   const [lats, setLats] = useState([]);
   const [lons, setLons] = useState([]);
   const [data, setData] = useState([]);
-  const [colorscale, setColorscale] = useState([
-    [0.0, '#440154'],
-    [0.2, '#440154'],
-    [0.2, '#3b528b'],
-    [0.4, '#3b528b'],
-    [0.4, '#21918c'],
-    [0.6, '#21918c'],
-    [0.6, '#5ec962'],
-    [0.8, '#5ec962'],
-    [0.8, '#fde725'],
-    [1.0, '#fde725'],
-  ]);
   const [minValue, setMinValue] = useState(null);
   const [maxValue, setMaxValue] = useState(null);
   const [error, setError] = useState(null);
@@ -34,6 +22,22 @@ const MapDisplay = ({
   const readableGroup = group ? ` and ${group}` : '';
 
   const fullTitle = `${readableIndex}${readableGroup} predicted by ${scenario} on ${model} in ${year}`;
+
+  const generateColorStops = (colorArray) => {
+    const step = 1 / colorArray.length;
+    const stops = [];
+
+    for (let i = 0; i < colorArray.length; i++) {
+      const start = i * step;
+      const end = (i + 1) * step;
+      stops.push([start, colorArray[i]]);
+      stops.push([end, colorArray[i]]);
+    }
+
+    return stops;
+  };
+
+  const [colorscale, setColorscale] = useState(generateColorStops(sequentialColors));
 
   const layout = {
     margin: { l: 10, r: 0, t: 60, b: 10 },
@@ -73,25 +77,10 @@ const MapDisplay = ({
       ? `/api/globe-data?source=env&year=${year}&index=${index}&scenario=${scenario}&model=${model}`
       : `/api/map-data?year=${year}&index=${index}&group=${group}&scenario=${scenario}&model=${model}`;
 
-    if (index.includes('Change')) {
-      setColorscale([
-        [0.0, '#0000ff'],
-        [0.5, '#ffffff'],
-        [1.0, '#ff0000'],
-      ]);
+    if (index.includes('Change') || index.includes('Temperature')) {
+      setColorscale(generateColorStops(divergingColors));
     } else {
-      setColorscale([
-        [0.0, '#440154'],
-        [0.2, '#440154'],
-        [0.2, '#3b528b'],
-        [0.4, '#3b528b'],
-        [0.4, '#21918c'],
-        [0.6, '#21918c'],
-        [0.6, '#5ec962'],
-        [0.8, '#5ec962'],
-        [0.8, '#fde725'],
-        [1.0, '#fde725'],
-      ]);
+      setColorscale(generateColorStops(sequentialColors));
     }
 
     fetch(url)

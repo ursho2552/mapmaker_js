@@ -1,6 +1,11 @@
 import React, { useEffect, useState, useRef, useMemo } from 'react';
 import Globe from 'react-globe.gl';
-import { colorbarLabelMapping, mapGlobeTitleStyle } from '../constants';
+import {
+  colorbarLabelMapping,
+  mapGlobeTitleStyle,
+  divergingColors,
+  sequentialColors,
+} from '../constants';
 
 const GlobeDisplay = ({
   year,
@@ -22,10 +27,13 @@ const GlobeDisplay = ({
   const [maxValue, setMaxValue] = useState(1);
   const [cachedData, setCachedData] = useState({});
   const [isHovered, setIsHovered] = useState(false);
+
   const readableIndex = colorbarLabelMapping[index] || index;
   const readableGroup = group ? ` and ${group}` : '';
-  const fullTitle = `${readableIndex} ${readableGroup} predicted by ${scenario} on ${model} in ${year}`;
-  const normalizedSelectedPoint = selectedPoint ? { lat: selectedPoint.y, lng: selectedPoint.x } : null;
+  const fullTitle = `${readableIndex}${readableGroup} predicted by ${scenario} on ${model} in ${year}`;
+  const normalizedSelectedPoint = selectedPoint
+    ? { lat: selectedPoint.y, lng: selectedPoint.x }
+    : null;
 
   const createHtmlElement = (d) => {
     const el = document.createElement('div');
@@ -53,55 +61,28 @@ const GlobeDisplay = ({
     return () => window.removeEventListener('resize', updateDimensions);
   }, []);
 
-  const getColorFromBin = useMemo(() => {
-    const divergingColors = ['#0000ff', '#ffffff', '#ff0000'];
-    const sequentialColors = ['#440154', '#3b528b', '#21918c', '#5ec962', '#fde725'];
-    const interpolateColor = (color1, color2, ratio) => {
-      const hexToRgb = (hex) => {
-        const bigint = parseInt(hex.slice(1), 16);
-        return [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255];
-      };
-      const rgbToHex = (r, g, b) =>
-        '#' +
-        [r, g, b]
-          .map((x) => {
-            const hex = x.toString(16);
-            return hex.length === 1 ? '0' + hex : hex;
-          })
-          .join('');
-      const c1 = hexToRgb(color1);
-      const c2 = hexToRgb(color2);
-      const r = Math.round(c1[0] + (c2[0] - c1[0]) * ratio);
-      const g = Math.round(c1[1] + (c2[1] - c1[1]) * ratio);
-      const b = Math.round(c1[2] + (c2[2] - c1[2]) * ratio);
-      return rgbToHex(r, g, b);
-    };
+  const isDiverging = useMemo(() => {
+    return index.includes('Change') || index.includes('Temperature');
+  }, [index]);
 
-    const colors = index.includes('Change') ? divergingColors : sequentialColors;
-
+  const getColorFromValue = useMemo(() => {
     return (value, min, max) => {
       if (isNaN(value) || value == null) return 'rgba(0,0,0,0)';
-      if (min === max) return colors[0];
+      if (min === max) return isDiverging ? divergingColors[1] : sequentialColors[0];
 
-      if (colors.length === 3) {
-        const norm = (value - min) / (max - min);
-        if (norm <= 0.5) {
-          const ratio = norm / 0.5;
-          return interpolateColor(colors[0], colors[1], ratio);
-        } else {
-          const ratio = (norm - 0.5) / 0.5;
-          return interpolateColor(colors[1], colors[2], ratio);
-        }
+      if (isDiverging) {
+        const mid = (min + max) / 2;
+        return value <= mid ? divergingColors[0] : divergingColors[1];
       } else {
         const binSize = (max - min) / 5;
-        if (value < min + binSize) return colors[0];
-        if (value < min + 2 * binSize) return colors[1];
-        if (value < min + 3 * binSize) return colors[2];
-        if (value < min + 4 * binSize) return colors[3];
-        return colors[4];
+        if (value < min + binSize) return sequentialColors[0];
+        if (value < min + 2 * binSize) return sequentialColors[1];
+        if (value < min + 3 * binSize) return sequentialColors[2];
+        if (value < min + 4 * binSize) return sequentialColors[3];
+        return sequentialColors[4];
       }
     };
-  }, [index]);
+  }, [index, isDiverging]);
 
   const fetchData = async (yr) => {
     const cacheKey = `${yr}_${index}_${group}_${scenario}_${model}_${sourceType}`;
@@ -147,7 +128,7 @@ const GlobeDisplay = ({
                 lat,
                 lng: lon,
                 size: value !== 0 ? 0.01 : 0,
-                color: getColorFromBin(value, minVal, maxVal),
+                color: getColorFromValue(value, minVal, maxVal),
               };
             });
         })
@@ -191,20 +172,31 @@ const GlobeDisplay = ({
     return () => cancelAnimationFrame(frame);
   }, [isHovered]);
 
-  const labels = useMemo(() => {
-    const binSize = (maxValue - minValue) / 5;
-    return Array.from({ length: 5 }, (_, i) =>
-      Math.round(minValue + i * binSize)
-    ).reverse();
-  }, [minValue, maxValue]);
+  const legendData = useMemo(() => {
+    if (minValue === maxValue) {
+      const singleColor = getColorFromValue(minValue, minValue, maxValue);
+      return { colors: [singleColor], labels: [minValue.toFixed(0)] };
+    }
 
-  const legendColors = index.includes('Change')
-    ? ['#0000ff', '#ffffff', '#ff0000']
-    : ['#440154', '#3b528b', '#21918c', '#5ec962', '#fde725'];
-
-  const legendLabels = index.includes('Change')
-    ? [minValue.toFixed(2), ((minValue + maxValue) / 2).toFixed(2), maxValue.toFixed(2)]
-    : labels.map((l) => l.toFixed(0));
+    if (isDiverging) {
+      return {
+        colors: divergingColors,
+        labels: [
+          minValue.toFixed(0),
+          ((minValue + maxValue) / 2).toFixed(0),
+          maxValue.toFixed(0),
+        ],
+      };
+    } else {
+      const binSize = (maxValue - minValue) / 5;
+      return {
+        colors: sequentialColors,
+        labels: Array.from({ length: 5 }, (_, i) =>
+          (minValue + i * binSize).toFixed(0)
+        ),
+      };
+    }
+  }, [minValue, maxValue, isDiverging]);
 
   const handlePointClick = (lng, lat) => {
     if (onPointClick) onPointClick(lng, lat);
@@ -224,7 +216,6 @@ const GlobeDisplay = ({
       onMouseLeave={() => setIsHovered(false)}
     >
       <div
-        ref={containerRef}
         style={{
           width: '100%',
           height: '100%',
@@ -233,21 +224,22 @@ const GlobeDisplay = ({
           backgroundColor: '#282c34',
         }}
       >
-        {/* Title */}
-        <div
-          style={mapGlobeTitleStyle}
-          dangerouslySetInnerHTML={{ __html: fullTitle }}
-        />
+        <div style={mapGlobeTitleStyle} dangerouslySetInnerHTML={{ __html: fullTitle }} />
 
         {error && (
           <div
-            style={{ position: 'absolute', top: 0, left: 0, color: 'red', zIndex: 11 }}
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              color: 'red',
+              zIndex: 11,
+            }}
           >
             {error}
           </div>
         )}
 
-        {/* Globe */}
         <div style={{ width: '100%', height: '100%' }}>
           <Globe
             ref={globeRef}
@@ -266,7 +258,6 @@ const GlobeDisplay = ({
           />
         </div>
 
-        {/* Legend (Colorbar) */}
         <div
           style={{
             position: 'absolute',
@@ -285,31 +276,28 @@ const GlobeDisplay = ({
             style={{
               flex: 1,
               display: 'flex',
-              flexDirection: 'column',
+              flexDirection: 'column-reverse',
               height: '90%',
               borderRadius: 4,
-              background: index.includes('Change')
-                ? 'linear-gradient(to top, #0000ff 0%, #ffffff 50%, #ff0000 100%)'
-                : 'none',
+              background: 'none',
             }}
           >
-            {!index.includes('Change') &&
-              legendColors.map((color, i) => (
-                <div
-                  key={i}
-                  style={{
-                    flex: 1,
-                    backgroundColor: color,
-                  }}
-                />
-              ))}
+            {legendData.colors.map((color, i) => (
+              <div
+                key={i}
+                style={{
+                  flex: 1,
+                  backgroundColor: color,
+                }}
+              />
+            ))}
           </div>
 
           <div
             style={{
               flex: 1,
               display: 'flex',
-              flexDirection: 'column',
+              flexDirection: 'column-reverse',
               justifyContent: 'space-between',
               marginLeft: 1,
               height: '90%',
@@ -318,7 +306,7 @@ const GlobeDisplay = ({
               userSelect: 'none',
             }}
           >
-            {legendLabels.map((lbl, i) => (
+            {legendData.labels.map((lbl, i) => (
               <div key={i}>{`- ${lbl}`}</div>
             ))}
           </div>
@@ -326,7 +314,6 @@ const GlobeDisplay = ({
       </div>
     </div>
   );
-
 };
 
 export default GlobeDisplay;
