@@ -45,11 +45,21 @@ const CombinedLinePlot = ({ point, leftSettings, rightSettings, startYear, endYe
     },
     paper_bgcolor: '#282c34',
     plot_bgcolor: '#282c34',
-    xaxis: { title: 'Year', color: 'white' },
+    xaxis: {
+      title: { text: 'Year', font: { color: 'white' } },
+      tickfont: { color: 'white' },
+      linecolor: 'white',
+      tickcolor: 'white',
+      gridcolor: '#444',
+      zeroline: false,
+    },
     yaxis: {
       title: leftName,
       color: 'cyan',
       showgrid: false,
+      zeroline: false,
+      linecolor: 'cyan',
+      tickcolor: 'cyan',
     },
     yaxis2: {
       title: rightName,
@@ -57,6 +67,9 @@ const CombinedLinePlot = ({ point, leftSettings, rightSettings, startYear, endYe
       overlaying: 'y',
       side: 'right',
       showgrid: false,
+      linecolor: 'orange',
+      tickcolor: 'orange',
+      zeroline: false,
     },
     legend: { x: 0, y: 1, font: { color: 'white' } },
   };
