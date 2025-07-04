@@ -75,30 +75,48 @@ export const infoMessages = {
         "The Habitat Suitability Index (HSI) hypothesizes species-habitat relationships and is a numerical index that represents the capacity of a habitat to support a selected species. The species distribution framework used in this analysis was developed by Righetti et al. (2019) and Benedetti et al. (2018) to estimate plankton diversity patterns from an ensemble forecasting approach using three different algorithms namely Generalized Linear Models, Generalized Additive Models and Artificial Neural Networks. Depending on the group that is selected, the HSI has been summed up and divided by the total number of species in that particular group in order to scale it between zero and one. It therefore represents the averaged HSI for each group selected.",
     'Change in HSI':
         "This change in diversity is derived from the Habitat Suitability Index. To assess the change from the beginning until the end of the 21st century, we used a base Habitat Suitability Index estimate that has been averaged over a period of eighteen years (2012-2030) that was subtracted from each year, 2012 - 2100. Therefore it shows the yearly difference in the Habitat Suitability Index when comparing to our base Habitat Suitability Index estimate and gives information on how much this index is about to change until the end of the century in regard to the chosen RCP emission scenario.",
-    'Species Turnover': 'Species turnover refers to the rate at which one species replaces another in a community over time.',
+    'Species Turnover':
+        "The species turnover represents the change in species composition compared to the species composition in the year 2012. We used the Jaccard Index, which results in a value between zero and one. High values close to one represent similar or identical species composition as in the year 2012.",
 
     // Plankton groups
-    'Total Plankton': 'Total Plankton includes all microscopic organisms, including both phytoplankton and zooplankton.',
-    'Zooplankton': 'Zooplankton are small drifting animals in the water, including species such as jellyfish and crustaceans.',
-    'Phytoplankton': 'Phytoplankton are microscopic marine algae that form the foundation of the ocean food web.',
-    'Copepods': 'Copepods are a type of small crustacean found in nearly every freshwater and saltwater habitat.',
-    'Diatoms': 'Diatoms are a group of microalgae that are known for their unique silica-based cell walls.',
-    'Dinoflagellates': 'Dinoflagellates are a type of plankton responsible for phenomena like red tides and bioluminescence.',
-    'Coccolithophores': 'Coccolithophores are single-celled marine algae surrounded by a microscopic plating made of calcium carbonate.',
+    'Total Plankton':
+        "In total, we included 859 marine plankton species. The datasets used were compiled by Righetti et al. (2018) and by Benedetti et al. (2018) and cover the range of 13 phyla, 71 orders, 147 families, and 324 genera.",
+    'Zooplankton':
+        "We projected the biogeography of 523 zooplankton species (61% of the total species). Within the category zooplankton, we cover the range of 8 phyla, 15 classes, 27 orders, and 214 genera.",
+    'Phytoplankton':
+        "We projected the biogeography of 336 phytoplankton species (39% of the total species). Within the category phytoplankton, we cover the range of 5 phyla, 15 classes, 44 orders, and 110 genera.",
+    'Copepods':
+        "We projected the biogeography of 272 copepod species (32% of the total species). The copepod dataset used covers 4 orders and 85 genera.",
+    'Diatoms':
+        "We projected the biogeography of 154 diatom species (18% of the total species) that cover the range of 22 orders and 51 genera.",
+    'Dinoflagellates':
+        "We projected the biogeography of 154 dinoflagellate species (18% of total species) that cover the range of two classes, 11 orders and 37 genera.",
+    'Coccolithophores':
+        "We projected the biogeography of 24 coccolithopore species (3% of total species) that cover the range of 3 classes, 8 orders and 18 genera.",
 
     // RCP scenarios
-    'RCP 2.6 (Paris Agreement)': 'RCP 2.6 is a scenario that assumes global annual greenhouse gas emissions peak between 2010–2020 and decline substantially thereafter.',
-    'RCP 4.5': 'RCP 4.5 is an intermediate scenario where emissions peak around 2040, then decline.',
-    'RCP 8.5 (Business as Usual)': 'RCP 8.5 is a high greenhouse gas emission scenario often considered the "business as usual" pathway.',
-    'RCP 8.5 - RCP2.6': 'This difference shows the projected climate outcomes between the high-emission RCP 8.5 and the low-emission RCP 2.6 scenario.',
-    'RCP 8.5 - RCP 4.5': 'This scenario shows the differences between the high-emission RCP 8.5 and moderate-emission RCP 4.5 pathways.',
-    'RCP 4.5 - RCP 2.6': 'This scenario compares the moderate-emission RCP 4.5 and low-emission RCP 2.6 pathways.',
+    'RCP 2.6 (Paris Agreement)':
+        "The RCP 2.6 represents a low greenhouse gas emissions and high mitigation future scenario, which would likely limit global warming to below 2 degrees Celsius by the year 2100. The radiative forcing reaches a maximum near the middle of the twenty-first century. The scenario requires proactive environmental policy and sustainable production and consumption with low greenhouse gas emissions.",
+    'RCP 4.5':
+        "The RCP 4.5 represents an intermediate greenhouse gas emissions scenario. Global warming will be above 2.5 degree Celsius by the year 2100.",
+    'RCP 8.5 (Business as Usual)':
+        "The RCP 8.5 is a high greenhouse gas emissions scenario in the absence of policies to combat climate change, leading to continued and sustained growth in atmospheric greenhouse gas concentrations (business-as-usual scenario). Global warming will exceed 4 degrees Celsius by the year 2100.",
+    'RCP 8.5 - RCP2.6':
+        "To see the differences between the high-emission scenario RCP 8.5 and the low-emission scenario RCP 2.6, we computed the difference by subtracting the corresponding chosen diversity index.",
+    'RCP 8.5 - RCP 4.5':
+        "To see the differences between the high-emission scenario RCP8.5 and the intermediate-emission scenario RCP4.5, we computed the difference by subtracting the corresponding chosen diversity index.",
+    'RCP 4.5 - RCP 2.6':
+        "To see the differences between the intermediate emission scenarion RCP 4.5 and the intermediate emission scenario RCP 2.6 we computed the difference by subtracting the corresponding diversity index chosen.",
 
     // Earth system models
-    'Model Mean': 'The Model Mean represents the average outcome across multiple climate models, providing a consensus projection.',
-    'CNRM-CM5': 'CNRM-CM5 is a global climate model developed by Météo-France in collaboration with other research institutions.',
-    'GFDL-ESM2M': 'GFDL-ESM2M is a coupled climate model developed by NOAA’s Geophysical Fluid Dynamics Laboratory.',
-    'IPSL-CMSA-LR': 'IPSL-CMSA-LR is a climate model developed by the Institut Pierre-Simon Laplace, used for climate projections.',
+    'Model Mean':
+        "The model mean represents the averaged output of the three Earth System Models used.",
+    'CNRM-CM5':
+        "The general circulation model CNRM-CM has been developed jointly by CNRM-GAME (Centre National de Recherches Météorologiques, Groupe d'Études de l'Atmosphère Météorologique) and Cerfacs (Centre Européen de Recherche et de Formation Avancée).",
+    'GFDL-ESM2M':
+        "This model was developed at the Geophysical Fluid Dynamics Laboratory.",
+    'IPSL-CMSA-LR':
+        "This climate model was developed at the Institut Pierre Simon Laplace and is a classical climate model that couples an atmosphere-land surface model to an ocean-sea ice model.",
 
     // Environmental parameters
     Temperature:
