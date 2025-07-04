@@ -4,7 +4,7 @@ import { projectDescription } from '../constants';
 
 const ProjectExplanationModal = ({ open, onClose }) => {
     return (
-        <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+        <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
             <DialogTitle>Welcome to MAPMAKER!</DialogTitle>
             <DialogContent dividers>
                 <Typography variant="body1" sx={{ whiteSpace: 'pre-line' }}>
