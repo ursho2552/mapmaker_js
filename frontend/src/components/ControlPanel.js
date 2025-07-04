@@ -125,7 +125,7 @@ const ControlPanel = ({
 
     {/* Metric */}
     <LabeledSelect
-      label={source === 'plankton' ? 'Index:' : 'Metric:'}
+      label={'Metric:'}
       id={source === 'plankton' ? 'diversity' : 'env-param'}
       value={source === 'plankton' ? diversity : envParam}
       options={source === 'plankton' ? diversityIndices : environmentalParameters}
