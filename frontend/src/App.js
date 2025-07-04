@@ -106,37 +106,6 @@ const App = () => {
         </DialogActions>
       </Dialog>
 
-      {/* Combined Line Plot */}
-      <Box sx={{
-        backgroundColor: '#1e1e1e',
-        borderRadius: 2,
-        height: '100%',
-        m: 2,
-      }}>
-
-        <CombinedLinePlot
-          point={selectedPoint}
-          leftSettings={{
-            source: panel1.source,
-            index: panel1.diversity,
-            group: panel1.group,
-            scenario: panel1.rcp,
-            model: panel1.model,
-            envParam: panel1.envParam
-          }}
-          rightSettings={{
-            source: panel2.source,
-            index: panel2.diversity,
-            group: panel2.group,
-            scenario: panel2.rcp,
-            model: panel2.model,
-            envParam: panel2.envParam
-          }}
-          startYear={2012}
-          endYear={2100}
-        />
-      </Box>
-
       <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', px: 2 }}>
         <DataPanel
           panel={panel1}
@@ -167,6 +136,36 @@ const App = () => {
           ICON_COLUMN={ICON_COLUMN}
           setSelectedPoint={setSelectedPoint}
           selectedPoint={selectedPoint}
+        />
+      </Box>
+
+      {/* Combined Line Plot */}
+      <Box sx={{
+        backgroundColor: '#1e1e1e',
+        borderRadius: 2,
+        height: '100%',
+        m: 2,
+      }}>
+        <CombinedLinePlot
+          point={selectedPoint}
+          leftSettings={{
+            source: panel1.source,
+            index: panel1.diversity,
+            group: panel1.group,
+            scenario: panel1.rcp,
+            model: panel1.model,
+            envParam: panel1.envParam
+          }}
+          rightSettings={{
+            source: panel2.source,
+            index: panel2.diversity,
+            group: panel2.group,
+            scenario: panel2.rcp,
+            model: panel2.model,
+            envParam: panel2.envParam
+          }}
+          startYear={2012}
+          endYear={2100}
         />
       </Box>
 
