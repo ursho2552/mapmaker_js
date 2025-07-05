@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef, useMemo } from 'react';
 import Globe from 'react-globe.gl';
+import { generateColorStops, getInterpolatedColorFromValue } from '../utils';
 import {
   colorbarLabelMapping,
   mapGlobeTitleStyle,
@@ -65,6 +66,10 @@ const GlobeDisplay = ({
     return index.includes('Change') || index.includes('Temperature');
   }, [index]);
 
+  const colorStops = useMemo(() => {
+    return generateColorStops(isDiverging ? divergingColors : sequentialColors);
+  }, [isDiverging]);
+
   const getColorFromValue = useMemo(() => {
     return (value, min, max) => {
       if (isNaN(value) || value == null) return 'rgba(0,0,0,0)';
@@ -128,7 +133,7 @@ const GlobeDisplay = ({
                 lat,
                 lng: lon,
                 size: value !== 0 ? 0.01 : 0,
-                color: getColorFromValue(value, minVal, maxVal),
+                color: getInterpolatedColorFromValue(value, minVal, maxVal, colorStops),
               };
             });
         })
