@@ -106,7 +106,15 @@ const App = () => {
         </DialogActions>
       </Dialog>
 
-      <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', px: 2 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'row',
+          gap: 2,
+          px: 2,
+          flexWrap: 'wrap',
+        }}
+      >
         <DataPanel
           panel={panel1}
           setPanel={setPanel1}
@@ -123,34 +131,27 @@ const App = () => {
           selectedPoint={selectedPoint}
         />
         {/* Combined Line Plot */}
-        <Box sx={{
-          backgroundColor: '#1e1e1e',
-          borderRadius: 2,
-          height: '100%',
-          m: 2,
-        }}>
-          <CombinedLinePlot
-            point={selectedPoint}
-            leftSettings={{
-              source: panel1.source,
-              index: panel1.diversity,
-              group: panel1.group,
-              scenario: panel1.rcp,
-              model: panel1.model,
-              envParam: panel1.envParam
-            }}
-            rightSettings={{
-              source: panel2.source,
-              index: panel2.diversity,
-              group: panel2.group,
-              scenario: panel2.rcp,
-              model: panel2.model,
-              envParam: panel2.envParam
-            }}
-            startYear={2012}
-            endYear={2100}
-          />
-        </Box>
+        <CombinedLinePlot
+          point={selectedPoint}
+          leftSettings={{
+            source: panel1.source,
+            index: panel1.diversity,
+            group: panel1.group,
+            scenario: panel1.rcp,
+            model: panel1.model,
+            envParam: panel1.envParam
+          }}
+          rightSettings={{
+            source: panel2.source,
+            index: panel2.diversity,
+            group: panel2.group,
+            scenario: panel2.rcp,
+            model: panel2.model,
+            envParam: panel2.envParam
+          }}
+          startYear={2012}
+          endYear={2100}
+        />
         <DataPanel
           panel={panel2}
           setPanel={setPanel2}
