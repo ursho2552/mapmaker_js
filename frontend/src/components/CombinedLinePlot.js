@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Plot from 'react-plotly.js';
+import { Box } from '@mui/material';
 import { nameToLabelMapping } from '../constants';
 
 const CombinedLinePlot = ({ point, leftSettings, rightSettings, startYear, endYear }) => {
@@ -40,6 +41,14 @@ const CombinedLinePlot = ({ point, leftSettings, rightSettings, startYear, endYe
   const rightName = rightSettings.source === 'plankton' ? nameToLabelMapping[rightSettings.index] : nameToLabelMapping[rightSettings.envParam];
 
   const layout = {
+    autosize: true,
+    margin: {
+      l: 50,
+      r: 50,
+      t: 50,
+      b: 50,
+      pad: 4,
+    },
     title: {
       text: `${leftName} and ${rightName} at ${point.x.toFixed(2)}°E, ${point.y.toFixed(2)}°N`,
       font: { color: 'white' }
@@ -76,31 +85,39 @@ const CombinedLinePlot = ({ point, leftSettings, rightSettings, startYear, endYe
   };
 
   return (
-    <Plot
-      data={[
-        {
-          x: leftData.x,
-          y: leftData.y,
-          type: 'scatter',
-          mode: 'lines+markers',
-          line: { color: 'cyan' },
-          showlegend: false,
-        },
-        {
-          x: rightData.x,
-          y: rightData.y,
-          type: 'scatter',
-          mode: 'lines+markers',
-          line: { color: 'orange' },
-          yaxis: 'y2',
-          showlegend: false,
-        }
-      ]}
-      layout={layout}
-      config={{ displayModeBar: false }}
-      useResizeHandler
-      style={{ width: '100%', height: '100%' }}
-    />
+    <Box sx={{
+      height: '50%',
+      p: 2,
+      backgroundColor: 'black',
+      borderRadius: 1,
+      maxWidth: 500,
+    }}>
+      <Plot
+        data={[
+          {
+            x: leftData.x,
+            y: leftData.y,
+            type: 'scatter',
+            mode: 'lines+markers',
+            line: { color: 'cyan' },
+            showlegend: false,
+          },
+          {
+            x: rightData.x,
+            y: rightData.y,
+            type: 'scatter',
+            mode: 'lines+markers',
+            line: { color: 'orange' },
+            yaxis: 'y2',
+            showlegend: false,
+          }
+        ]}
+        layout={layout}
+        config={{ displayModeBar: false }}
+        useResizeHandler={true}
+        style={{ width: '100%', height: '100%' }}
+      />
+    </Box>
   );
 };
 

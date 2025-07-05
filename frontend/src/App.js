@@ -116,7 +116,7 @@ const App = () => {
           flexWrap: 'wrap',
         }}
       >
-        <Box sx={{ flexGrow: 5 }}>
+        <Box sx={{ flexGrow: 5, minWidth: '300px' }}>
           <DataPanel
             panel={panel1}
             setPanel={setPanel1}
@@ -126,7 +126,7 @@ const App = () => {
             selectedPoint={selectedPoint}
           />
         </Box>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, px: 2, flexGrow: 3 }}>
+        <Box sx={{ flexGrow: 1, minWidth: '300px', display: 'flex', flexDirection: 'column', gap: 2 }}>
           {/* Control Panel 1 */}
           <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
             <ControlPanel

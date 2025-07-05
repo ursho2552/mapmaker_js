@@ -34,7 +34,7 @@ const LabeledSelect = ({
       </Typography>
     </Box>
     <Box sx={inputColumn}>
-      <FormControl variant="outlined" size="small" fullWidth sx={{ minWidth: 180, backgroundColor: 'white', borderRadius: 1 }}>
+      <FormControl variant="outlined" size="small" fullWidth sx={{ backgroundColor: 'white', borderRadius: 1 }}>
         <Select id={id} value={value} onChange={onChange}>
           {options.map((opt) => (
             <MenuItem key={opt} value={opt}>
@@ -75,7 +75,13 @@ const ControlPanel = ({
   diversityIndices,
   environmentalParameters,
 }) => (
-  <Box sx={{ flex: 1, minHeight: 250, p: 2, backgroundColor: 'black', borderRadius: 1, height: '50%' }}>
+  <Box sx={{
+    minHeight: 250,
+    p: 2,
+    backgroundColor: 'black',
+    borderRadius: 1,
+    height: '50%'
+  }}>
     {/* Data Source Row */}
     <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, justifyContent: 'space-between' }}>
       <FormControl component="fieldset" sx={{ color: 'white' }}>

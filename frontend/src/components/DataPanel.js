@@ -20,7 +20,12 @@ const DataPanel = ({
     selectedPoint,
 }) => {
     return (
-        <Box sx={{ flex: 8, minWidth: 300, p: 2, backgroundColor: 'black', borderRadius: 1 }}>
+        <Box sx={{
+            width: '100%',
+            p: 2,
+            backgroundColor: 'black',
+            borderRadius: 1
+        }}>
             {/* View Switch */}
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
                 <FormControl component="fieldset">
