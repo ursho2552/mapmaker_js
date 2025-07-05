@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useMemo } from 'react';
 import Globe from 'react-globe.gl';
-import { generateColorStops, getInterpolatedColorFromValue } from '../utils';
+import { generateColorStops, getInterpolatedColorFromValue, generateColorbarTicks } from '../utils';
 import {
   colorbarLabelMapping,
   mapGlobeTitleStyle,
@@ -36,6 +36,28 @@ const GlobeDisplay = ({
     ? { lat: selectedPoint.y, lng: selectedPoint.x }
     : null;
 
+  const getDynamicPrecision = (range) => {
+    if (range === 0) return 2;
+    const magnitude = Math.log10(Math.abs(range));
+    if (magnitude >= 3) return 0;
+    if (magnitude >= 2) return 1;
+    if (magnitude >= 0) return 2;
+    if (magnitude >= -2) return 3;
+    return 4;
+  };
+
+  const isDiverging = useMemo(() => {
+    return index.includes('Change') || index.includes('Temperature');
+  }, [index]);
+
+  const colorscale = useMemo(() => {
+    return generateColorStops(isDiverging ? divergingColors : sequentialColors);
+  }, [isDiverging]);
+
+  const numBins = colorscale.length / 2;
+
+  const { tickvals, ticktext } = generateColorbarTicks(minValue, maxValue, numBins);
+
   const createHtmlElement = (d) => {
     const el = document.createElement('div');
     el.style.color = 'red';
@@ -61,14 +83,6 @@ const GlobeDisplay = ({
     window.addEventListener('resize', updateDimensions);
     return () => window.removeEventListener('resize', updateDimensions);
   }, []);
-
-  const isDiverging = useMemo(() => {
-    return index.includes('Change') || index.includes('Temperature');
-  }, [index]);
-
-  const colorStops = useMemo(() => {
-    return generateColorStops(isDiverging ? divergingColors : sequentialColors);
-  }, [isDiverging]);
 
   const getColorFromValue = useMemo(() => {
     return (value, min, max) => {
@@ -133,7 +147,7 @@ const GlobeDisplay = ({
                 lat,
                 lng: lon,
                 size: value !== 0 ? 0.01 : 0,
-                color: getInterpolatedColorFromValue(value, minVal, maxVal, colorStops),
+                color: getInterpolatedColorFromValue(value, minVal, maxVal, colorscale),
               };
             });
         })
@@ -178,30 +192,25 @@ const GlobeDisplay = ({
   }, [isHovered]);
 
   const legendData = useMemo(() => {
+    const precision = getDynamicPrecision(maxValue - minValue);
+    const n = colorscale.length;
+
     if (minValue === maxValue) {
       const singleColor = getColorFromValue(minValue, minValue, maxValue);
-      return { colors: [singleColor], labels: [minValue.toFixed(0)] };
+      return { colors: [singleColor], labels: [minValue.toFixed(precision)] };
     }
 
-    if (isDiverging) {
-      return {
-        colors: divergingColors,
-        labels: [
-          minValue.toFixed(0),
-          ((minValue + maxValue) / 2).toFixed(0),
-          maxValue.toFixed(0),
-        ],
-      };
-    } else {
-      const binSize = (maxValue - minValue) / 5;
-      return {
-        colors: sequentialColors,
-        labels: Array.from({ length: 5 }, (_, i) =>
-          (minValue + i * binSize).toFixed(0)
-        ),
-      };
+    const labels = [];
+    for (let i = 0; i <= n; i++) {
+      const val = minValue + ((maxValue - minValue) * i) / n;
+      labels.push(val.toFixed(precision));
     }
-  }, [minValue, maxValue, isDiverging]);
+
+    const colors = colorscale.map((stop) => Array.isArray(stop) ? stop[1] : stop);
+
+    return { colors, labels };
+  }, [minValue, maxValue, colorscale, getColorFromValue]);
+
 
   const handlePointClick = (lng, lat) => {
     if (onPointClick) onPointClick(lng, lat);
@@ -268,7 +277,7 @@ const GlobeDisplay = ({
             position: 'absolute',
             top: 60,
             right: 10,
-            width: 65,
+            width: 90,
             height: 'calc(100% - 80px)',
             display: 'flex',
             flexDirection: 'row',
@@ -277,6 +286,7 @@ const GlobeDisplay = ({
             zIndex: 10,
           }}
         >
+          {/* Color bins */}
           <div
             style={{
               flex: 1,
@@ -291,13 +301,14 @@ const GlobeDisplay = ({
               <div
                 key={i}
                 style={{
-                  flex: 1,
+                  flex: 1 / (colorscale.length / 2),
                   backgroundColor: color,
                 }}
               />
             ))}
           </div>
 
+          {/* Labels */}
           <div
             style={{
               flex: 1,

@@ -39,3 +39,34 @@ export const getInterpolatedColorFromValue = (value, min, max, colorStops) => {
 
     return colorStops[colorStops.length - 1][1];
 };
+
+export const generateColorbarTicks = (min, max, numBins) => {
+    if (min == null || max == null) return { tickvals: [], ticktext: [] };
+
+    const range = max - min;
+    const step = range / numBins;
+    const tickvals = [];
+    const ticktext = [];
+
+    // Decide precision based on range
+    let precision;
+    if (range >= 1000) {
+        precision = 0;
+    } else if (range >= 100) {
+        precision = 1;
+    } else if (range >= 1) {
+        precision = 2;
+    } else if (range >= 0.01) {
+        precision = 3;
+    } else {
+        precision = 4;
+    }
+
+    for (let i = 0; i <= numBins; i++) {
+        const val = min + step * i;
+        tickvals.push(val);
+        ticktext.push(val.toFixed(precision));
+    }
+
+    return { tickvals, ticktext };
+};
