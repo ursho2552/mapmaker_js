@@ -116,15 +116,16 @@ const App = () => {
           flexWrap: 'wrap',
         }}
       >
-        <DataPanel
-          panel={panel1}
-          setPanel={setPanel1}
-          debouncedYear={debouncedYear1}
-          debouncedUpdateYear={debouncedUpdateYear1}
-          setSelectedPoint={setSelectedPoint}
-          selectedPoint={selectedPoint}
-          sx={{ flexGrow: 5 }}
-        />
+        <Box sx={{ flexGrow: 5 }}>
+          <DataPanel
+            panel={panel1}
+            setPanel={setPanel1}
+            debouncedYear={debouncedYear1}
+            debouncedUpdateYear={debouncedUpdateYear1}
+            setSelectedPoint={setSelectedPoint}
+            selectedPoint={selectedPoint}
+          />
+        </Box>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, px: 2, flexGrow: 3 }}>
           {/* Control Panel 1 */}
           <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
@@ -176,7 +177,6 @@ const App = () => {
               iconColumn={ICON_COLUMN}
             />
           </Box>
-
           {/* Combined Line Plot */}
           <CombinedLinePlot
             point={selectedPoint}
@@ -198,20 +198,19 @@ const App = () => {
             }}
             startYear={2012}
             endYear={2100}
-            sx={{ width: '100%' }}
           />
         </Box>
-        <DataPanel
-          panel={panel2}
-          setPanel={setPanel2}
-          debouncedYear={debouncedYear2}
-          debouncedUpdateYear={debouncedUpdateYear2}
-          setSelectedPoint={setSelectedPoint}
-          selectedPoint={selectedPoint}
-          sx={{ flexGrow: 5 }}
-        />
+        <Box sx={{ flexGrow: 5 }}>
+          <DataPanel
+            panel={panel2}
+            setPanel={setPanel2}
+            debouncedYear={debouncedYear2}
+            debouncedUpdateYear={debouncedUpdateYear2}
+            setSelectedPoint={setSelectedPoint}
+            selectedPoint={selectedPoint}
+          />
+        </Box>
       </Box>
-
       {/* Footer */}
       <Footer />
     </Box>
