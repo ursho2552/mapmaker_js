@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Plot from 'react-plotly.js';
-import { colorbarLabelMapping, mapGlobeTitleStyle, divergingColors, sequentialColors } from '../constants';
+import { nameToLabelMapping, mapGlobeTitleStyle, divergingColors, sequentialColors } from '../constants';
 import { generateColorbarTicks } from '../utils';
 
 const MapDisplay = ({
@@ -19,7 +19,7 @@ const MapDisplay = ({
   const [minValue, setMinValue] = useState(null);
   const [maxValue, setMaxValue] = useState(null);
   const [error, setError] = useState(null);
-  const readableIndex = colorbarLabelMapping[index] || index;
+  const readableIndex = nameToLabelMapping[index] || index;
   const readableGroup = group ? ` and ${group}` : '';
 
   const fullTitle = `${readableIndex}${readableGroup} predicted by ${scenario} on ${model} in ${year}`;

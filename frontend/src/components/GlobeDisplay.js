@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef, useMemo } from 'react';
 import Globe from 'react-globe.gl';
 import { generateColorStops, getInterpolatedColorFromValue, generateColorbarTicks } from '../utils';
 import {
-  colorbarLabelMapping,
+  nameToLabelMapping,
   mapGlobeTitleStyle,
   divergingColors,
   sequentialColors,
@@ -29,7 +29,7 @@ const GlobeDisplay = ({
   const [cachedData, setCachedData] = useState({});
   const [isHovered, setIsHovered] = useState(false);
 
-  const readableIndex = colorbarLabelMapping[index] || index;
+  const readableIndex = nameToLabelMapping[index] || index;
   const readableGroup = group ? ` and ${group}` : '';
   const fullTitle = `${readableIndex}${readableGroup} predicted by ${scenario} on ${model} in ${year}`;
   const normalizedSelectedPoint = selectedPoint

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Plot from 'react-plotly.js';
+import { nameToLabelMapping } from '../constants';
 
 const CombinedLinePlot = ({ point, leftSettings, rightSettings, startYear, endYear }) => {
   const [leftData, setLeftData] = useState(null);
@@ -35,8 +36,8 @@ const CombinedLinePlot = ({ point, leftSettings, rightSettings, startYear, endYe
   if (error) return <div style={{ color: 'red' }}>Error loading chart: {error}</div>;
   if (!leftData || !rightData) return null;
 
-  const leftName = leftSettings.source === 'plankton' ? leftSettings.index : leftSettings.envParam;
-  const rightName = rightSettings.source === 'plankton' ? rightSettings.index : rightSettings.envParam;
+  const leftName = leftSettings.source === 'plankton' ? nameToLabelMapping[leftSettings.index] : nameToLabelMapping[leftSettings.envParam];
+  const rightName = rightSettings.source === 'plankton' ? nameToLabelMapping[rightSettings.index] : nameToLabelMapping[rightSettings.envParam];
 
   const layout = {
     title: {
