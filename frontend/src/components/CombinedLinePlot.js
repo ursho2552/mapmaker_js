@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import Plot from 'react-plotly.js';
-import { Box, } from '@mui/material';
 import { nameToLabelMapping } from '../constants';
 
 const CombinedLinePlot = ({ point, leftSettings, rightSettings, startYear, endYear }) => {
@@ -77,33 +76,31 @@ const CombinedLinePlot = ({ point, leftSettings, rightSettings, startYear, endYe
   };
 
   return (
-    <Box sx={{ flex: 3, minWidth: 300, p: 2, backgroundColor: 'black', borderRadius: 1, height: '40%' }}>
-      <Plot
-        data={[
-          {
-            x: leftData.x,
-            y: leftData.y,
-            type: 'scatter',
-            mode: 'lines+markers',
-            line: { color: 'cyan' },
-            showlegend: false,
-          },
-          {
-            x: rightData.x,
-            y: rightData.y,
-            type: 'scatter',
-            mode: 'lines+markers',
-            line: { color: 'orange' },
-            yaxis: 'y2',
-            showlegend: false,
-          }
-        ]}
-        layout={layout}
-        config={{ displayModeBar: false }}
-        useResizeHandler
-        style={{ width: '100%', height: '100%' }}
-      />
-    </Box>
+    <Plot
+      data={[
+        {
+          x: leftData.x,
+          y: leftData.y,
+          type: 'scatter',
+          mode: 'lines+markers',
+          line: { color: 'cyan' },
+          showlegend: false,
+        },
+        {
+          x: rightData.x,
+          y: rightData.y,
+          type: 'scatter',
+          mode: 'lines+markers',
+          line: { color: 'orange' },
+          yaxis: 'y2',
+          showlegend: false,
+        }
+      ]}
+      layout={layout}
+      config={{ displayModeBar: false }}
+      useResizeHandler
+      style={{ width: '100%', height: '100%' }}
+    />
   );
 };
 

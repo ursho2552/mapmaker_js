@@ -10,25 +10,17 @@ import {
 } from '@mui/material';
 import GlobeDisplay from './GlobeDisplay';
 import MapDisplay from './MapDisplay';
-import ControlPanel from './ControlPanel';
 
 const DataPanel = ({
     panel,
     setPanel,
     debouncedYear,
     debouncedUpdateYear,
-    filterBiomes,
-    diversityIndices,
-    environmentalParameters,
-    openInfoModal,
-    LABEL_COLUMN,
-    INPUT_COLUMN,
-    ICON_COLUMN,
     setSelectedPoint,
     selectedPoint,
 }) => {
     return (
-        <Box sx={{ flex: 4, minWidth: 300, p: 2, backgroundColor: 'black', borderRadius: 1 }}>
+        <Box sx={{ flex: 8, minWidth: 300, p: 2, backgroundColor: 'black', borderRadius: 1 }}>
             {/* View Switch */}
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
                 <FormControl component="fieldset">
@@ -118,30 +110,6 @@ const DataPanel = ({
                     />
                 )}
             </Box>
-
-            <ControlPanel
-                source={panel.source}
-                onSourceChange={(e) => setPanel({ ...panel, source: e.target.value })}
-                diversity={panel.diversity}
-                onDiversityChange={(e) => setPanel({ ...panel, diversity: e.target.value })}
-                envParam={panel.envParam}
-                onEnvParamChange={(e) => setPanel({ ...panel, envParam: e.target.value })}
-                group={panel.group}
-                onGroupChange={(e) => setPanel({ ...panel, group: e.target.value })}
-                rcp={panel.rcp}
-                onRcpChange={(e) => setPanel({ ...panel, rcp: e.target.value })}
-                model={panel.model}
-                onModelChange={(e) => setPanel({ ...panel, model: e.target.value })}
-                filteredGroups={filterBiomes(panel.diversity).groups}
-                filteredScenarios={filterBiomes(panel.diversity).rcp}
-                filteredModels={filterBiomes(panel.diversity).models}
-                diversityIndices={diversityIndices}
-                environmentalParameters={environmentalParameters}
-                openInfoModal={openInfoModal}
-                labelColumn={LABEL_COLUMN}
-                inputColumn={INPUT_COLUMN}
-                iconColumn={ICON_COLUMN}
-            />
         </Box>
     );
 };
