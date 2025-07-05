@@ -1,76 +1,104 @@
+/* Global */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: #282c34;
+  color: white;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+}
 
-        /* Global */
-        html, body {
-          margin: 0;
-          padding: 0;
-          height: 100%;
-          background: #282c34;
-          color: white;
-          font-family: "Roboto", "Helvetica", "Arial", sans-serif;
-        }
-        #root {
-          background: #282c34;
-          min-height: 100vh;
-        }
+#root {
+  background: #282c34;
+  min-height: 100vh;
+}
 
-        /* Map Display */
-        .map-container,
-        .globe-display-container {
-          width: 100%;
-          height: 500px;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          background: #282c34;
-          position: relative;
-        }
+/* Map Display */
+.map-container,
+.globe-display-container {
+  width: 100%;
+  height: 500px;
+  display: flex;
+  background: #282c34;
+  position: relative;
+}
 
-        /* Legend / Colorbar */
-        .colorbar-container {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          margin: 16px 0;
-        }
-        .colorbar {
-          width: 20px;
-          height: 300px;
-          background: linear-gradient(
-            to top,
-            #2b83ba 0%,
-            #abdda4 20%,
-            #ffffbf 40%,
-            #fdae61 60%,
-            #d7191c 100%
-          );
-          border: 1px solid #ccc;
-          border-radius: 3px;
-          position: relative;
-        }
-        .colorbar-labels {
-          display: flex;
-          flex-direction: column-reverse;
-          justify-content: space-between;
-          height: 300px;
-          font-size: 12px;
-        }
-        .colorbar-title {
-          writing-mode: vertical-rl;
-          transform: rotate(180deg);
-          text-align: center;
-          margin-top: 4px;
-        }
+/* Legend / Colorbar */
+.colorbar-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 16px 0;
+}
 
-        /* Responsive */
-        @media (max-width: 1024px) {
-          .map-container, .globe-display-container { height: 400px; }
-          .colorbar, .colorbar-labels { height: 250px; }
-        }
-        @media (max-width: 768px) {
-          .map-container, .globe-display-container { height: 300px; }
-          .colorbar, .colorbar-labels { height: 200px; font-size: 11px; }
-        }
-        @media (max-width: 480px) {
-          .map-container, .globe-display-container { height: 200px; }
-          .colorbar, .colorbar-labels { height: 150px; font-size: 10px; }
-        }
+.colorbar {
+  width: 20px;
+  height: 300px;
+  background: linear-gradient(to top,
+      #2b83ba 0%,
+      #abdda4 20%,
+      #ffffbf 40%,
+      #fdae61 60%,
+      #d7191c 100%);
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  position: relative;
+}
+
+.colorbar-labels {
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: space-between;
+  height: 300px;
+  font-size: 12px;
+}
+
+.colorbar-title {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  text-align: center;
+  margin-top: 4px;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+
+  .map-container,
+  .globe-display-container {
+    height: 400px;
+  }
+
+  .colorbar,
+  .colorbar-labels {
+    height: 250px;
+  }
+}
+
+@media (max-width: 768px) {
+
+  .map-container,
+  .globe-display-container {
+    height: 300px;
+  }
+
+  .colorbar,
+  .colorbar-labels {
+    height: 200px;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 480px) {
+
+  .map-container,
+  .globe-display-container {
+    height: 200px;
+  }
+
+  .colorbar,
+  .colorbar-labels {
+    height: 150px;
+    font-size: 10px;
+  }
+}

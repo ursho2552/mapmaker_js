@@ -54,12 +54,6 @@ const GlobeDisplay = ({
     return generateColorStops(isDiverging ? divergingColors : sequentialColors);
   }, [isDiverging]);
 
-  const colors = colorscale.map(([pos, color]) => color);
-
-  const numBins = colorscale.length / 2;
-
-  const { tickvals, ticktext } = useMemo(() => generateColorbarTicks(minValue, maxValue, numBins), [minValue, maxValue, numBins]);
-
   const createHtmlElement = (d) => {
     const el = document.createElement('div');
     el.style.color = 'red';
@@ -255,25 +249,26 @@ const GlobeDisplay = ({
             {error}
           </div>
         )}
-
-        <div style={{ width: '100%', height: '100%' }}>
-          <Globe
-            ref={globeRef}
-            width={dimensions.width}
-            height={dimensions.height}
-            globeImageUrl="//unpkg.com/three-globe/example/img/earth-water.png"
-            showAtmosphere={false}
-            backgroundColor="#282c34"
-            pointsData={pointsData}
-            pointAltitude="size"
-            pointColor="color"
-            pointRadius={0.9}
-            onPointClick={(pt) => handlePointClick(pt.lng, pt.lat)}
-            htmlElementsData={normalizedSelectedPoint ? [normalizedSelectedPoint] : []}
-            htmlElement={createHtmlElement}
-          />
+        <div className="globe-display-container"
+          style={{ position: 'relative', width: '100%', height: '100%' }}>
+          <div style={{ width: '100%', height: '100%' }}>
+            <Globe
+              ref={globeRef}
+              width={dimensions.width}
+              height={dimensions.height}
+              globeImageUrl="//unpkg.com/three-globe/example/img/earth-water.png"
+              showAtmosphere={false}
+              backgroundColor="#282c34"
+              pointsData={pointsData}
+              pointAltitude="size"
+              pointColor="color"
+              pointRadius={0.9}
+              onPointClick={(pt) => handlePointClick(pt.lng, pt.lat)}
+              htmlElementsData={normalizedSelectedPoint ? [normalizedSelectedPoint] : []}
+              htmlElement={createHtmlElement}
+            />
+          </div>
         </div>
-
         <div
           style={{
             position: 'absolute',
