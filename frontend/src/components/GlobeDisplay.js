@@ -54,9 +54,11 @@ const GlobeDisplay = ({
     return generateColorStops(isDiverging ? divergingColors : sequentialColors);
   }, [isDiverging]);
 
+  const colors = colorscale.map(([pos, color]) => color);
+
   const numBins = colorscale.length / 2;
 
-  const { tickvals, ticktext } = generateColorbarTicks(minValue, maxValue, numBins);
+  const { tickvals, ticktext } = useMemo(() => generateColorbarTicks(minValue, maxValue, numBins), [minValue, maxValue, numBins]);
 
   const createHtmlElement = (d) => {
     const el = document.createElement('div');
@@ -301,7 +303,7 @@ const GlobeDisplay = ({
               <div
                 key={i}
                 style={{
-                  flex: 1 / (colorscale.length / 2),
+                  flex: 2 / colorscale.length,
                   backgroundColor: color,
                 }}
               />
@@ -314,17 +316,24 @@ const GlobeDisplay = ({
               flex: 1,
               display: 'flex',
               flexDirection: 'column-reverse',
-              justifyContent: 'space-between',
-              marginLeft: 1,
               height: '90%',
-              color: 'white',
-              fontSize: 12,
-              userSelect: 'none',
+              borderRadius: 4,
+              background: 'none',
             }}
           >
             {legendData.labels.map((lbl, i) => (
-              <div key={i}>{`- ${lbl}`}</div>
+              <div
+                key={i}
+                style={{
+                  flex: 2 / colorscale.length,
+                  color: 'white',
+                  fontSize: 13,
+                }}
+              >
+                {`- ${lbl}`}
+              </div>
             ))}
+
           </div>
         </div>
       </div>
