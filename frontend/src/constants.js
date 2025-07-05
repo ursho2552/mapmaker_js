@@ -13,7 +13,19 @@ export const colorbarLabelMapping = {
 };
 
 // Color palettes
-export const divergingColors = ['#0000ff', '#ff0000'];
+export const divergingColors = [
+    '#3b4cc0',
+    '#4f6ec5',
+    '#6390cb',
+    '#7ab1d3',
+    '#9ad0dc',
+    '#d6d6d6',
+    '#e7b6b6',
+    '#db8d8d',
+    '#cd6464',
+    '#b40426'
+];
+
 export const sequentialColors = ['#440154', '#3b528b', '#21918c', '#5ec962', '#fde725'];
 
 export const diversityIndices = [
