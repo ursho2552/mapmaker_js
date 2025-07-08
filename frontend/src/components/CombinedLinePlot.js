@@ -41,7 +41,6 @@ const CombinedLinePlot = ({ point, leftSettings, rightSettings, startYear, endYe
   const rightName = rightSettings.source === 'plankton' ? nameToLabelMapping[rightSettings.index] : nameToLabelMapping[rightSettings.envParam];
 
   const layout = {
-    autosize: true,
     margin: {
       l: 50,
       r: 50,
@@ -86,10 +85,10 @@ const CombinedLinePlot = ({ point, leftSettings, rightSettings, startYear, endYe
 
   return (
     <Box sx={{
-      height: '50%',
       p: 2,
       backgroundColor: 'black',
       borderRadius: 1,
+      maxWidth: 610,
     }}>
       <Plot
         data={[
@@ -113,7 +112,6 @@ const CombinedLinePlot = ({ point, leftSettings, rightSettings, startYear, endYe
         ]}
         layout={layout}
         config={{ displayModeBar: false }}
-        useResizeHandler={true}
         style={{ width: '100%', height: '100%' }}
       />
     </Box>

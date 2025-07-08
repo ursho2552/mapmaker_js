@@ -21,39 +21,42 @@ const LabeledSelect = ({
   infoText,
   openInfoModal,
 }) => (
-  <Box sx={{ display: 'flex', flexDirection: 'column', mb: 1, gap: 1 }}>
-    <Box sx={{ width: '320px', display: 'flex', alignItems: 'center' }}>
-      <FormControl
-        variant="outlined"
-        size="small"
-        sx={{ backgroundColor: 'white', borderRadius: 1, flexGrow: 1, mr: 0.5 }}
+  <Box sx={{ display: 'flex', flexDirection: 'row', mb: 1, gap: 1 }}>
+    <FormControl
+      variant="outlined"
+      size="small"
+      sx={{
+        backgroundColor: 'white',
+        borderRadius: 1,
+        width: 250,
+        mr: 0.5,
+      }}
+    >
+      <Select
+        id={id}
+        value={value}
+        onChange={onChange}
+        startAdornment={
+          <IconButton onClick={() => openInfoModal(value, value)} size="small">
+            <InfoOutlinedIcon fontSize="small" />
+          </IconButton>
+        }
       >
-        <Select
-          id={id}
-          value={value}
-          onChange={onChange}
-          startAdornment={
-            <IconButton onClick={() => openInfoModal(value, value)} size="small">
-              <InfoOutlinedIcon fontSize="small" />
-            </IconButton>
-          }
-        >
-          {options.map((opt) => (
-            <MenuItem key={opt} value={opt}>
-              {opt}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+        {options.map((opt) => (
+          <MenuItem key={opt} value={opt}>
+            {opt}
+          </MenuItem>
+        ))}
+      </Select>
+    </FormControl>
 
-      <IconButton
-        onClick={() => openInfoModal(label, infoText)}
-        size="small"
-        sx={{ color: 'white', p: 0, m: 0 }}
-      >
-        <InfoOutlinedIcon fontSize="small" />
-      </IconButton>
-    </Box>
+    <IconButton
+      onClick={() => openInfoModal(label, infoText)}
+      size="small"
+      sx={{ color: 'white', p: 0, m: 0 }}
+    >
+      <InfoOutlinedIcon fontSize="small" />
+    </IconButton>
   </Box>
 );
 
@@ -82,9 +85,10 @@ const ControlPanel = ({
     py: 1,
     backgroundColor: 'black',
     borderRadius: 1,
+    maxWidth: 280,
   }}>
     {/* Data Source Row */}
-    <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, justifyContent: 'space-between' }}>
+    <Box sx={{ alignItems: 'center', mb: 1 }}>
       <FormControl component="fieldset" sx={{ color: 'white' }}>
         <RadioGroup row name="source" value={source} onChange={onSourceChange}>
           <FormControlLabel
