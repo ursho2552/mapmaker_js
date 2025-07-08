@@ -132,7 +132,7 @@ const App = () => {
               selectedPoint={selectedPoint}
             />
           </Box>
-          <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2, px: 2 }}>
+          <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
             <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
               {/* Control Panel 1 */}
               <ControlPanel
