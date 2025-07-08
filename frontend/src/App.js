@@ -22,6 +22,7 @@ const App = () => {
   // Top-level state
   const [infoModalOpen, setInfoModalOpen] = useState(false);
   const [infoModalText, setInfoModalText] = useState('');
+  const [infoModalTitle, setInfoModalTitle] = useState('');
 
   // Clicked point for line plot
   const [selectedPoint, setSelectedPoint] = useState({ x: 0, y: 0 });
@@ -57,15 +58,12 @@ const App = () => {
   );
 
   // Helpers
-  const openInfoModal = (key) => {
+  const openInfoModal = (title, key) => {
     setInfoModalText(infoMessages[key] ?? 'No information available');
+    setInfoModalTitle(title);
     setInfoModalOpen(true);
   };
   const closeInfoModal = () => setInfoModalOpen(false);
-
-  const LABEL_COLUMN = { width: '100px', display: 'flex', alignItems: 'center', gap: 1 };
-  const INPUT_COLUMN = { flexGrow: 1, display: 'flex', alignItems: 'center' };
-  const ICON_COLUMN = { width: '62px', display: 'flex', justifyContent: 'flex-start', alignItems: 'center' };
 
   // Filter helpers (biomes)
   const filterBiomes = (diversity) => ({
@@ -98,7 +96,7 @@ const App = () => {
 
       {/* Info Modal */}
       <Dialog open={infoModalOpen} onClose={closeInfoModal} maxWidth="sm" fullWidth>
-        <DialogTitle>Explanation</DialogTitle>
+        <DialogTitle>{infoModalTitle}</DialogTitle>
         <DialogContent dividers>
           <Typography variant="body1" sx={{ whiteSpace: 'pre-line' }}>{infoModalText}</Typography>
         </DialogContent>
@@ -154,9 +152,6 @@ const App = () => {
                 diversityIndices={diversityIndices}
                 environmentalParameters={environmentalParameters}
                 openInfoModal={openInfoModal}
-                labelColumn={LABEL_COLUMN}
-                inputColumn={INPUT_COLUMN}
-                iconColumn={ICON_COLUMN}
               />
               { /* Control Panel 2 */}
               <ControlPanel
@@ -178,9 +173,6 @@ const App = () => {
                 diversityIndices={diversityIndices}
                 environmentalParameters={environmentalParameters}
                 openInfoModal={openInfoModal}
-                labelColumn={LABEL_COLUMN}
-                inputColumn={INPUT_COLUMN}
-                iconColumn={ICON_COLUMN}
               />
             </Box>
             {/* Combined Line Plot */}

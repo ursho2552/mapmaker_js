@@ -20,22 +20,24 @@ const LabeledSelect = ({
   onChange,
   infoText,
   openInfoModal,
-  labelColumn,
-  inputColumn,
-  iconColumn,
 }) => (
-  <Box sx={{ display: 'flex', mb: 1, gap: 1 }}>
-    <Box sx={labelColumn}>
-      <IconButton onClick={() => openInfoModal(infoText)} size="small" sx={{ color: 'white', p: 0 }}>
-        <InfoOutlinedIcon fontSize="small" />
-      </IconButton>
-      <Typography color="white" sx={{ mr: 0.5 }}>
-        {label}
-      </Typography>
-    </Box>
-    <Box sx={inputColumn}>
-      <FormControl variant="outlined" size="small" fullWidth sx={{ backgroundColor: 'white', borderRadius: 1 }}>
-        <Select id={id} value={value} onChange={onChange}>
+  <Box sx={{ display: 'flex', flexDirection: 'column', mb: 1, gap: 1 }}>
+    <Box sx={{ width: '320px', display: 'flex', alignItems: 'center' }}>
+      <FormControl
+        variant="outlined"
+        size="small"
+        sx={{ backgroundColor: 'white', borderRadius: 1, flexGrow: 1, mr: 0.5 }}
+      >
+        <Select
+          id={id}
+          value={value}
+          onChange={onChange}
+          startAdornment={
+            <IconButton onClick={() => openInfoModal(value, value)} size="small">
+              <InfoOutlinedIcon fontSize="small" />
+            </IconButton>
+          }
+        >
           {options.map((opt) => (
             <MenuItem key={opt} value={opt}>
               {opt}
@@ -43,9 +45,12 @@ const LabeledSelect = ({
           ))}
         </Select>
       </FormControl>
-    </Box>
-    <Box sx={iconColumn}>
-      <IconButton onClick={() => openInfoModal(value)} size="small" sx={{ color: 'white', p: 0 }}>
+
+      <IconButton
+        onClick={() => openInfoModal(label, infoText)}
+        size="small"
+        sx={{ color: 'white', p: 0, m: 0 }}
+      >
         <InfoOutlinedIcon fontSize="small" />
       </IconButton>
     </Box>
@@ -69,18 +74,14 @@ const ControlPanel = ({
   filteredScenarios,
   filteredModels,
   openInfoModal,
-  labelColumn,
-  inputColumn,
-  iconColumn,
   diversityIndices,
   environmentalParameters,
 }) => (
   <Box sx={{
-    minHeight: 250,
-    p: 2,
+    px: 2,
+    py: 1,
     backgroundColor: 'black',
     borderRadius: 1,
-    height: '50%'
   }}>
     {/* Data Source Row */}
     <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, justifyContent: 'space-between' }}>
@@ -102,59 +103,47 @@ const ControlPanel = ({
 
     {/* Scenario */}
     <LabeledSelect
-      label="Scenario:"
+      label="Scenario"
       id="rcp"
       value={rcp}
       options={filteredScenarios}
       onChange={onRcpChange}
       infoText="RCP Scenarios general"
       openInfoModal={openInfoModal}
-      labelColumn={labelColumn}
-      inputColumn={inputColumn}
-      iconColumn={iconColumn}
     />
 
     {/* Model */}
     <LabeledSelect
-      label="Model:"
+      label="Model"
       id="model"
       value={model}
       options={filteredModels}
       onChange={onModelChange}
       infoText="Earth System Models general"
       openInfoModal={openInfoModal}
-      labelColumn={labelColumn}
-      inputColumn={inputColumn}
-      iconColumn={iconColumn}
     />
 
     {/* Metric */}
     <LabeledSelect
-      label={'Metric:'}
+      label={'Metric'}
       id={source === 'plankton' ? 'diversity' : 'env-param'}
       value={source === 'plankton' ? diversity : envParam}
       options={source === 'plankton' ? diversityIndices : environmentalParameters}
       onChange={source === 'plankton' ? onDiversityChange : onEnvParamChange}
       infoText={source === 'plankton' ? 'Diversity Indices general' : 'Environmental Parameters general'}
       openInfoModal={openInfoModal}
-      labelColumn={labelColumn}
-      inputColumn={inputColumn}
-      iconColumn={iconColumn}
     />
 
     {/* Group (Plankton only) */}
     {source === 'plankton' && (
       <LabeledSelect
-        label="Group:"
+        label="Group"
         id="group"
         value={group}
         options={filteredGroups}
         onChange={onGroupChange}
         infoText="Plankton Groups general"
         openInfoModal={openInfoModal}
-        labelColumn={labelColumn}
-        inputColumn={inputColumn}
-        iconColumn={iconColumn}
       />
     )}
   </Box>
