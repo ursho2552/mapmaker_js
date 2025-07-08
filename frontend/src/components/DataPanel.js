@@ -73,7 +73,7 @@ const DataPanel = ({
             <Box sx={{ width: '100%', height: 400, position: 'relative' }}>
                 {panel.source === 'plankton' && panel.view === 'map' && (
                     <MapDisplay
-                        year={debouncedYear}
+                        year={panel.year}
                         index={panel.diversity}
                         group={panel.group}
                         scenario={panel.rcp}
@@ -85,7 +85,7 @@ const DataPanel = ({
                 )}
                 {panel.source === 'plankton' && panel.view === 'globe' && (
                     <GlobeDisplay
-                        year={debouncedYear}
+                        year={panel.year}
                         index={panel.diversity}
                         group={panel.group}
                         scenario={panel.rcp}
@@ -97,7 +97,7 @@ const DataPanel = ({
                 )}
                 {panel.source === 'environmental' && panel.view === 'map' && (
                     <MapDisplay
-                        year={debouncedYear}
+                        year={panel.year}
                         index={panel.envParam}
                         scenario={panel.rcp}
                         model={panel.model}
@@ -108,7 +108,7 @@ const DataPanel = ({
                 )}
                 {panel.source === 'environmental' && panel.view === 'globe' && (
                     <GlobeDisplay
-                        year={debouncedYear}
+                        year={panel.year}
                         index={panel.envParam}
                         scenario={panel.rcp}
                         model={panel.model}
