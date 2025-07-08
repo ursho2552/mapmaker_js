@@ -110,105 +110,112 @@ const App = () => {
       <Box
         sx={{
           display: 'flex',
-          flexDirection: 'row',
+          flexDirection: 'column',
           gap: 2,
-          px: 2,
-          flexWrap: 'wrap',
         }}
       >
-        <Box sx={{ flexGrow: 5, minWidth: '300px' }}>
-          <DataPanel
-            panel={panel1}
-            setPanel={setPanel1}
-            debouncedYear={debouncedYear1}
-            debouncedUpdateYear={debouncedUpdateYear1}
-            setSelectedPoint={setSelectedPoint}
-            selectedPoint={selectedPoint}
-          />
-        </Box>
-        <Box sx={{ flexGrow: 1, minWidth: '300px', display: 'flex', flexDirection: 'column', gap: 2 }}>
-          {/* Control Panel 1 */}
-          <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
-            <ControlPanel
-              source={panel1.source}
-              onSourceChange={(e) => setPanel1({ ...panel1, source: e.target.value })}
-              diversity={panel1.diversity}
-              onDiversityChange={(e) => setPanel1({ ...panel1, diversity: e.target.value })}
-              envParam={panel1.envParam}
-              onEnvParamChange={(e) => setPanel1({ ...panel1, envParam: e.target.value })}
-              group={panel1.group}
-              onGroupChange={(e) => setPanel1({ ...panel1, group: e.target.value })}
-              rcp={panel1.rcp}
-              onRcpChange={(e) => setPanel1({ ...panel1, rcp: e.target.value })}
-              model={panel1.model}
-              onModelChange={(e) => setPanel1({ ...panel1, model: e.target.value })}
-              filteredGroups={filterBiomes(panel1.diversity).groups}
-              filteredScenarios={filterBiomes(panel1.diversity).rcp}
-              filteredModels={filterBiomes(panel1.diversity).models}
-              diversityIndices={diversityIndices}
-              environmentalParameters={environmentalParameters}
-              openInfoModal={openInfoModal}
-              labelColumn={LABEL_COLUMN}
-              inputColumn={INPUT_COLUMN}
-              iconColumn={ICON_COLUMN}
-            />
-            { /* Control Panel 2 */}
-            <ControlPanel
-              source={panel2.source}
-              onSourceChange={(e) => setPanel2({ ...panel2, source: e.target.value })}
-              diversity={panel2.diversity}
-              onDiversityChange={(e) => setPanel2({ ...panel2, diversity: e.target.value })}
-              envParam={panel2.envParam}
-              onEnvParamChange={(e) => setPanel2({ ...panel2, envParam: e.target.value })}
-              group={panel2.group}
-              onGroupChange={(e) => setPanel2({ ...panel2, group: e.target.value })}
-              rcp={panel2.rcp}
-              onRcpChange={(e) => setPanel2({ ...panel2, rcp: e.target.value })}
-              model={panel2.model}
-              onModelChange={(e) => setPanel2({ ...panel2, model: e.target.value })}
-              filteredGroups={filterBiomes(panel2.diversity).groups}
-              filteredScenarios={filterBiomes(panel2.diversity).rcp}
-              filteredModels={filterBiomes(panel2.diversity).models}
-              diversityIndices={diversityIndices}
-              environmentalParameters={environmentalParameters}
-              openInfoModal={openInfoModal}
-              labelColumn={LABEL_COLUMN}
-              inputColumn={INPUT_COLUMN}
-              iconColumn={ICON_COLUMN}
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            gap: 2,
+            px: 2,
+          }}
+        >
+          <Box sx={{ flex: 1 }}>
+            <DataPanel
+              panel={panel1}
+              setPanel={setPanel1}
+              debouncedYear={debouncedYear1}
+              debouncedUpdateYear={debouncedUpdateYear1}
+              setSelectedPoint={setSelectedPoint}
+              selectedPoint={selectedPoint}
             />
           </Box>
-          {/* Combined Line Plot */}
-          <CombinedLinePlot
-            point={selectedPoint}
-            leftSettings={{
-              source: panel1.source,
-              index: panel1.diversity,
-              group: panel1.group,
-              scenario: panel1.rcp,
-              model: panel1.model,
-              envParam: panel1.envParam
-            }}
-            rightSettings={{
-              source: panel2.source,
-              index: panel2.diversity,
-              group: panel2.group,
-              scenario: panel2.rcp,
-              model: panel2.model,
-              envParam: panel2.envParam
-            }}
-            startYear={2012}
-            endYear={2100}
-          />
-        </Box>
-        <Box sx={{ flexGrow: 5 }}>
-          <DataPanel
-            panel={panel2}
-            setPanel={setPanel2}
-            debouncedYear={debouncedYear2}
-            debouncedUpdateYear={debouncedUpdateYear2}
-            setSelectedPoint={setSelectedPoint}
-            selectedPoint={selectedPoint}
-          />
+          <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2, px: 2 }}>
+            <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
+              {/* Control Panel 1 */}
+              <ControlPanel
+                source={panel1.source}
+                onSourceChange={(e) => setPanel1({ ...panel1, source: e.target.value })}
+                diversity={panel1.diversity}
+                onDiversityChange={(e) => setPanel1({ ...panel1, diversity: e.target.value })}
+                envParam={panel1.envParam}
+                onEnvParamChange={(e) => setPanel1({ ...panel1, envParam: e.target.value })}
+                group={panel1.group}
+                onGroupChange={(e) => setPanel1({ ...panel1, group: e.target.value })}
+                rcp={panel1.rcp}
+                onRcpChange={(e) => setPanel1({ ...panel1, rcp: e.target.value })}
+                model={panel1.model}
+                onModelChange={(e) => setPanel1({ ...panel1, model: e.target.value })}
+                filteredGroups={filterBiomes(panel1.diversity).groups}
+                filteredScenarios={filterBiomes(panel1.diversity).rcp}
+                filteredModels={filterBiomes(panel1.diversity).models}
+                diversityIndices={diversityIndices}
+                environmentalParameters={environmentalParameters}
+                openInfoModal={openInfoModal}
+                labelColumn={LABEL_COLUMN}
+                inputColumn={INPUT_COLUMN}
+                iconColumn={ICON_COLUMN}
+              />
+              { /* Control Panel 2 */}
+              <ControlPanel
+                source={panel2.source}
+                onSourceChange={(e) => setPanel2({ ...panel2, source: e.target.value })}
+                diversity={panel2.diversity}
+                onDiversityChange={(e) => setPanel2({ ...panel2, diversity: e.target.value })}
+                envParam={panel2.envParam}
+                onEnvParamChange={(e) => setPanel2({ ...panel2, envParam: e.target.value })}
+                group={panel2.group}
+                onGroupChange={(e) => setPanel2({ ...panel2, group: e.target.value })}
+                rcp={panel2.rcp}
+                onRcpChange={(e) => setPanel2({ ...panel2, rcp: e.target.value })}
+                model={panel2.model}
+                onModelChange={(e) => setPanel2({ ...panel2, model: e.target.value })}
+                filteredGroups={filterBiomes(panel2.diversity).groups}
+                filteredScenarios={filterBiomes(panel2.diversity).rcp}
+                filteredModels={filterBiomes(panel2.diversity).models}
+                diversityIndices={diversityIndices}
+                environmentalParameters={environmentalParameters}
+                openInfoModal={openInfoModal}
+                labelColumn={LABEL_COLUMN}
+                inputColumn={INPUT_COLUMN}
+                iconColumn={ICON_COLUMN}
+              />
+            </Box>
+            {/* Combined Line Plot */}
+            <CombinedLinePlot
+              point={selectedPoint}
+              leftSettings={{
+                source: panel1.source,
+                index: panel1.diversity,
+                group: panel1.group,
+                scenario: panel1.rcp,
+                model: panel1.model,
+                envParam: panel1.envParam
+              }}
+              rightSettings={{
+                source: panel2.source,
+                index: panel2.diversity,
+                group: panel2.group,
+                scenario: panel2.rcp,
+                model: panel2.model,
+                envParam: panel2.envParam
+              }}
+              startYear={2012}
+              endYear={2100}
+            />
+          </Box>
+          <Box sx={{ flex: 1 }}>
+            <DataPanel
+              panel={panel2}
+              setPanel={setPanel2}
+              debouncedYear={debouncedYear2}
+              debouncedUpdateYear={debouncedUpdateYear2}
+              setSelectedPoint={setSelectedPoint}
+              selectedPoint={selectedPoint}
+            />
+          </Box>
         </Box>
       </Box>
       {/* Footer */}

@@ -21,10 +21,13 @@ const DataPanel = ({
 }) => {
     return (
         <Box sx={{
-            width: '100%',
             p: 2,
             backgroundColor: 'black',
-            borderRadius: 1
+            borderRadius: 1,
+            flex: 1,
+            minWidth: 0,
+            display: 'flex',
+            flexDirection: 'column',
         }}>
             {/* View Switch */}
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
