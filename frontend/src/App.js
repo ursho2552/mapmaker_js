@@ -108,6 +108,7 @@ const App = () => {
         sx={{
           display: 'flex',
           flexDirection: 'row',
+          flexWrap: 'wrap',
           gap: 2,
           px: 2,
         }}
@@ -122,7 +123,7 @@ const App = () => {
             selectedPoint={selectedPoint}
           />
         </Box>
-        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2, flexWrap: 'wrap' }}>
           <Box sx={{ flex: 1, display: 'flex', flexDirection: 'row', gap: 2 }}>
             {/* Control Panel 1 */}
             <ControlPanel
@@ -168,29 +169,27 @@ const App = () => {
             />
           </Box>
           {/* Combined Line Plot */}
-          <Box sx={{ flex: 1 }}>
-            <CombinedLinePlot
-              point={selectedPoint}
-              leftSettings={{
-                source: panel1.source,
-                index: panel1.diversity,
-                group: panel1.group,
-                scenario: panel1.rcp,
-                model: panel1.model,
-                envParam: panel1.envParam
-              }}
-              rightSettings={{
-                source: panel2.source,
-                index: panel2.diversity,
-                group: panel2.group,
-                scenario: panel2.rcp,
-                model: panel2.model,
-                envParam: panel2.envParam
-              }}
-              startYear={2012}
-              endYear={2100}
-            />
-          </Box>
+          <CombinedLinePlot
+            point={selectedPoint}
+            leftSettings={{
+              source: panel1.source,
+              index: panel1.diversity,
+              group: panel1.group,
+              scenario: panel1.rcp,
+              model: panel1.model,
+              envParam: panel1.envParam
+            }}
+            rightSettings={{
+              source: panel2.source,
+              index: panel2.diversity,
+              group: panel2.group,
+              scenario: panel2.rcp,
+              model: panel2.model,
+              envParam: panel2.envParam
+            }}
+            startYear={2012}
+            endYear={2100}
+          />
         </Box>
         <Box sx={{ flex: 2, display: 'flex' }}>
           <DataPanel

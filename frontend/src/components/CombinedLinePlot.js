@@ -89,6 +89,7 @@ const CombinedLinePlot = ({ point, leftSettings, rightSettings, startYear, endYe
       backgroundColor: 'black',
       borderRadius: 1,
       maxWidth: 610,
+      maxHeight: 350,
     }}>
       <Plot
         data={[
@@ -113,6 +114,7 @@ const CombinedLinePlot = ({ point, leftSettings, rightSettings, startYear, endYe
         layout={layout}
         config={{ displayModeBar: false }}
         style={{ width: '100%', height: '100%' }}
+        useResizeHandler={true}
       />
     </Box>
   );
