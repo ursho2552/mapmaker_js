@@ -97,8 +97,14 @@ const GlobeDisplay = ({
       const data = await response.json();
 
       const flatData = data.variable.flat();
-      const minVal = Math.min(...flatData.filter((v) => !isNaN(v) && v != null));
-      const maxVal = Math.max(...flatData.filter((v) => !isNaN(v) && v != null));
+      let minVal = Math.min(...flatData.filter((v) => !isNaN(v) && v != null));
+      let maxVal = Math.max(...flatData.filter((v) => !isNaN(v) && v != null));
+
+      if (isDiverging) {
+        const absMax = Math.max(Math.abs(minVal), Math.abs(maxVal));
+        minVal = -absMax;
+        maxVal = absMax;
+      }
 
       const transformed = data.lats
         .filter((_, latIdx) => latIdx % 2 === 0)
