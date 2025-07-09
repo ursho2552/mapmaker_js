@@ -49,7 +49,7 @@ const CombinedLinePlot = ({ point, leftSettings, rightSettings, startYear, endYe
       pad: 2,
     },
     title: {
-      text: `${leftName} and ${rightName} at ${point.x.toFixed(2)}°E, ${point.y.toFixed(2)}°N`,
+      text: `${leftName} and ${rightName}<br>at ${point.x.toFixed(2)}°E, ${point.y.toFixed(2)}°N`,
       font: { color: 'white' }
     },
     paper_bgcolor: '#282c34',
