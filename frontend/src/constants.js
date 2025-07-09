@@ -135,9 +135,9 @@ export const infoMessages = {
         "This climate model was developed at the Institut Pierre Simon Laplace and is a classical climate model that couples an atmosphere-land surface model to an ocean-sea ice model.",
 
     // Environmental parameters
-    Temperature:
+    "Temperature":
         'Sea Surface Temperature (SST) in degrees Celsius.',
-    Oxygen:
+    "Oxygen":
         'Dissolved oxygen concentration in mg/L.',
     'Change in Temperature':
         'Difference in sea surface temperature compared to baseline conditions.',
