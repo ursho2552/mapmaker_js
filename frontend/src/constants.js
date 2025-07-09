@@ -51,7 +51,7 @@ export const rcpScenarios = [
     'RCP 2.6 (Paris Agreement)',
     'RCP 4.5',
     'RCP 8.5 (Business as Usual)',
-    'RCP 8.5 - RCP2.6',
+    'RCP 8.5 - RCP 2.6',
     'RCP 8.5 - RCP 4.5',
     'RCP 4.5 - RCP 2.6',
 ];
@@ -117,7 +117,7 @@ export const infoMessages = {
         "The RCP 4.5 represents an intermediate greenhouse gas emissions scenario. Global warming will be above 2.5 degree Celsius by the year 2100.",
     'RCP 8.5 (Business as Usual)':
         "The RCP 8.5 is a high greenhouse gas emissions scenario in the absence of policies to combat climate change, leading to continued and sustained growth in atmospheric greenhouse gas concentrations (business-as-usual scenario). Global warming will exceed 4 degrees Celsius by the year 2100.",
-    'RCP 8.5 - RCP2.6':
+    'RCP 8.5 - RCP 2.6':
         "To see the differences between the high-emission scenario RCP 8.5 and the low-emission scenario RCP 2.6, we computed the difference by subtracting the corresponding chosen diversity index.",
     'RCP 8.5 - RCP 4.5':
         "To see the differences between the high-emission scenario RCP8.5 and the intermediate-emission scenario RCP4.5, we computed the difference by subtracting the corresponding chosen diversity index.",
