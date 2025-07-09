@@ -54,6 +54,16 @@ export const getInterpolatedColorFromValue = (value, min, max, colorStops) => {
     return colorStops[colorStops.length - 1][1];
 };
 
+export const getLegendFromColorscale = (colorscale, minValue, maxValue) => {
+    const numBins = colorscale.length / 2;
+    const { tickvals, ticktext } = generateColorbarTicks(minValue, maxValue, numBins);
+    const binColors = colorscale
+        .filter((_, i) => i % 2 === 0)
+        .slice(0, numBins)
+        .map(([_, color]) => color);
+    return { colors: binColors, labels: ticktext };
+};
+
 export const generateColorbarTicks = (min, max, numBins) => {
     if (min == null || max == null) return { tickvals: [], ticktext: [] };
 
@@ -62,10 +72,8 @@ export const generateColorbarTicks = (min, max, numBins) => {
     const tickvals = [];
     const ticktext = [];
 
-    const precision = range >= 1000 ? 0 :
-        range >= 100 ? 1 :
-            range >= 1 ? 2 :
-                range >= 0.01 ? 3 : 4;
+    const precision = range >= 4 ? 0 :
+        range >= 1 ? 2 : 3;
 
     for (let i = 0; i <= numBins; i++) {
         const val = min + step * i;

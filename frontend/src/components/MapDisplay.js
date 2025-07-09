@@ -58,9 +58,7 @@ const MapDisplay = ({
     ],
   };
 
-  const numBins = (colorscale.length / 2);
-
-  const { tickvals, ticktext } = generateColorbarTicks(minValue, maxValue, numBins);
+  const { tickvals, ticktext } = generateColorbarTicks(minValue, maxValue, colorscale.length / 2);
 
   useEffect(() => {
     const isEnv = sourceType === 'environmental';

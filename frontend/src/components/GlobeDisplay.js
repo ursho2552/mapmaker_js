@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useMemo } from 'react';
 import Globe from 'react-globe.gl';
-import { generateColorStops, getInterpolatedColorFromValue, generateColorbarTicks } from '../utils';
+import { generateColorStops, getInterpolatedColorFromValue, getLegendFromColorscale } from '../utils';
 import {
   nameToLabelMapping,
   mapGlobeTitleStyle,
@@ -36,16 +36,6 @@ const GlobeDisplay = ({
     ? { lat: selectedPoint.y, lng: selectedPoint.x }
     : null;
 
-  const getDynamicPrecision = (range) => {
-    if (range === 0) return 2;
-    const magnitude = Math.log10(Math.abs(range));
-    if (magnitude >= 3) return 0;
-    if (magnitude >= 2) return 1;
-    if (magnitude >= 0) return 2;
-    if (magnitude >= -2) return 3;
-    return 4;
-  };
-
   const isDiverging = useMemo(() => {
     return index.includes('Change') || index.includes('Temperature');
   }, [index]);
@@ -79,25 +69,6 @@ const GlobeDisplay = ({
     window.addEventListener('resize', updateDimensions);
     return () => window.removeEventListener('resize', updateDimensions);
   }, []);
-
-  const getColorFromValue = useMemo(() => {
-    return (value, min, max) => {
-      if (isNaN(value) || value == null) return 'rgba(0,0,0,0)';
-      if (min === max) return isDiverging ? divergingColors[1] : sequentialColors[0];
-
-      if (isDiverging) {
-        const mid = (min + max) / 2;
-        return value <= mid ? divergingColors[0] : divergingColors[1];
-      } else {
-        const binSize = (max - min) / 5;
-        if (value < min + binSize) return sequentialColors[0];
-        if (value < min + 2 * binSize) return sequentialColors[1];
-        if (value < min + 3 * binSize) return sequentialColors[2];
-        if (value < min + 4 * binSize) return sequentialColors[3];
-        return sequentialColors[4];
-      }
-    };
-  }, [index, isDiverging]);
 
   const fetchData = async (yr) => {
     const cacheKey = `${yr}_${index}_${group}_${scenario}_${model}_${sourceType}`;
@@ -188,25 +159,11 @@ const GlobeDisplay = ({
   }, [isHovered]);
 
   const legendData = useMemo(() => {
-    const precision = getDynamicPrecision(maxValue - minValue);
-    const n = colorscale.length;
-
-    if (minValue === maxValue) {
-      const singleColor = getColorFromValue(minValue, minValue, maxValue);
-      return { colors: [singleColor], labels: [minValue.toFixed(precision)] };
+    if (minValue == null || maxValue == null || colorscale.length === 0) {
+      return { colors: [], labels: [] };
     }
-
-    const labels = [];
-    for (let i = 0; i <= n; i++) {
-      const val = minValue + ((maxValue - minValue) * i) / n;
-      labels.push(val.toFixed(precision));
-    }
-
-    const colors = colorscale.map((stop) => Array.isArray(stop) ? stop[1] : stop);
-
-    return { colors, labels };
-  }, [minValue, maxValue, colorscale, getColorFromValue]);
-
+    return getLegendFromColorscale(colorscale, minValue, maxValue);
+  }, [minValue, maxValue, colorscale]);
 
   const handlePointClick = (lng, lat) => {
     if (onPointClick) onPointClick(lng, lat);
