@@ -82,7 +82,9 @@ const MapDisplay = ({
       ? `/api/globe-data?source=env&year=${year}&index=${index}&scenario=${scenario}&model=${model}`
       : `/api/map-data?year=${year}&index=${index}&group=${group}&scenario=${scenario}&model=${model}`;
 
-    if (index.includes('Change') || index.includes('Temperature')) {
+    const isDiverging = index.includes('Change') || index.includes('Temperature');
+
+    if (isDiverging) {
       setColorscale(generateColorStops(divergingColors));
     } else {
       setColorscale(generateColorStops(sequentialColors));
@@ -97,8 +99,14 @@ const MapDisplay = ({
         setLats(json.lats);
         setLons(json.lons);
         setData(json.variable);
-        setMinValue(json.minValue);
-        setMaxValue(json.maxValue);
+        if (isDiverging) {
+          const absMax = Math.max(Math.abs(json.minValue), Math.abs(json.maxValue));
+          setMinValue(-absMax);
+          setMaxValue(absMax);
+        } else {
+          setMinValue(json.minValue);
+          setMaxValue(json.maxValue);
+        }
         setError(null);
       })
       .catch((err) => {
