@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Plot from 'react-plotly.js';
 import { nameToLabelMapping, mapGlobeTitleStyle, divergingColors, sequentialColors } from '../constants';
-import { generateColorbarTicks } from '../utils';
+import { generateColorStops, generateColorbarTicks, getColorscaleForIndex } from '../utils';
 
 const MapDisplay = ({
   year,
@@ -23,20 +23,6 @@ const MapDisplay = ({
   const readableGroup = group ? ` and ${group}` : '';
 
   const fullTitle = `${readableIndex}${readableGroup} predicted by ${scenario} on ${model} in ${year}`;
-
-  const generateColorStops = (colorArray) => {
-    const step = 1 / colorArray.length;
-    const stops = [];
-
-    for (let i = 0; i < colorArray.length; i++) {
-      const start = i * step;
-      const end = (i + 1) * step;
-      stops.push([start, colorArray[i]]);
-      stops.push([end, colorArray[i]]);
-    }
-
-    return stops;
-  };
 
   const [colorscale, setColorscale] = useState(generateColorStops(sequentialColors));
 
@@ -84,11 +70,7 @@ const MapDisplay = ({
 
     const isDiverging = index.includes('Change') || index.includes('Temperature');
 
-    if (isDiverging) {
-      setColorscale(generateColorStops(divergingColors));
-    } else {
-      setColorscale(generateColorStops(sequentialColors));
-    }
+    setColorscale(getColorscaleForIndex(index));
 
     fetch(url)
       .then((response) => {

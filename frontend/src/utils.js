@@ -1,6 +1,23 @@
-export const generateColorStops = (colors) => {
-    const numColors = colors.length;
-    return colors.map((color, i) => [i / (numColors - 1), color]);
+import { divergingColors, sequentialColors } from './constants';
+
+export const generateColorStops = (colorArray) => {
+    const step = 1 / colorArray.length;
+    const stops = [];
+
+    for (let i = 0; i < colorArray.length; i++) {
+        const start = i * step;
+        const end = (i + 1) * step;
+        stops.push([start, colorArray[i]]);
+        stops.push([end, colorArray[i]]);
+    }
+
+    return stops;
+};
+
+export const getColorscaleForIndex = (index) => {
+    const isDiverging = index.includes('Change') || index.includes('Temperature');
+    const baseColors = isDiverging ? divergingColors : sequentialColors;
+    return generateColorStops(baseColors);
 };
 
 export const hexToRgb = (hex) => {
