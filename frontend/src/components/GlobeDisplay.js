@@ -154,16 +154,10 @@ const GlobeDisplay = ({
   }, []);
 
   useEffect(() => {
-    const frame = requestAnimationFrame(() => {
-      if (!isHovered && globeRef.current) {
-        globeRef.current.controls().autoRotate = true;
-        globeRef.current.controls().autoRotateSpeed = 1;
-      } else if (globeRef.current) {
-        globeRef.current.controls().autoRotate = false;
-      }
-    });
-    return () => cancelAnimationFrame(frame);
-  }, [isHovered]);
+    if (globeRef.current) {
+      globeRef.current.controls().autoRotate = false;
+    }
+  }, []);
 
   const legendData = useMemo(() => {
     if (minValue == null || maxValue == null || colorscale.length === 0) {

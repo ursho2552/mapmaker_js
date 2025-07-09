@@ -113,7 +113,7 @@ const App = () => {
           px: 2,
         }}
       >
-        <Box sx={{ flex: 2, display: 'flex' }}>
+        <Box sx={{ flex: 1, display: 'flex' }}>
           <DataPanel
             panel={panel1}
             setPanel={setPanel1}
@@ -191,7 +191,7 @@ const App = () => {
             endYear={2100}
           />
         </Box>
-        <Box sx={{ flex: 2, display: 'flex' }}>
+        <Box sx={{ flex: 1, display: 'flex' }}>
           <DataPanel
             panel={panel2}
             setPanel={setPanel2}
