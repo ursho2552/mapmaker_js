@@ -58,8 +58,19 @@ const ReferencesModal = ({ open, onClose }) => (
         Zooplankton
       </Typography>
       <Typography variant="body2" paragraph>
-        Benedetti&nbsp;et&nbsp;al.&nbsp;<em>Major restructuring of marine
-          plankton assemblages under global warming</em>&nbsp;
+        Benedetti&nbsp;et&nbsp;al.&nbsp;
+        <em>Major restructuring of marine plankton assemblages under global warming</em>, in <em>Nature Communications</em> (2021), doi:&nbsp;
+        <Link
+          href="https://doi.org/10.1038/s41467-021-25385-x"
+          target="_blank"
+          rel="noopener noreferrer"
+          underline="hover"
+          sx={{ color: 'primary.main' }}
+        >
+          10.1038/s41558-021-25385-x
+        </Link>
+      </Typography>
+      <Typography variant="body2" paragraph>
         E.&nbsp;T.&nbsp;Buitenhuis&nbsp;et&nbsp;al.&nbsp;
         <em>MAREDAT: towards a world atlas of MARine Ecosystem&nbsp;DATa</em>,
         in <em>Earth System Science Data</em> (July&nbsp;2013), pp.&nbsp;227–239,
@@ -117,9 +128,19 @@ const ReferencesModal = ({ open, onClose }) => (
       </Typography>
 
       <Typography variant="body2" paragraph>
-        Benedetti&nbsp;et&nbsp;al.&nbsp;<em>Major restructuring of marine
-          plankton assemblages under global warming</em>&nbsp;(under&nbsp;review)
-        <br />
+        <Typography variant="body2" paragraph>
+          Benedetti&nbsp;et&nbsp;al.&nbsp;
+          <em>Major restructuring of marine plankton assemblages under global warming</em>, in <em>Nature Communications</em> (2021), doi:&nbsp;
+          <Link
+            href="https://doi.org/10.1038/s41467-021-25385-x"
+            target="_blank"
+            rel="noopener noreferrer"
+            underline="hover"
+            sx={{ color: 'primary.main' }}
+          >
+            10.1038/s41558-021-25385-x
+          </Link>
+        </Typography>
         Urs&nbsp;Hofmann&nbsp;Elizondo&nbsp;et&nbsp;al.&nbsp;
         <em>Biome partitioning of the global ocean based on phytoplankton
           biogeography</em>, in <em>Progress in Oceanography</em> (2021),
