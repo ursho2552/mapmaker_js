@@ -113,7 +113,10 @@ const App = () => {
           px: 2,
         }}
       >
-        <Box sx={{ flex: 1, display: 'flex' }}>
+        <Box sx={{
+          flex: 1,
+          display: 'flex'
+        }}>
           <DataPanel
             panel={panel1}
             setPanel={setPanel1}
