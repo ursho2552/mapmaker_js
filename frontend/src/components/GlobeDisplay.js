@@ -249,8 +249,7 @@ const GlobeDisplay = ({
             {error}
           </div>
         )}
-        <div className="globe-display-container"
-          style={{ position: 'relative', width: '100%', height: '100%' }}>
+        <div style={{ position: 'relative', width: '100%', height: '100%' }}>
           <div style={{ width: '100%', height: '100%' }}>
             <Globe
               ref={globeRef}
