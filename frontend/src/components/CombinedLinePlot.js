@@ -42,11 +42,11 @@ const CombinedLinePlot = ({ point, leftSettings, rightSettings, startYear, endYe
 
   const layout = {
     margin: {
-      l: 50,
-      r: 50,
+      l: 70,
+      r: 70,
       t: 50,
       b: 50,
-      pad: 4,
+      pad: 2,
     },
     title: {
       text: `${leftName} and ${rightName} at ${point.x.toFixed(2)}°E, ${point.y.toFixed(2)}°N`,
