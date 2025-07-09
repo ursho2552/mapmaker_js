@@ -26,6 +26,7 @@ const DataPanel = ({
             borderRadius: 1,
             flex: 1,
             minWidth: 500,
+            maxWidth: 600,
             display: 'flex',
             flexDirection: 'column',
         }}>
