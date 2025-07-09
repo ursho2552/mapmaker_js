@@ -1,6 +1,11 @@
 import React, { useEffect, useState, useRef, useMemo } from 'react';
 import Globe from 'react-globe.gl';
-import { generateColorStops, getInterpolatedColorFromValue, getLegendFromColorscale } from '../utils';
+import {
+  generateColorStops,
+  getInterpolatedColorFromValue,
+  getLegendFromColorscale,
+  getColorDomainForIndex,
+} from '../utils';
 import {
   nameToLabelMapping,
   mapGlobeTitleStyle,
@@ -100,11 +105,7 @@ const GlobeDisplay = ({
       let minVal = Math.min(...flatData.filter((v) => !isNaN(v) && v != null));
       let maxVal = Math.max(...flatData.filter((v) => !isNaN(v) && v != null));
 
-      if (isDiverging) {
-        const absMax = Math.max(Math.abs(minVal), Math.abs(maxVal));
-        minVal = -absMax;
-        maxVal = absMax;
-      }
+      [minVal, maxVal] = getColorDomainForIndex(minVal, maxVal, isDiverging);
 
       const transformed = data.lats
         .filter((_, latIdx) => latIdx % 2 === 0)
@@ -273,9 +274,10 @@ const GlobeDisplay = ({
               flex: 1,
               display: 'flex',
               flexDirection: 'column-reverse',
-              height: '90%',
+              height: '96%',
               borderRadius: 4,
               background: 'none',
+              marginTop: 4,
             }}
           >
             {legendData.labels.map((lbl, i) => (

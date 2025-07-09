@@ -1,7 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import Plot from 'react-plotly.js';
-import { nameToLabelMapping, mapGlobeTitleStyle, divergingColors, sequentialColors } from '../constants';
-import { generateColorStops, generateColorbarTicks, getColorscaleForIndex } from '../utils';
+import { nameToLabelMapping, mapGlobeTitleStyle, sequentialColors } from '../constants';
+import {
+  generateColorStops,
+  generateColorbarTicks,
+  getColorscaleForIndex,
+  getColorDomainForIndex,
+} from '../utils';
 
 const MapDisplay = ({
   year,
@@ -58,7 +63,12 @@ const MapDisplay = ({
     ],
   };
 
-  const { tickvals, ticktext } = generateColorbarTicks(minValue, maxValue, colorscale.length / 2);
+  const { tickvals, ticktext } = useMemo(() => {
+    if (minValue == null || maxValue == null || !colorscale.length) {
+      return { tickvals: [], ticktext: [] };
+    }
+    return generateColorbarTicks(minValue, maxValue, colorscale.length / 2);
+  }, [minValue, maxValue, colorscale]);
 
   useEffect(() => {
     const isEnv = sourceType === 'environmental';
@@ -79,14 +89,9 @@ const MapDisplay = ({
         setLats(json.lats);
         setLons(json.lons);
         setData(json.variable);
-        if (isDiverging) {
-          const absMax = Math.max(Math.abs(json.minValue), Math.abs(json.maxValue));
-          setMinValue(-absMax);
-          setMaxValue(absMax);
-        } else {
-          setMinValue(json.minValue);
-          setMaxValue(json.maxValue);
-        }
+        const [minValue, maxValue] = getColorDomainForIndex(json.minValue, json.maxValue, isDiverging);
+        setMinValue(minValue);
+        setMaxValue(maxValue);
         setError(null);
       })
       .catch((err) => {

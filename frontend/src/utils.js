@@ -14,6 +14,14 @@ export const getColorscaleForIndex = (index) => {
     return generateColorStops(isDiverging ? divergingColors : sequentialColors);
 };
 
+export const getColorDomainForIndex = (minVal, maxVal, isDiverging) => {
+    if (isDiverging) {
+        const absMax = Math.max(Math.abs(minVal), Math.abs(maxVal));
+        return [-absMax, absMax];
+    }
+    return [minVal, maxVal];
+};
+
 export const hexToRgb = (hex) => {
     const normalized = hex.replace('#', '');
     const fullHex = normalized.length === 3
