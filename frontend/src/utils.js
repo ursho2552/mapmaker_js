@@ -1,33 +1,30 @@
 import { divergingColors, sequentialColors } from './constants';
 
-export const generateColorStops = (colorArray) => {
-    const step = 1 / colorArray.length;
-    const stops = [];
-
-    for (let i = 0; i < colorArray.length; i++) {
+export const generateColorStops = (colors) => {
+    const step = 1 / colors.length;
+    return colors.flatMap((color, i) => {
         const start = i * step;
         const end = (i + 1) * step;
-        stops.push([start, colorArray[i]]);
-        stops.push([end, colorArray[i]]);
-    }
-
-    return stops;
+        return [[start, color], [end, color]];
+    });
 };
 
 export const getColorscaleForIndex = (index) => {
     const isDiverging = index.includes('Change') || index.includes('Temperature');
-    const baseColors = isDiverging ? divergingColors : sequentialColors;
-    return generateColorStops(baseColors);
+    return generateColorStops(isDiverging ? divergingColors : sequentialColors);
 };
 
 export const hexToRgb = (hex) => {
-    hex = hex.replace('#', '');
-    if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
-    const bigint = parseInt(hex, 16);
+    const normalized = hex.replace('#', '');
+    const fullHex = normalized.length === 3
+        ? normalized.split('').map(c => c + c).join('')
+        : normalized;
+
+    const value = parseInt(fullHex, 16);
     return {
-        r: (bigint >> 16) & 255,
-        g: (bigint >> 8) & 255,
-        b: bigint & 255,
+        r: (value >> 16) & 255,
+        g: (value >> 8) & 255,
+        b: value & 255,
     };
 };
 
@@ -35,16 +32,16 @@ export const getInterpolatedColorFromValue = (value, min, max, colorStops) => {
     if (isNaN(value) || value == null) return 'rgba(0,0,0,0)';
     if (min === max) return colorStops[colorStops.length - 1][1];
 
-    const normValue = (value - min) / (max - min);
+    const norm = (value - min) / (max - min);
 
     for (let i = 0; i < colorStops.length - 1; i++) {
-        const [start, colorStart] = colorStops[i];
-        const [end, colorEnd] = colorStops[i + 1];
+        const [start, startColor] = colorStops[i];
+        const [end, endColor] = colorStops[i + 1];
 
-        if (normValue >= start && normValue <= end) {
-            const ratio = (normValue - start) / (end - start);
-            const rgbStart = hexToRgb(colorStart);
-            const rgbEnd = hexToRgb(colorEnd);
+        if (norm >= start && norm <= end) {
+            const ratio = (norm - start) / (end - start);
+            const rgbStart = hexToRgb(startColor);
+            const rgbEnd = hexToRgb(endColor);
 
             const r = Math.round(rgbStart.r + ratio * (rgbEnd.r - rgbStart.r));
             const g = Math.round(rgbStart.g + ratio * (rgbEnd.g - rgbStart.g));
@@ -65,19 +62,10 @@ export const generateColorbarTicks = (min, max, numBins) => {
     const tickvals = [];
     const ticktext = [];
 
-    // Decide precision based on range
-    let precision;
-    if (range >= 1000) {
-        precision = 0;
-    } else if (range >= 100) {
-        precision = 1;
-    } else if (range >= 1) {
-        precision = 2;
-    } else if (range >= 0.01) {
-        precision = 3;
-    } else {
-        precision = 4;
-    }
+    const precision = range >= 1000 ? 0 :
+        range >= 100 ? 1 :
+            range >= 1 ? 2 :
+                range >= 0.01 ? 3 : 4;
 
     for (let i = 0; i <= numBins; i++) {
         const val = min + step * i;
