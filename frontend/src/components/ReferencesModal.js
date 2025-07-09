@@ -18,12 +18,12 @@ const ReferencesModal = ({ open, onClose }) => (
     <DialogTitle>References &amp; Data Courtesy</DialogTitle>
 
     <DialogContent dividers>
-      {/* ------------------------------  DATA  ------------------------------ */}
+      {/* Data */}
       <Typography variant="h6" sx={{ fontWeight: 'bold', mt: 1 }}>
         Data
       </Typography>
 
-      {/* Phytoplankton ------------------------------------------------------- */}
+      {/* Phytoplankton */}
       <Typography variant="body2" sx={{ fontStyle: 'italic', mt: 1 }}>
         Phytoplankton
       </Typography>
@@ -53,14 +53,13 @@ const ReferencesModal = ({ open, onClose }) => (
         </Link>
       </Typography>
 
-      {/* Zooplankton -------------------------------------------------------- */}
+      {/* Zooplankton */}
       <Typography variant="body2" sx={{ fontStyle: 'italic', mt: 1 }}>
         Zooplankton
       </Typography>
       <Typography variant="body2" paragraph>
         Benedetti&nbsp;et&nbsp;al.&nbsp;<em>Major restructuring of marine
-          plankton assemblages under global warming</em>&nbsp;(under&nbsp;review)
-        <br />
+          plankton assemblages under global warming</em>&nbsp;
         E.&nbsp;T.&nbsp;Buitenhuis&nbsp;et&nbsp;al.&nbsp;
         <em>MAREDAT: towards a world atlas of MARine Ecosystem&nbsp;DATa</em>,
         in <em>Earth System Science Data</em> (July&nbsp;2013), pp.&nbsp;227–239,
@@ -76,7 +75,7 @@ const ReferencesModal = ({ open, onClose }) => (
         </Link>
       </Typography>
 
-      {/* -------------------  SPECIES DISTRIBUTION MODELS  ------------------ */}
+      {/* Species Distribution Models */}
       <Typography variant="h6" sx={{ fontWeight: 'bold', mt: 2 }}>
         Species Distribution Models
       </Typography>
@@ -146,7 +145,7 @@ const ReferencesModal = ({ open, onClose }) => (
         </Link>
       </Typography>
 
-      {/* ------------------------------  CMIP5  ----------------------------- */}
+      {/* CMIP5 */}
       <Typography variant="h6" sx={{ fontWeight: 'bold', mt: 2 }}>
         CMIP5
       </Typography>
@@ -178,7 +177,7 @@ const ReferencesModal = ({ open, onClose }) => (
         </Link>
       </Typography>
 
-      {/* -----------------------  EARTH SYSTEM MODELS  ---------------------- */}
+      {/* Earth System Models */}
       <Typography variant="h6" sx={{ fontWeight: 'bold', mt: 2 }}>
         Earth System Models
       </Typography>
@@ -261,7 +260,7 @@ const ReferencesModal = ({ open, onClose }) => (
         </Link>
       </Typography>
 
-      {/* --------------------------  ACKNOWLEDGEMENTS  ---------------------- */}
+      {/* Acknowledgements */}
       <Typography variant="h6" sx={{ fontWeight: 'bold', mt: 2 }}>
         Acknowledgements
       </Typography>
