@@ -7,7 +7,8 @@ import {
     Typography,
     Button,
     Box,
-    Collapse
+    Collapse,
+    Link
 } from '@mui/material';
 
 function InfoModal({ open, onClose, title, shortText, longText }) {
@@ -32,9 +33,15 @@ function InfoModal({ open, onClose, title, shortText, longText }) {
                 </Typography>
 
                 <Box mt={2}>
-                    <Button variant="text" onClick={handleToggleExpand}>
+                    <Link
+                        component="button"
+                        variant="body2"
+                        underline="hover"
+                        onClick={handleToggleExpand}
+                        sx={{ color: 'primary.main', fontWeight: 500 }}
+                    >
                         {showFullText ? 'Show Less' : 'Learn More'}
-                    </Button>
+                    </Link>
 
                     <Collapse in={showFullText}>
                         <Box mt={2}>
