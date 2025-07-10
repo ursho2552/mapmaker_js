@@ -14,7 +14,6 @@ import MapDisplay from './MapDisplay';
 const DataPanel = ({
     panel,
     setPanel,
-    debouncedYear,
     debouncedUpdateYear,
     setSelectedPoint,
     selectedPoint,
@@ -25,7 +24,7 @@ const DataPanel = ({
             backgroundColor: 'black',
             borderRadius: 1,
             flex: 1,
-            width: 500,
+            minWidth: 500,
             display: 'flex',
             flexDirection: 'column',
         }}>
