@@ -67,6 +67,52 @@ export const environmentalParameters = [
 
 export const projectDescription = "Global marine biodiversity supplies essential ecosystem services to human societies. Marine plankton ecosystems fuel ocean productivity, drive global biogeochemical cycles and regulate the Earth's climate. Climate-mediated loss of biodiversity has been suggested to negatively impact ocean ecosystem services, but future projections of climate change impacts on biodiversity and ecosystem function are poorly constrained due to a lack of observational data. Hence, policy makers lack quantitative evidence on the vulnerability of marine ecosystems. The MArine Plankton diversity bioindicator scenarios for policy MAKERs project is a collaboration between IUCN Global Marine and Polar Programme and ETH Environmental Physics Group (UP) to inform data-driven decision-making on marine biodiversity protection at the international policy level and was financed through the Geneva Science Policy Interface (GSPI). Based on observational data and novel machine learning algorithms we have mapped the biogeography of 859 plankton species. We defined ocean biomes, projected future changes in biodiversity and identified hotspots of diversity change. The interactive web tool for policy makers visualizes the results on a global map and is the first step in narrowing the gap between science and policy makers in regard to plankton diversity and their impact on ecosystem functions to be incorporated in marine management decisions.";
 
+export const infoMessagesShort = {
+    // General descriptions
+    'Diversity Indices general': 'Overview of diversity metrics based on habitat suitability.',
+    'Plankton Groups general': 'Summary of 859 plankton species, split into zooplankton and phytoplankton.',
+    'RCP Scenarios general': 'Explains IPCC climate pathways (RCPs) from low to high emissions.',
+    'Earth System Models general': 'Describes climate models used to simulate Earth’s system interactions.',
+    'Environmental Parameters general': 'Key ocean variables like temperature, oxygen, and chlorophyll-a.',
+
+    // Diversity indices
+    'Biomes': 'Ocean regions classified by plankton distribution using clustering methods.',
+    'Species Richness': 'Shows proportion of species present using model-based thresholds.',
+    'Hotspots of Change in Diversity': 'Annual species richness change compared to 2012–2030 baseline.',
+    'Habitat Suitability Index (HSI)': 'Numerical index of habitat suitability averaged over species.',
+    'Change in HSI': 'Yearly change in HSI relative to a baseline (2012–2030).',
+    'Species Turnover': 'Change in species composition since 2012, based on Jaccard Index.',
+
+    // Plankton groups
+    'Total Plankton': 'Includes 859 species across 13 phyla and 324 genera.',
+    'Zooplankton': '523 species from 8 phyla and 214 genera.',
+    'Phytoplankton': '336 species across 5 phyla and 110 genera.',
+    'Copepods': '272 copepod species from 4 orders and 85 genera.',
+    'Diatoms': '154 species across 22 orders and 51 genera.',
+    'Dinoflagellates': '154 species from 2 classes and 11 orders.',
+    'Coccolithophores': '24 species across 3 classes and 8 orders.',
+
+    // RCP scenarios
+    'RCP 2.6 (Paris Agreement)': 'Low-emissions scenario with <2°C warming; high mitigation needed.',
+    'RCP 4.5': 'Intermediate emissions; warming expected >2.5°C by 2100.',
+    'RCP 8.5 (Business as Usual)': 'High-emissions scenario with >4°C warming; no policy intervention.',
+    'RCP 8.5 - RCP 2.6': 'Difference between high and low emissions outcomes.',
+    'RCP 8.5 - RCP 4.5': 'Difference between high and intermediate emissions outcomes.',
+    'RCP 4.5 - RCP 2.6': 'Difference between intermediate and low emissions outcomes.',
+
+    // Earth system models
+    'Model Mean': 'Average of the three Earth System Models used.',
+    'CNRM-CM5': 'Developed by CNRM-GAME and Cerfacs.',
+    'GFDL-ESM2M': 'Model from the Geophysical Fluid Dynamics Lab.',
+    'IPSL-CMSA-LR': 'Climate model from Institut Pierre Simon Laplace.',
+
+    // Environmental parameters
+    'Temperature': 'Sea surface temperature in °C.',
+    'Oxygen': 'Dissolved oxygen in mg/L.',
+    'Change in Temperature': 'Difference in SST from baseline conditions.',
+    'Chlorophyll-a Concentration': 'Chlorophyll-a in mg/m³ (logarithmic scale).',
+};
+
 export const infoMessages = {
     // General descriptions
     'Diversity Indices general':

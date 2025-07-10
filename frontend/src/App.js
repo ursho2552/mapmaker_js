@@ -9,12 +9,13 @@ import ProjectExplanationModal from './components/ProjectExplanationModal';
 import _ from 'lodash';
 import './App.css';
 import { Box, Typography } from '@mui/material';
-import { diversityIndices, environmentalParameters, planktonGroups, rcpScenarios, earthModels, infoMessages } from './constants';
+import { diversityIndices, environmentalParameters, planktonGroups, rcpScenarios, earthModels, infoMessages, infoMessagesShort } from './constants';
 
 const App = () => {
   // Top-level state
   const [infoModalOpen, setInfoModalOpen] = useState(false);
   const [infoModalText, setInfoModalText] = useState('');
+  const [infoModalShortText, setInfoModalShortText] = useState('');
   const [infoModalTitle, setInfoModalTitle] = useState('');
 
   // Clicked point for line plot
@@ -52,6 +53,7 @@ const App = () => {
 
   // Helpers
   const openInfoModal = (title, key) => {
+    setInfoModalShortText(infoMessagesShort[key] ?? 'No short description available');
     setInfoModalText(infoMessages[key] ?? 'No information available');
     setInfoModalTitle(title);
     setInfoModalOpen(true);
@@ -92,7 +94,7 @@ const App = () => {
         open={infoModalOpen}
         onClose={closeInfoModal}
         title={infoModalTitle}
-        shortText="This is a brief summary."
+        shortText={infoModalShortText}
         longText={infoModalText}
       />
       <Box
