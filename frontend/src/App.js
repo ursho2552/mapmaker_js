@@ -4,18 +4,11 @@ import Footer from './components/Footer';
 import ReferencesButton from './components/ReferencesButton';
 import DataPanel from './components/DataPanel';
 import ControlPanel from './components/ControlPanel';
+import InfoModal from './components/InfoModal';
 import ProjectExplanationModal from './components/ProjectExplanationModal';
 import _ from 'lodash';
 import './App.css';
-import {
-  Box,
-  Typography,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-} from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { diversityIndices, environmentalParameters, planktonGroups, rcpScenarios, earthModels, infoMessages } from './constants';
 
 const App = () => {
@@ -95,15 +88,13 @@ const App = () => {
       </Box>
 
       {/* Info Modal */}
-      <Dialog open={infoModalOpen} onClose={closeInfoModal} maxWidth="sm" fullWidth>
-        <DialogTitle>{infoModalTitle}</DialogTitle>
-        <DialogContent dividers>
-          <Typography variant="body1" sx={{ whiteSpace: 'pre-line' }}>{infoModalText}</Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={closeInfoModal}>Close</Button>
-        </DialogActions>
-      </Dialog>
+      <InfoModal
+        open={infoModalOpen}
+        onClose={closeInfoModal}
+        title={infoModalTitle}
+        shortText="This is a brief summary."
+        longText={infoModalText}
+      />
       <Box
         sx={{
           display: 'flex',
