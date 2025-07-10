@@ -24,7 +24,7 @@ const DataPanel = ({
             backgroundColor: 'black',
             borderRadius: 1,
             flex: 1,
-            minWidth: 500,
+            width: 500,
             display: 'flex',
             flexDirection: 'column',
         }}>
