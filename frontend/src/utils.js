@@ -1,4 +1,4 @@
-import { divergingColors, sequentialColors } from './constants';
+import { differenceColors, temperatureColors, sequentialColors } from './constants';
 
 export const generateColorStops = (colors) => {
     const step = 1 / colors.length;
@@ -10,12 +10,12 @@ export const generateColorStops = (colors) => {
 };
 
 export const getColorscaleForIndex = (index) => {
-    const isDiverging = index.includes('Change') || index.includes('Temperature');
-    return generateColorStops(isDiverging ? divergingColors : sequentialColors);
+    const colors = index.includes("Change") ? differenceColors : index.includes("Temperature") ? temperatureColors : sequentialColors;
+    return generateColorStops(colors);
 };
 
-export const getColorDomainForIndex = (minVal, maxVal, isDiverging) => {
-    if (isDiverging) {
+export const getColorDomainForIndex = (minVal, maxVal, isDifference) => {
+    if (isDifference) {
         const absMax = Math.max(Math.abs(minVal), Math.abs(maxVal));
         return [-absMax, absMax];
     }

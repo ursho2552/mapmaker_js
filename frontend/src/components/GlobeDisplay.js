@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef, useMemo } from 'react';
 import Globe from 'react-globe.gl';
 import {
-  generateColorStops,
+  getColorscaleForIndex,
   getInterpolatedColorFromValue,
   getLegendFromColorscale,
   getColorDomainForIndex,
@@ -9,8 +9,6 @@ import {
 import {
   nameToLabelMapping,
   mapGlobeTitleStyle,
-  divergingColors,
-  sequentialColors,
 } from '../constants';
 
 const GlobeDisplay = ({
@@ -41,13 +39,9 @@ const GlobeDisplay = ({
     ? { lat: selectedPoint.y, lng: selectedPoint.x }
     : null;
 
-  const isDiverging = useMemo(() => {
-    return index.includes('Change') || index.includes('Temperature');
-  }, [index]);
-
   const colorscale = useMemo(() => {
-    return generateColorStops(isDiverging ? divergingColors : sequentialColors);
-  }, [isDiverging]);
+    return getColorscaleForIndex(index);
+  }, [index]);
 
   const createHtmlElement = (d) => {
     const el = document.createElement('div');
@@ -105,7 +99,7 @@ const GlobeDisplay = ({
       let minVal = Math.min(...flatData.filter((v) => !isNaN(v) && v != null));
       let maxVal = Math.max(...flatData.filter((v) => !isNaN(v) && v != null));
 
-      [minVal, maxVal] = getColorDomainForIndex(minVal, maxVal, isDiverging);
+      [minVal, maxVal] = getColorDomainForIndex(minVal, maxVal, index.includes('Change'));
 
       const transformed = data.lats
         .filter((_, latIdx) => latIdx % 2 === 0)

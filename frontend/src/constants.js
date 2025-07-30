@@ -13,7 +13,7 @@ export const nameToLabelMapping = {
 };
 
 // Color palettes
-export const divergingColors = [
+export const differenceColors = [
     '#3b4cc0',
     '#4f6ec5',
     '#6390cb',
@@ -26,7 +26,32 @@ export const divergingColors = [
     '#b40426'
 ];
 
-export const sequentialColors = ['#440154', '#3b528b', '#21918c', '#5ec962', '#fde725'];
+export const sequentialColors = [
+    '#440154',
+    '#482777',
+    '#3b528b',
+    '#31688e',
+    '#21918c',
+    '#35b779',
+    '#5ec962',
+    '#aadc32',
+    '#dde318',
+    '#fde725'
+];
+
+export const temperatureColors = [
+    '#313695',
+    '#4575b4',
+    '#74add1',
+    '#abd9e9',
+    '#e0f3f8',
+    '#f7f7f7',
+    '#fee090',
+    '#fdae61',
+    '#f46d43',
+    '#d73027',
+    '#a50026'
+];
 
 export const diversityIndices = [
     'Biomes',
