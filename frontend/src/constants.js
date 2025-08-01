@@ -1,6 +1,6 @@
 // Colorbar label mapping
 export const nameToLabelMapping = {
-    'Biomes': 'Biome [INSERT BIOMES LABEL]',
+    'Biomes': 'Biome',
     'Species Richness': 'Species Richness [% species]',
     'Hotspots of Change in Diversity': 'Diversity changes [%]',
     'Habitat Suitability Index (HSI)': 'HSI [%]',
