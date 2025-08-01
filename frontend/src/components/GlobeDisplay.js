@@ -40,8 +40,8 @@ const GlobeDisplay = ({
     : null;
 
   const colorscale = useMemo(() => {
-    return getColorscaleForIndex(index);
-  }, [index]);
+    return getColorscaleForIndex(index, scenario);
+  }, [index, scenario]);
 
   const createHtmlElement = (d) => {
     const el = document.createElement('div');
@@ -99,7 +99,7 @@ const GlobeDisplay = ({
       let minVal = Math.min(...flatData.filter((v) => !isNaN(v) && v != null));
       let maxVal = Math.max(...flatData.filter((v) => !isNaN(v) && v != null));
 
-      [minVal, maxVal] = getColorDomainForIndex(minVal, maxVal, index.includes('Change'));
+      [minVal, maxVal] = getColorDomainForIndex(minVal, maxVal, index, scenario);
 
       const transformed = data.lats
         .filter((_, latIdx) => latIdx % 2 === 0)

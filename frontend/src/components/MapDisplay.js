@@ -76,7 +76,7 @@ const MapDisplay = ({
       ? `/api/globe-data?source=env&year=${year}&index=${index}&scenario=${scenario}&model=${model}`
       : `/api/map-data?year=${year}&index=${index}&group=${group}&scenario=${scenario}&model=${model}`;
 
-    setColorscale(getColorscaleForIndex(index));
+    setColorscale(getColorscaleForIndex(index, scenario));
 
     fetch(url)
       .then((response) => {
@@ -87,7 +87,7 @@ const MapDisplay = ({
         setLats(json.lats);
         setLons(json.lons);
         setData(json.variable);
-        const [minValue, maxValue] = getColorDomainForIndex(json.minValue, json.maxValue, index.includes("Change"));
+        const [minValue, maxValue] = getColorDomainForIndex(json.minValue, json.maxValue, index, scenario);
         setMinValue(minValue);
         setMaxValue(maxValue);
         setError(null);

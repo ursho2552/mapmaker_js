@@ -9,13 +9,13 @@ export const generateColorStops = (colors) => {
     });
 };
 
-export const getColorscaleForIndex = (index) => {
-    const colors = index.includes("Change") ? differenceColors : index.includes("Temperature") ? temperatureColors : sequentialColors;
+export const getColorscaleForIndex = (index, scenario) => {
+    const colors = (index.includes("Change") || scenario.includes("-")) ? differenceColors : index.includes("Temperature") ? temperatureColors : sequentialColors;
     return generateColorStops(colors);
 };
 
-export const getColorDomainForIndex = (minVal, maxVal, isDifference) => {
-    if (isDifference) {
+export const getColorDomainForIndex = (minVal, maxVal, index, scenario) => {
+    if (index.includes("Change") || scenario.includes("-")) {
         const absMax = Math.max(Math.abs(minVal), Math.abs(maxVal));
         return [-absMax, absMax];
     }
