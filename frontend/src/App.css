@@ -14,3 +14,11 @@ body {
   background: #282c34;
   min-height: 100vh;
 }
+
+.App {
+  background-image: url('../public/assets/Gemini_mapmaker_background.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+}

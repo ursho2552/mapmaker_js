@@ -72,7 +72,7 @@ const App = () => {
   }, []);
 
   return (
-    <Box className="App" sx={{ backgroundColor: '#f5f5f5', minHeight: '100vh', p: 0 }}>
+    <Box className="App">
       <ProjectExplanationModal
         open={projectModalOpen}
         onClose={() => setProjectModalOpen(false)}
