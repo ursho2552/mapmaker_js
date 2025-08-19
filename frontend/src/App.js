@@ -72,7 +72,13 @@ const App = () => {
   }, []);
 
   return (
-    <Box className="App">
+    <Box className="App"
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        minHeight: '100vh',
+      }}
+    >
       <ProjectExplanationModal
         open={projectModalOpen}
         onClose={() => setProjectModalOpen(false)}
@@ -99,11 +105,15 @@ const App = () => {
       />
       <Box
         sx={{
+          flex: 1,
           display: 'flex',
-          flexDirection: 'row',
-          flexWrap: 'wrap',
-          gap: 2,
-          px: 2,
+          flexDirection: {
+            xs: 'column',
+            sm: 'column',
+            md: 'row',
+          },
+          gap: 1,
+          px: 1,
         }}
       >
         <Box sx={{
@@ -119,8 +129,8 @@ const App = () => {
             selectedPoint={selectedPoint}
           />
         </Box>
-        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2, flexWrap: 'wrap' }}>
-          <Box sx={{ flex: 1, display: 'flex', flexDirection: 'row', gap: 2 }}>
+        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 1, flexWrap: 'wrap' }}>
+          <Box sx={{ flex: 1, display: 'flex', flexDirection: 'row', gap: 1 }}>
             {/* Control Panel 1 */}
             <ControlPanel
               source={panel1.source}

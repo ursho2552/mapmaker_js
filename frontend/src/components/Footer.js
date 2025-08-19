@@ -9,9 +9,8 @@ const Footer = () => {
       component="footer"
       sx={{
         backgroundColor: 'transparent',
-        py: 3,
-        px: 2,
-        mt: 4,
+        mt: 1,
+        mb: 1,
         textAlign: 'center',
       }}
     >
