@@ -21,7 +21,7 @@ const DataPanel = ({
     return (
         <Box sx={{
             p: 2,
-            backgroundColor: 'black',
+            backgroundColor: 'rgba(0, 0, 0, 0.25)',
             borderRadius: 1,
             flex: 1,
             width: 500,

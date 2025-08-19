@@ -86,7 +86,7 @@ const CombinedLinePlot = ({ point, leftSettings, rightSettings, startYear, endYe
   return (
     <Box sx={{
       p: 2,
-      backgroundColor: 'black',
+      backgroundColor: 'rgba(0, 0, 0, 0.25)',
       borderRadius: 1,
       flex: 2,
     }}>

@@ -83,7 +83,7 @@ const ControlPanel = ({
   <Box sx={{
     px: 2,
     py: 1,
-    backgroundColor: 'black',
+    backgroundColor: 'rgba(0, 0, 0, 0.25)',
     borderRadius: 1,
   }}>
     {/* Data Source Row */}
