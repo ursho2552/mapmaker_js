@@ -85,7 +85,6 @@ const ControlPanel = ({
     py: 1,
     backgroundColor: 'black',
     borderRadius: 1,
-    maxWidth: 280,
   }}>
     {/* Data Source Row */}
     <Box sx={{ alignItems: 'center', mb: 1 }}>
