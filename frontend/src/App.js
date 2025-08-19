@@ -18,10 +18,8 @@ const App = () => {
   const [infoModalShortText, setInfoModalShortText] = useState('');
   const [infoModalTitle, setInfoModalTitle] = useState('');
 
-  // Clicked point for line plot
   const [selectedPoint, setSelectedPoint] = useState({ x: 0, y: 0 });
 
-  // Panel specific states
   const createPanelState = () => ({
     year: 2012,
     debouncedYear: 2012,
@@ -38,20 +36,15 @@ const App = () => {
   const [panel2, setPanel2] = useState({ ...createPanelState(), source: 'environmental', view: 'globe' });
   const [projectModalOpen, setProjectModalOpen] = useState(true);
 
-  // Debounce helpers
+  // Separate locks
+  const [lockScenario, setLockScenario] = useState(false);
+  const [lockModel, setLockModel] = useState(false);
+
   const [debouncedYear1, setDebouncedYear1] = useState(2012);
   const [debouncedYear2, setDebouncedYear2] = useState(2012);
-  const debouncedUpdateYear1 = useMemo(
-    () => _.debounce((y) => setDebouncedYear1(y), 500),
-    []
-  );
+  const debouncedUpdateYear1 = useMemo(() => _.debounce((y) => setDebouncedYear1(y), 500), []);
+  const debouncedUpdateYear2 = useMemo(() => _.debounce((y) => setDebouncedYear2(y), 500), []);
 
-  const debouncedUpdateYear2 = useMemo(
-    () => _.debounce((y) => setDebouncedYear2(y), 500),
-    []
-  );
-
-  // Helpers
   const openInfoModal = (title, key) => {
     setInfoModalShortText(infoMessagesShort[key] ?? 'No short description available');
     setInfoModalText(infoMessages[key] ?? 'No information available');
@@ -60,31 +53,36 @@ const App = () => {
   };
   const closeInfoModal = () => setInfoModalOpen(false);
 
-  // Filter helpers (biomes)
   const filterBiomes = (diversity) => ({
     groups: diversity === 'Biomes' ? planktonGroups.slice(0, 1) : planktonGroups,
     rcp: diversity === 'Biomes' ? rcpScenarios.slice(0, 3) : rcpScenarios,
     models: diversity === 'Biomes' ? earthModels.slice(0, 1) : earthModels,
   });
 
-  useEffect(() => {
-    setProjectModalOpen(true);
-  }, []);
+  useEffect(() => setProjectModalOpen(true), []);
+
+  // Scenario & Model handlers
+  const handleRcpChange = (panelSetter, otherPanelSetter, value) => {
+    panelSetter(prev => ({ ...prev, rcp: value }));
+    if (lockScenario) {
+      otherPanelSetter(prev => ({ ...prev, rcp: value }));
+    }
+  };
+
+  const handleModelChange = (panelSetter, otherPanelSetter, value) => {
+    panelSetter(prev => ({ ...prev, model: value }));
+    if (lockModel) {
+      otherPanelSetter(prev => ({ ...prev, model: value }));
+    }
+  };
 
   return (
-    <Box className="App"
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        minHeight: '100vh',
-      }}
-    >
+    <Box className="App" sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <ProjectExplanationModal
         open={projectModalOpen}
         onClose={() => setProjectModalOpen(false)}
       />
 
-      {/* Header */}
       <Box component="header" sx={{ backgroundColor: 'transparent', py: 2, px: 4, position: 'relative', textAlign: 'center', fontcolor: "black" }}>
         <Typography variant="h1" sx={{ fontSize: '3.5rem', fontWeight: 'bold', color: "black" }}>
           MAPMAKER
@@ -95,7 +93,6 @@ const App = () => {
         <ReferencesButton sx={{ position: 'absolute', top: '30%', right: 16, transform: 'translateY(-50%)' }} />
       </Box>
 
-      {/* Info Modal */}
       <InfoModal
         open={infoModalOpen}
         onClose={closeInfoModal}
@@ -103,23 +100,29 @@ const App = () => {
         shortText={infoModalShortText}
         longText={infoModalText}
       />
-      <Box
-        sx={{
-          flex: 1,
-          display: 'flex',
-          flexDirection: {
-            xs: 'column',
-            sm: 'column',
-            md: 'row',
-          },
-          gap: 1,
-          px: 1,
-        }}
-      >
-        <Box sx={{
-          flex: 1,
-          display: 'flex'
-        }}>
+
+      {/* Lock toggles */}
+      <Box sx={{ px: 4, py: 1, display: 'flex', gap: 4 }}>
+        <label>
+          <input
+            type="checkbox"
+            checked={lockScenario}
+            onChange={(e) => setLockScenario(e.target.checked)}
+          />{' '}
+          Lock scenario
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            checked={lockModel}
+            onChange={(e) => setLockModel(e.target.checked)}
+          />{' '}
+          Lock model
+        </label>
+      </Box>
+
+      <Box sx={{ flex: 1, display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 1, px: 1 }}>
+        <Box sx={{ flex: 1, display: 'flex' }}>
           <DataPanel
             panel={panel1}
             setPanel={setPanel1}
@@ -129,9 +132,9 @@ const App = () => {
             selectedPoint={selectedPoint}
           />
         </Box>
-        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 1, flexWrap: 'wrap' }}>
+
+        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 1 }}>
           <Box sx={{ flex: 1, display: 'flex', flexDirection: 'row', gap: 1 }}>
-            {/* Control Panel 1 */}
             <ControlPanel
               source={panel1.source}
               onSourceChange={(e) => setPanel1({ ...panel1, source: e.target.value })}
@@ -142,9 +145,9 @@ const App = () => {
               group={panel1.group}
               onGroupChange={(e) => setPanel1({ ...panel1, group: e.target.value })}
               rcp={panel1.rcp}
-              onRcpChange={(e) => setPanel1({ ...panel1, rcp: e.target.value })}
+              onRcpChange={(e) => handleRcpChange(setPanel1, setPanel2, e.target.value)}
               model={panel1.model}
-              onModelChange={(e) => setPanel1({ ...panel1, model: e.target.value })}
+              onModelChange={(e) => handleModelChange(setPanel1, setPanel2, e.target.value)}
               filteredGroups={filterBiomes(panel1.diversity).groups}
               filteredScenarios={filterBiomes(panel1.diversity).rcp}
               filteredModels={filterBiomes(panel1.diversity).models}
@@ -152,7 +155,7 @@ const App = () => {
               environmentalParameters={environmentalParameters}
               openInfoModal={openInfoModal}
             />
-            { /* Control Panel 2 */}
+
             <ControlPanel
               source={panel2.source}
               onSourceChange={(e) => setPanel2({ ...panel2, source: e.target.value })}
@@ -163,9 +166,9 @@ const App = () => {
               group={panel2.group}
               onGroupChange={(e) => setPanel2({ ...panel2, group: e.target.value })}
               rcp={panel2.rcp}
-              onRcpChange={(e) => setPanel2({ ...panel2, rcp: e.target.value })}
+              onRcpChange={(e) => handleRcpChange(setPanel2, setPanel1, e.target.value)}
               model={panel2.model}
-              onModelChange={(e) => setPanel2({ ...panel2, model: e.target.value })}
+              onModelChange={(e) => handleModelChange(setPanel2, setPanel1, e.target.value)}
               filteredGroups={filterBiomes(panel2.diversity).groups}
               filteredScenarios={filterBiomes(panel2.diversity).rcp}
               filteredModels={filterBiomes(panel2.diversity).models}
@@ -174,7 +177,7 @@ const App = () => {
               openInfoModal={openInfoModal}
             />
           </Box>
-          {/* Combined Line Plot */}
+
           <CombinedLinePlot
             point={selectedPoint}
             leftSettings={{
@@ -197,6 +200,7 @@ const App = () => {
             endYear={2100}
           />
         </Box>
+
         <Box sx={{ flex: 1, display: 'flex' }}>
           <DataPanel
             panel={panel2}
@@ -208,7 +212,7 @@ const App = () => {
           />
         </Box>
       </Box>
-      {/* Footer */}
+
       <Footer />
     </Box>
   );
