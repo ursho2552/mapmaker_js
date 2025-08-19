@@ -79,7 +79,7 @@ const App = () => {
       />
 
       {/* Header */}
-      <Box component="header" sx={{ backgroundColor: '#fff', py: 2, px: 4, position: 'relative', textAlign: 'center', fontcolor: "black" }}>
+      <Box component="header" sx={{ backgroundColor: 'transparent', py: 2, px: 4, position: 'relative', textAlign: 'center', fontcolor: "black" }}>
         <Typography variant="h1" sx={{ fontSize: '3.5rem', fontWeight: 'bold', color: "black" }}>
           MAPMAKER
         </Typography>
