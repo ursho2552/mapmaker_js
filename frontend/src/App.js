@@ -10,6 +10,7 @@ import _ from 'lodash';
 import './App.css';
 import { Box, Typography } from '@mui/material';
 import { diversityIndices, environmentalParameters, planktonGroups, rcpScenarios, earthModels, infoMessages, infoMessagesShort } from './constants';
+import { Lock, LockOpen } from '@mui/icons-material';
 
 const App = () => {
   // Top-level state
@@ -101,28 +102,8 @@ const App = () => {
         longText={infoModalText}
       />
 
-      {/* Lock toggles */}
-      <Box sx={{ px: 4, py: 1, display: 'flex', gap: 4 }}>
-        <label>
-          <input
-            type="checkbox"
-            checked={lockScenario}
-            onChange={(e) => setLockScenario(e.target.checked)}
-          />{' '}
-          Lock scenario
-        </label>
-        <label>
-          <input
-            type="checkbox"
-            checked={lockModel}
-            onChange={(e) => setLockModel(e.target.checked)}
-          />{' '}
-          Lock model
-        </label>
-      </Box>
-
       <Box sx={{ flex: 1, display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 1, px: 1 }}>
-        <Box sx={{ flex: 1, display: 'flex' }}>
+        <Box sx={{ flex: 5, display: 'flex' }}>
           <DataPanel
             panel={panel1}
             setPanel={setPanel1}
@@ -133,7 +114,7 @@ const App = () => {
           />
         </Box>
 
-        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 1 }}>
+        <Box sx={{ flex: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
           <Box sx={{ flex: 1, display: 'flex', flexDirection: 'row', gap: 1 }}>
             <ControlPanel
               source={panel1.source}
@@ -155,6 +136,46 @@ const App = () => {
               environmentalParameters={environmentalParameters}
               openInfoModal={openInfoModal}
             />
+
+            {/* Lock Icons */}
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: 3,
+                alignSelf: 'center',
+                px: 1,
+                pb: 2,
+              }}
+            >
+              {/* Scenario lock */}
+              <Box
+                sx={{
+                  cursor: 'pointer',
+                  '&:hover': { color: '#1976d2' },
+                  display: 'flex',
+                  alignItems: 'center',
+                }}
+                onClick={() => setLockScenario(!lockScenario)}
+              >
+                {lockScenario ? <Lock /> : <LockOpen />}
+              </Box>
+
+              {/* Model lock */}
+              <Box
+                sx={{
+                  cursor: 'pointer',
+                  '&:hover': { color: '#1976d2' },
+                  display: 'flex',
+                  alignItems: 'center',
+                }}
+                onClick={() => setLockModel(!lockModel)}
+              >
+                {lockModel ? <Lock /> : <LockOpen />}
+              </Box>
+            </Box>
 
             <ControlPanel
               source={panel2.source}
@@ -201,7 +222,7 @@ const App = () => {
           />
         </Box>
 
-        <Box sx={{ flex: 1, display: 'flex' }}>
+        <Box sx={{ flex: 5, display: 'flex' }}>
           <DataPanel
             panel={panel2}
             setPanel={setPanel2}
