@@ -8,7 +8,7 @@ import InfoModal from './components/InfoModal';
 import ProjectExplanationModal from './components/ProjectExplanationModal';
 import _ from 'lodash';
 import './App.css';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, Divider } from '@mui/material';
 import { diversityIndices, environmentalParameters, planktonGroups, rcpScenarios, earthModels, infoMessages, infoMessagesShort } from './constants';
 import { Lock, LockOpen } from '@mui/icons-material';
 
@@ -84,15 +84,18 @@ const App = () => {
         onClose={() => setProjectModalOpen(false)}
       />
 
-      <Box component="header" sx={{ backgroundColor: 'transparent', py: 2, px: 4, position: 'relative', textAlign: 'center', fontcolor: "black" }}>
-        <Typography variant="h1" sx={{ fontSize: '3.5rem', fontWeight: 'bold', color: "black" }}>
+      <Box component="header" sx={{ backgroundColor: 'transparent', mt: 2, px: 4, position: 'relative', textAlign: 'center', fontcolor: "black" }}>
+        <Typography variant="h1" sx={{ fontSize: '3.5rem', fontWeight: 'bold', color: "white" }}>
           MAPMAKER
         </Typography>
-        <Typography variant="h6" sx={{ fontSize: '1.25rem', color: 'gray', mt: 1 }}>
+        <Typography variant="h6" sx={{ fontSize: '1.25rem', color: 'white', mt: 1 }}>
           MArine Plankton diversity bioindicator scenarios for policy MAKERs
         </Typography>
         <ReferencesButton sx={{ position: 'absolute', top: '30%', right: 16, transform: 'translateY(-50%)' }} />
       </Box>
+
+      {/* Separator */}
+      <Divider sx={{ bgcolor: 'rgba(255,255,255,0.3)', mb: 2 }} />
 
       <InfoModal
         open={infoModalOpen}

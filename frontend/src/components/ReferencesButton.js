@@ -18,7 +18,7 @@ const ReferencesButton = ({ sx, ...buttonProps }) => {
       <Button
         onClick={handleOpen}
         sx={{
-          color: 'black',
+          color: 'white',
           textTransform: 'none',
           p: 0,
           fontSize: 16,

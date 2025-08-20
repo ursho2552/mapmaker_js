@@ -88,7 +88,7 @@ const CombinedLinePlot = ({ point, leftSettings, rightSettings, startYear, endYe
       p: 2,
       backgroundColor: 'rgba(0, 0, 0, 0.25)',
       borderRadius: 1,
-      flex: 2,
+      flex: 1,
     }}>
       <Plot
         data={[
