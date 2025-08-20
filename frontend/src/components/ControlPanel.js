@@ -28,7 +28,7 @@ const LabeledSelect = ({
       sx={{
         backgroundColor: 'white',
         borderRadius: 1,
-        width: 250,
+        width: 220,
         mr: 0.5,
       }}
     >
