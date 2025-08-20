@@ -26,10 +26,19 @@ const LabeledSelect = ({
       variant="outlined"
       size="small"
       sx={{
-        backgroundColor: 'white',
-        borderRadius: 1,
+        backgroundColor: 'rgba(255, 255, 255, 0.12)',
+        backdropFilter: 'blur(12px)', // Glassmorphism effect
+        borderRadius: 2,
         width: 220,
         mr: 0.5,
+        border: '1px solid rgba(255, 255, 255, 0.25)',
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+        '& .MuiInputBase-input': {
+          color: '#FFFFFF', // White text inside dropdown
+        },
+        '& .MuiSvgIcon-root': {
+          color: '#FFFFFF', // White dropdown arrow
+        },
       }}
     >
       <Select
@@ -37,10 +46,26 @@ const LabeledSelect = ({
         value={value}
         onChange={onChange}
         startAdornment={
-          <IconButton onClick={() => openInfoModal(value, value)} size="small">
+          <IconButton onClick={() => openInfoModal(value, value)} size="small" sx={{ color: 'white' }}>
             <InfoOutlinedIcon fontSize="small" />
           </IconButton>
         }
+        MenuProps={{
+          PaperProps: {
+            sx: {
+              backgroundColor: 'rgba(255, 255, 255, 0.08)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255, 255, 255, 0.25)',
+              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.4)',
+              '& .MuiMenuItem-root': {
+                color: '#FFFFFF',
+                '&:hover': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                },
+              },
+            },
+          },
+        }}
       >
         {options.map((opt) => (
           <MenuItem key={opt} value={opt}>
@@ -80,12 +105,15 @@ const ControlPanel = ({
   diversityIndices,
   environmentalParameters,
 }) => (
-  <Box sx={{
-    px: 2,
-    py: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.25)',
-    borderRadius: 1,
-  }}>
+  <Box
+    sx={{
+      px: 2,
+      py: 1,
+      backgroundColor: 'rgba(0, 0, 0, 0.25)',
+      backdropFilter: 'blur(8px)',
+      borderRadius: 2,
+    }}
+  >
     {/* Data Source Row */}
     <Box sx={{ alignItems: 'center', mb: 1 }}>
       <FormControl component="fieldset" sx={{ color: 'white' }}>

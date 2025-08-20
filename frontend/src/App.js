@@ -146,7 +146,6 @@ const App = () => {
                 alignItems: 'center',
                 gap: 3,
                 alignSelf: 'center',
-                px: 1,
                 pb: 2,
               }}
             >
