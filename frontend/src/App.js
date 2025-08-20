@@ -158,7 +158,13 @@ const App = () => {
                   display: 'flex',
                   alignItems: 'center',
                 }}
-                onClick={() => setLockScenario(!lockScenario)}
+                onClick={() => {
+                  const newLock = !lockScenario;
+                  setLockScenario(newLock);
+                  if (newLock) {
+                    setPanel2(prev => ({ ...prev, rcp: panel1.rcp }));
+                  }
+                }}
               >
                 {lockScenario ? <Lock /> : <LockOpen />}
               </Box>
@@ -171,7 +177,13 @@ const App = () => {
                   display: 'flex',
                   alignItems: 'center',
                 }}
-                onClick={() => setLockModel(!lockModel)}
+                onClick={() => {
+                  const newLock = !lockModel;
+                  setLockModel(newLock);
+                  if (newLock) {
+                    setPanel2(prev => ({ ...prev, model: panel1.model }));
+                  }
+                }}
               >
                 {lockModel ? <Lock /> : <LockOpen />}
               </Box>
