@@ -38,8 +38,8 @@ const App = () => {
   const [projectModalOpen, setProjectModalOpen] = useState(true);
 
   // Separate locks
-  const [lockScenario, setLockScenario] = useState(false);
-  const [lockModel, setLockModel] = useState(false);
+  const [lockScenario, setLockScenario] = useState(true);
+  const [lockModel, setLockModel] = useState(true);
 
   const [debouncedYear1, setDebouncedYear1] = useState(2012);
   const [debouncedYear2, setDebouncedYear2] = useState(2012);
