@@ -156,8 +156,8 @@ const CombinedLinePlot = ({ point, leftSettings, rightSettings, startYear, endYe
             onClick={handleDownload}
             sx={{
               position: 'absolute',
-              top: 8,
-              right: 16,
+              top: 4,
+              right: 8,
               color: 'white',
               backgroundColor: 'rgba(0,0,0,0.4)',
               '&:hover': {
