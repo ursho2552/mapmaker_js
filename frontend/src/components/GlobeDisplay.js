@@ -1,187 +1,287 @@
-import React, { useEffect, useState, useMemo, useRef } from 'react';
+import React, { useEffect, useState, useRef, useMemo } from 'react';
 import Globe from 'react-globe.gl';
-import * as d3 from 'd3-scale-chromatic';
-import { scaleSequential } from 'd3-scale';
+import {
+  getColorscaleForIndex,
+  getInterpolatedColorFromValue,
+  getLegendFromColorscale,
+  getColorDomainForIndex,
+} from '../utils';
+import {
+  nameToLabelMapping,
+  mapGlobeTitleStyle,
+} from '../constants';
 
-const GlobeDisplay = ({ year, index, scenario, model, onPointClick }) => {
+const GlobeDisplay = ({
+  year,
+  index,
+  group,
+  scenario,
+  model,
+  sourceType = 'environmental',
+  onPointClick,
+  selectedPoint,
+}) => {
+  const containerRef = useRef(null);
+  const globeRef = useRef();
+
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [pointsData, setPointsData] = useState([]);
   const [error, setError] = useState(null);
   const [minValue, setMinValue] = useState(0);
   const [maxValue, setMaxValue] = useState(1);
   const [cachedData, setCachedData] = useState({});
-  const [isHovered, setIsHovered] = useState(false); // Track hover state
+  const [isHovered, setIsHovered] = useState(false);
 
-  const globeRef = useRef(); // Reference to the Globe component
-  // Define a mapping for the colorbar label based on the selected index
-  const colorbarLabelMapping = {
-    'Temperature': '°C',
-    'Oxygen': 'mg/L',
-    'Change in Temperature': 'Δ°C',
-    'Chlorophyll-a Concentration': 'log(mg/m³)',
+  const readableIndex = nameToLabelMapping[index] || index;
+  const readableGroup = group ? ` and ${group}` : '';
+  const fullTitle = `${readableIndex}${readableGroup} predicted by ${scenario} on ${model} in ${year}`;
+  const normalizedSelectedPoint = selectedPoint
+    ? { lat: selectedPoint.y, lng: selectedPoint.x }
+    : null;
+
+  const colorscale = useMemo(() => {
+    return getColorscaleForIndex(index, scenario);
+  }, [index, scenario]);
+
+  const createHtmlElement = (d) => {
+    const el = document.createElement('div');
+    el.style.color = 'red';
+    el.style.fontSize = '24px';
+    el.style.pointerEvents = 'none';
+    el.style.userSelect = 'none';
+    el.style.transform = 'translate(-50%, -100%)';
+    el.style.whiteSpace = 'nowrap';
+    el.setAttribute('aria-label', 'Selected Point Pin');
+    el.setAttribute('title', 'Selected Point');
+    el.textContent = '📍';
+    return el;
   };
 
-  const colorbarLabel = colorbarLabelMapping[index] || ''; // Get the label based on the selected index
+  useEffect(() => {
+    const updateDimensions = () => {
+      if (containerRef.current) {
+        const { offsetWidth, offsetHeight } = containerRef.current;
+        setDimensions({ width: offsetWidth, height: offsetHeight });
+      }
+    };
+    updateDimensions();
+    window.addEventListener('resize', updateDimensions);
+    return () => window.removeEventListener('resize', updateDimensions);
+  }, []);
 
+  const fetchData = async (yr) => {
+    const cacheKey = `${yr}_${index}_${group}_${scenario}_${model}_${sourceType}`;
 
-  // Fetch data and cache it by year
-  const fetchData = async (year) => {
-    if (cachedData[year]) {
-      setPointsData(cachedData[year].pointsData);
-      setMinValue(cachedData[year].minValue);
-      setMaxValue(cachedData[year].maxValue);
+    if (cachedData[cacheKey]) {
+      setPointsData(cachedData[cacheKey].pointsData);
+      setMinValue(cachedData[cacheKey].minValue);
+      setMaxValue(cachedData[cacheKey].maxValue);
       return;
     }
 
-    console.log('Fetching globe data for year:', year);
     try {
-      const response = await fetch(
-        `/api/globe-data?year=${year}&index=${index}&scenario=${scenario}&model=${model}`
-      );
+      const isPlankton = sourceType === 'plankton';
+      const params = new URLSearchParams({
+        source: isPlankton ? 'plankton' : 'env',
+        year: yr.toString(),
+        index,
+        scenario,
+        model,
+      });
+      if (isPlankton) params.append('group', group);
+
+      const url = `/api/globe-data?${params.toString()}`;
+      const response = await fetch(url);
       if (!response.ok) throw new Error('Network response was not ok');
-
       const data = await response.json();
+
       const flatData = data.variable.flat();
-      const minVal = Math.min(...flatData);
-      const maxVal = Math.max(...flatData);
-      setMinValue(minVal);
-      setMaxValue(maxVal);
+      let minVal = Math.min(...flatData.filter((v) => !isNaN(v) && v != null));
+      let maxVal = Math.max(...flatData.filter((v) => !isNaN(v) && v != null));
 
-      const transformedData = data.lats
-        .filter((_, latIndex) => latIndex % 2 === 0)
-        .map((lat, latIndex) => {
+      [minVal, maxVal] = getColorDomainForIndex(minVal, maxVal, index, scenario);
+
+      const transformed = data.lats
+        .filter((_, latIdx) => latIdx % 2 === 0)
+        .map((lat, latIdx) => {
           return data.lons
-            .filter((_, lonIndex) => lonIndex % 2 === 0)
-            .map((lon, lonIndex) => {
-              const realLatIndex = latIndex * 2;
-              const realLonIndex = lonIndex * 2;
-              const value = data.variable[realLatIndex][realLonIndex];
-
-              // Filter out NaN values and missing data
-              if (isNaN(value) || value === null) {
-                return null;
-              }
-
+            .filter((_, lonIdx) => lonIdx % 2 === 0)
+            .map((lon, lonIdx) => {
+              const realLatIdx = latIdx * 2;
+              const realLonIdx = lonIdx * 2;
+              const value = data.variable[realLatIdx][realLonIdx];
+              if (value == null || isNaN(value)) return null;
               return {
-                lat: lat,
+                lat,
                 lng: lon,
-                size: value !== 0 && value !== null ? 0.01 : 0,
-                color: getColorFromViridis(value, minVal, maxVal),
+                size: value !== 0 ? 0.01 : 0,
+                color: getInterpolatedColorFromValue(value, minVal, maxVal, colorscale),
               };
             });
         })
         .flat()
-        .filter((point) => point !== null); // Filter out null points
+        .filter((p) => p !== null);
 
-      setCachedData((prevCache) => ({
-        ...prevCache,
-        [year]: { pointsData: transformedData, minValue: minVal, maxValue: maxVal },
+      setCachedData((prev) => ({
+        ...prev,
+        [cacheKey]: { pointsData: transformed, minValue: minVal, maxValue: maxVal },
       }));
-
-      setPointsData(transformedData);
+      setPointsData(transformed);
+      setMinValue(minVal);
+      setMaxValue(maxVal);
       setError(null);
-    } catch (error) {
-      console.error('Error fetching globe data:', error);
+    } catch (err) {
+      console.error('Error fetching globe data:', err);
       setError('Failed to load data');
     }
   };
 
   useEffect(() => {
-    fetchData([year, index, scenario, model]);
-  }, [year, index, scenario, model]);
+    fetchData(year);
+  }, [year, index, group, scenario, model, sourceType]);
 
-  // Viridis color scale function
-  const getColorFromViridis = useMemo(() => {
-    return (value, min, max) => {
-      if (isNaN(value) || value === null) {
-        return 'rgba(0, 0, 0, 0)'; // Transparent for NaN or missing values
-      }
-      const normalizedValue = (value - min) / (max - min);
-      const viridisScale = scaleSequential(d3.interpolateViridis).domain([0, 1]);
-      return viridisScale(normalizedValue);
-    };
-  }, []);
-
-  // Limit zoom range
   useEffect(() => {
     if (globeRef.current) {
-      globeRef.current.controls().minDistance = 250; // Set the minimum zoom distance
-      globeRef.current.controls().maxDistance = 400; // Set the maximum zoom distance
+      globeRef.current.controls().minDistance = 250;
+      globeRef.current.controls().maxDistance = 400;
     }
   }, []);
 
-  // Auto-rotate logic
-  const rotateGlobe = () => {
-    if (!isHovered && globeRef.current) {
-      globeRef.current.controls().autoRotate = true;
-      globeRef.current.controls().autoRotateSpeed = 1; // Adjust rotation speed
-    } else if (globeRef.current) {
-      globeRef.current.controls().autoRotate = false; // Stop rotation on hover
-    }
-  };
-
   useEffect(() => {
-    const animationId = requestAnimationFrame(rotateGlobe);
-    return () => cancelAnimationFrame(animationId);
-  }, [isHovered]);
+    if (globeRef.current) {
+      globeRef.current.controls().autoRotate = false;
+    }
+  }, []);
 
-  // Generate colorbar gradient
-  const generateColorbarGradient = () => {
-    const steps = 4;
-    const colorStops = Array.from({ length: steps }, (_, i) => {
-      const value = i / (steps - 1);
-      return getColorFromViridis(minValue + value * (maxValue - minValue), minValue, maxValue);
-    });
-    return `linear-gradient(to top, ${colorStops.join(', ')})`;
+  const legendData = useMemo(() => {
+    if (minValue == null || maxValue == null || colorscale.length === 0) {
+      return { colors: [], labels: [] };
+    }
+    return getLegendFromColorscale(colorscale, minValue, maxValue);
+  }, [minValue, maxValue, colorscale]);
+
+  const handlePointClick = (lng, lat) => {
+    if (onPointClick) onPointClick(lng, lat);
   };
-
-  // Generate colorbar labels
-  const generateColorbarLabels = () => {
-    const labelCount = 5;
-    const range = maxValue - minValue;
-    const stepSize = Math.round(range / (labelCount - 1));
-
-    return Array.from({ length: labelCount }, (_, i) => Math.round(minValue + i * stepSize));
-  };
-
-  const labels = generateColorbarLabels();
 
   return (
     <div
-      className="globe-display-container"
+      ref={containerRef}
+      style={{
+        width: '100%',
+        height: '100%',
+        position: 'relative',
+        backgroundColor: 'rgba(18, 18, 18, 0.6)',
+        overflow: 'hidden',
+      }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {error && <div>{error}</div>}
-      <div className="globe-container">
-        <Globe
-          ref={globeRef}
-          width={500}
-          height={500}
-          // globeImageUrl={null}
-          globeImageUrl="//unpkg.com/three-globe/example/img/earth-water.png"
-          showAtmosphere={false}
-          pointsData={pointsData}
-          pointAltitude="size"
-          pointColor="color"
-          pointRadius={0.9}
-          // onPointClick={null}
-          onPointClick={(point) => onPointClick(point.lng, point.lat)}
-          backgroundColor="#282c34"
-          // backgroundColor="rgba(0, 0, 0, 0)"
-        />
-      </div>
-      <div className="colorbar-container">
-        <div className="colorbar" style={{ background: generateColorbarGradient() }} />
-        <div className="colorbar-labels">
-          {labels.map((label, index) => (
-            <div key={index} className="colorbar-label">
-              {label}
-            </div>
-          ))}
+      <div
+        style={{
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          backgroundColor: 'rgba(18, 18, 18, 0.6)',
+        }}
+      >
+        <div style={mapGlobeTitleStyle} dangerouslySetInnerHTML={{ __html: fullTitle }} />
+
+        {error && (
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              color: 'red',
+              zIndex: 11,
+            }}
+          >
+            {error}
+          </div>
+        )}
+        <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+          <div style={{ width: '100%', height: '100%' }}>
+            <Globe
+              ref={globeRef}
+              width={dimensions.width}
+              height={dimensions.height}
+              globeImageUrl="//unpkg.com/three-globe/example/img/earth-water.png"
+              showAtmosphere={false}
+              backgroundColor="rgba(18, 18, 18, 0.6)"
+              pointsData={pointsData}
+              pointAltitude="size"
+              pointColor="color"
+              pointRadius={0.9}
+              onPointClick={(pt) => handlePointClick(pt.lng, pt.lat)}
+              htmlElementsData={normalizedSelectedPoint ? [normalizedSelectedPoint] : []}
+              htmlElement={createHtmlElement}
+            />
+          </div>
         </div>
-        {/* Display the colorbar label */}
-        <div className="colorbar-title" style={{ color: 'white', textAlign: 'center', marginTop: '10px' }}>
-          {colorbarLabel}
+        <div
+          style={{
+            position: 'absolute',
+            top: 60,
+            right: 10,
+            width: 90,
+            height: 'calc(100% - 80px)',
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            pointerEvents: 'none',
+            zIndex: 10,
+          }}
+        >
+          {/* Color bins */}
+          <div
+            style={{
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column-reverse',
+              height: '90%',
+              borderRadius: 4,
+              background: 'none',
+            }}
+          >
+            {legendData.colors.map((color, i) => (
+              <div
+                key={i}
+                style={{
+                  flex: 2 / colorscale.length,
+                  backgroundColor: color,
+                }}
+              />
+            ))}
+          </div>
+
+          {/* Labels */}
+          <div
+            style={{
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column-reverse',
+              height: '96%',
+              borderRadius: 4,
+              background: 'none',
+              marginTop: 4,
+            }}
+          >
+            {legendData.labels.map((lbl, i) => (
+              <div
+                key={i}
+                style={{
+                  flex: 2 / colorscale.length,
+                  color: 'white',
+                  fontSize: 13,
+                }}
+              >
+                {`- ${lbl}`}
+              </div>
+            ))}
+
+          </div>
         </div>
       </div>
     </div>
