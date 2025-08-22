@@ -27,17 +27,17 @@ const LabeledSelect = ({
       size="small"
       sx={{
         backgroundColor: 'rgba(255, 255, 255, 0.12)',
-        backdropFilter: 'blur(12px)', // Glassmorphism effect
+        backdropFilter: 'blur(12px)',
         borderRadius: 2,
         width: 220,
         mr: 0.5,
         border: '1px solid rgba(255, 255, 255, 0.25)',
         boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
         '& .MuiInputBase-input': {
-          color: '#FFFFFF', // White text inside dropdown
+          color: '#FFFFFF',
         },
         '& .MuiSvgIcon-root': {
-          color: '#FFFFFF', // White dropdown arrow
+          color: '#FFFFFF',
         },
       }}
     >
