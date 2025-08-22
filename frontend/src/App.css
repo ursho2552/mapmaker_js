@@ -4,14 +4,14 @@ body {
   margin: 0;
   padding: 0;
   height: 100%;
-  background: #282c34;
+  background: rgba(18, 18, 18, 0.6);
   color: white;
   font-family: "Roboto", "Helvetica", "Arial", sans-serif;
   overflow-y: scroll;
 }
 
 #root {
-  background: #282c34;
+  background: rgba(18, 18, 18, 0.6);
   min-height: 100vh;
 }
 
