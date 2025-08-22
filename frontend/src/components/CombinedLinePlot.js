@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Plot from 'react-plotly.js';
-import { Box } from '@mui/material';
+import { Box, IconButton, Tooltip } from '@mui/material';
+import DownloadIcon from '@mui/icons-material/Download';
 import { nameToLabelMapping } from '../constants';
 
 const CombinedLinePlot = ({ point, leftSettings, rightSettings, startYear, endYear }) => {
@@ -34,26 +35,54 @@ const CombinedLinePlot = ({ point, leftSettings, rightSettings, startYear, endYe
       .catch(err => setError(err.toString()));
   }, [point, leftSettings, rightSettings, startYear, endYear]);
 
+  const handleDownload = () => {
+    if (!leftData || !rightData) return;
+
+    const csvHeader = `Year,${leftSettings.source === 'plankton'
+      ? nameToLabelMapping[leftSettings.index]
+      : nameToLabelMapping[leftSettings.envParam]
+      },${rightSettings.source === 'plankton'
+        ? nameToLabelMapping[rightSettings.index]
+        : nameToLabelMapping[rightSettings.envParam]
+      }`;
+
+    const years = leftData.x;
+    const csvRows = years.map((year, i) => {
+      const leftVal = leftData.y[i] ?? '';
+      const rightVal = rightData.y[i] ?? '';
+      return `${year},${leftVal},${rightVal}`;
+    });
+
+    const csvContent = [csvHeader, ...csvRows].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `time_series_${point.x.toFixed(2)}_${point.y.toFixed(2)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   if (error) return <div style={{ color: 'red' }}>Error loading chart: {error}</div>;
   if (!leftData || !rightData) return null;
 
-  const leftName = leftSettings.source === 'plankton' ? nameToLabelMapping[leftSettings.index] : nameToLabelMapping[leftSettings.envParam];
-  const rightName = rightSettings.source === 'plankton' ? nameToLabelMapping[rightSettings.index] : nameToLabelMapping[rightSettings.envParam];
+  const leftName = leftSettings.source === 'plankton'
+    ? nameToLabelMapping[leftSettings.index]
+    : nameToLabelMapping[leftSettings.envParam];
+  const rightName = rightSettings.source === 'plankton'
+    ? nameToLabelMapping[rightSettings.index]
+    : nameToLabelMapping[rightSettings.envParam];
 
   const layout = {
-    margin: {
-      l: 70,
-      r: 70,
-      t: 50,
-      b: 50,
-      pad: 2,
-    },
+    margin: { l: 70, r: 70, t: 50, b: 50, pad: 2 },
     title: {
       text: `${leftName} and ${rightName}<br>at ${point.x.toFixed(2)}°E, ${point.y.toFixed(2)}°N`,
       font: { color: 'white' }
     },
-    paper_bgcolor: '#282c34',
-    plot_bgcolor: '#282c34',
+    paper_bgcolor: 'rgba(18, 18, 18, 0.6)',
+    plot_bgcolor: 'rgba(18, 18, 18, 0.6)',
     xaxis: {
       title: { text: 'Year', font: { color: 'white' } },
       tickfont: { color: 'white' },
@@ -84,37 +113,63 @@ const CombinedLinePlot = ({ point, leftSettings, rightSettings, startYear, endYe
   };
 
   return (
-    <Box sx={{
-      p: 2,
-      backgroundColor: 'rgba(0, 0, 0, 0.25)',
-      borderRadius: 1,
-      flex: 1,
-    }}>
-      <Plot
-        data={[
-          {
-            x: leftData.x,
-            y: leftData.y,
-            type: 'scatter',
-            mode: 'lines+markers',
-            line: { color: 'cyan' },
-            showlegend: false,
-          },
-          {
-            x: rightData.x,
-            y: rightData.y,
-            type: 'scatter',
-            mode: 'lines+markers',
-            line: { color: 'orange' },
-            yaxis: 'y2',
-            showlegend: false,
-          }
-        ]}
-        layout={layout}
-        config={{ displayModeBar: false }}
-        style={{ width: '100%' }}
-        useResizeHandler={true}
-      />
+    <Box
+      sx={{
+        p: 2,
+        backgroundColor: 'rgba(0, 0, 0, 0.25)',
+        borderRadius: 1,
+        flex: 1,
+        position: 'relative',
+      }}
+    >
+      <Box sx={{ position: 'relative' }}>
+        {/* Plotly chart */}
+        <Plot
+          data={[
+            {
+              x: leftData.x,
+              y: leftData.y,
+              type: 'scatter',
+              mode: 'lines+markers',
+              line: { color: 'cyan' },
+              showlegend: false,
+            },
+            {
+              x: rightData.x,
+              y: rightData.y,
+              type: 'scatter',
+              mode: 'lines+markers',
+              line: { color: 'orange' },
+              yaxis: 'y2',
+              showlegend: false,
+            }
+          ]}
+          layout={layout}
+          config={{ displayModeBar: false }}
+          style={{ width: '100%' }}
+          useResizeHandler={true}
+        />
+
+        {/* Download button */}
+        <Tooltip title="Download CSV">
+          <IconButton
+            onClick={handleDownload}
+            sx={{
+              position: 'absolute',
+              top: 8,
+              right: 16,
+              color: 'white',
+              backgroundColor: 'rgba(0,0,0,0.4)',
+              '&:hover': {
+                backgroundColor: 'rgba(0,0,0,0.6)',
+              },
+              zIndex: 10,
+            }}
+          >
+            <DownloadIcon />
+          </IconButton>
+        </Tooltip>
+      </Box>
     </Box>
   );
 };

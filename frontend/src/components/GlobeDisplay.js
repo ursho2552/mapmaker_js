@@ -171,7 +171,7 @@ const GlobeDisplay = ({
         width: '100%',
         height: '100%',
         position: 'relative',
-        backgroundColor: '#282c34',
+        backgroundColor: 'rgba(18, 18, 18, 0.6)',
         overflow: 'hidden',
       }}
       onMouseEnter={() => setIsHovered(true)}
@@ -183,7 +183,7 @@ const GlobeDisplay = ({
           height: '100%',
           display: 'flex',
           flexDirection: 'column',
-          backgroundColor: '#282c34',
+          backgroundColor: 'rgba(18, 18, 18, 0.6)',
         }}
       >
         <div style={mapGlobeTitleStyle} dangerouslySetInnerHTML={{ __html: fullTitle }} />
@@ -209,7 +209,7 @@ const GlobeDisplay = ({
               height={dimensions.height}
               globeImageUrl="//unpkg.com/three-globe/example/img/earth-water.png"
               showAtmosphere={false}
-              backgroundColor="#282c34"
+              backgroundColor="rgba(18, 18, 18, 0.6)"
               pointsData={pointsData}
               pointAltitude="size"
               pointColor="color"

@@ -33,8 +33,8 @@ const MapDisplay = ({
 
   const layout = {
     margin: { l: 10, r: 0, t: 60, b: 10 },
-    paper_bgcolor: '#282c34',
-    plot_bgcolor: '#282c34',
+    paper_bgcolor: 'rgba(18, 18, 18, 0.6)',
+    plot_bgcolor: 'rgba(18, 18, 18, 0.6)',
     xaxis: {
       showgrid: false,
       zeroline: false,
@@ -99,7 +99,7 @@ const MapDisplay = ({
   }, [year, index, group, scenario, model, sourceType]);
 
   return (
-    <div style={{ width: '100%', height: '100%', position: 'relative', backgroundColor: '#282c34' }}>
+    <div style={{ width: '100%', height: '100%', position: 'relative', backgroundColor: 'rgba(18, 18, 18, 0.6)' }}>
       {error && <div style={{ color: 'red' }}>{error}</div>}
 
       {/* Title Box */}
