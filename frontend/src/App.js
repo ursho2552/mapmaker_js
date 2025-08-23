@@ -8,9 +8,9 @@ import InfoModal from './components/InfoModal';
 import ProjectExplanationModal from './components/ProjectExplanationModal';
 import _ from 'lodash';
 import './App.css';
-import { Box, Typography, Divider } from '@mui/material';
+import { Box, Typography, Divider, IconButton, Collapse } from '@mui/material';
 import { diversityIndices, environmentalParameters, planktonGroups, rcpScenarios, earthModels, infoMessages, infoMessagesShort } from './constants';
-import { Lock, LockOpen } from '@mui/icons-material';
+import { Lock, LockOpen, ExpandLess, ExpandMore } from '@mui/icons-material';
 
 const App = () => {
   // Top-level state
@@ -37,14 +37,18 @@ const App = () => {
   const [panel2, setPanel2] = useState({ ...createPanelState(), source: 'environmental', view: 'globe' });
   const [projectModalOpen, setProjectModalOpen] = useState(true);
 
-  // Separate locks
+  // Locks
   const [lockScenario, setLockScenario] = useState(true);
   const [lockModel, setLockModel] = useState(true);
 
+  // Debounced years
   const [debouncedYear1, setDebouncedYear1] = useState(2012);
   const [debouncedYear2, setDebouncedYear2] = useState(2012);
   const debouncedUpdateYear1 = useMemo(() => _.debounce((y) => setDebouncedYear1(y), 500), []);
   const debouncedUpdateYear2 = useMemo(() => _.debounce((y) => setDebouncedYear2(y), 500), []);
+
+  // Collapsible state
+  const [panelsCollapsed, setPanelsCollapsed] = useState(false);
 
   const openInfoModal = (title, key) => {
     setInfoModalShortText(infoMessagesShort[key] ?? 'No short description available');
@@ -84,7 +88,8 @@ const App = () => {
         onClose={() => setProjectModalOpen(false)}
       />
 
-      <Box component="header" sx={{ backgroundColor: 'transparent', mt: 2, px: 4, position: 'relative', textAlign: 'center', fontcolor: "black" }}>
+      {/* Header */}
+      <Box component="header" sx={{ backgroundColor: 'transparent', mt: 2, px: 4, position: 'relative', textAlign: 'center' }}>
         <Typography variant="h1" sx={{ fontSize: '3.5rem', fontWeight: 'bold', color: "white" }}>
           MAPMAKER
         </Typography>
@@ -94,9 +99,9 @@ const App = () => {
         <ReferencesButton sx={{ position: 'absolute', top: '30%', right: 16, transform: 'translateY(-50%)' }} />
       </Box>
 
-      {/* Separator */}
       <Divider sx={{ bgcolor: 'rgba(255,255,255,0.3)', mb: 2 }} />
 
+      {/* Info Modal */}
       <InfoModal
         open={infoModalOpen}
         onClose={closeInfoModal}
@@ -105,7 +110,7 @@ const App = () => {
         longText={infoModalText}
       />
 
-      <Box sx={{ flex: 1, display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 1, px: 1 }}>
+      <Box sx={{ flex: 1, display: 'flex', flexDirection: { xs: 'column', md: 'column', lg: 'row' }, gap: 1, px: 1 }}>
         <Box sx={{ flex: 5, display: 'flex' }}>
           <DataPanel
             panel={panel1}
@@ -118,101 +123,141 @@ const App = () => {
         </Box>
 
         <Box sx={{ flex: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
-          <Box sx={{ flex: 1, display: 'flex', flexDirection: 'row', gap: 1 }}>
-            <ControlPanel
-              source={panel1.source}
-              onSourceChange={(e) => setPanel1({ ...panel1, source: e.target.value })}
-              diversity={panel1.diversity}
-              onDiversityChange={(e) => setPanel1({ ...panel1, diversity: e.target.value })}
-              envParam={panel1.envParam}
-              onEnvParamChange={(e) => setPanel1({ ...panel1, envParam: e.target.value })}
-              group={panel1.group}
-              onGroupChange={(e) => setPanel1({ ...panel1, group: e.target.value })}
-              rcp={panel1.rcp}
-              onRcpChange={(e) => handleRcpChange(setPanel1, setPanel2, e.target.value)}
-              model={panel1.model}
-              onModelChange={(e) => handleModelChange(setPanel1, setPanel2, e.target.value)}
-              filteredGroups={filterBiomes(panel1.diversity).groups}
-              filteredScenarios={filterBiomes(panel1.diversity).rcp}
-              filteredModels={filterBiomes(panel1.diversity).models}
-              diversityIndices={diversityIndices}
-              environmentalParameters={environmentalParameters}
-              openInfoModal={openInfoModal}
-            />
-
-            {/* Lock Icons */}
-            <Box
+          {/* Collapsible title */}
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              backgroundColor: 'rgba(0, 0, 0, 0.25)',
+              backdropFilter: 'blur(8px)',
+              px: 2,
+              py: 1,
+              borderRadius: 2,
+            }}
+          >
+            <Typography
+              variant="h6"
               sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center',
-                gap: 3,
-                alignSelf: 'center',
-                pb: 2,
+                color: 'white',
               }}
             >
-              {/* Scenario lock */}
-              <Box
-                sx={{
-                  cursor: 'pointer',
-                  '&:hover': { color: '#1976d2' },
-                  display: 'flex',
-                  alignItems: 'center',
-                }}
-                onClick={() => {
-                  const newLock = !lockScenario;
-                  setLockScenario(newLock);
-                  if (newLock) {
-                    setPanel2(prev => ({ ...prev, rcp: panel1.rcp }));
-                  }
-                }}
-              >
-                {lockScenario ? <Lock /> : <LockOpen />}
-              </Box>
-
-              {/* Model lock */}
-              <Box
-                sx={{
-                  cursor: 'pointer',
-                  '&:hover': { color: '#1976d2' },
-                  display: 'flex',
-                  alignItems: 'center',
-                }}
-                onClick={() => {
-                  const newLock = !lockModel;
-                  setLockModel(newLock);
-                  if (newLock) {
-                    setPanel2(prev => ({ ...prev, model: panel1.model }));
-                  }
-                }}
-              >
-                {lockModel ? <Lock /> : <LockOpen />}
-              </Box>
-            </Box>
-
-            <ControlPanel
-              source={panel2.source}
-              onSourceChange={(e) => setPanel2({ ...panel2, source: e.target.value })}
-              diversity={panel2.diversity}
-              onDiversityChange={(e) => setPanel2({ ...panel2, diversity: e.target.value })}
-              envParam={panel2.envParam}
-              onEnvParamChange={(e) => setPanel2({ ...panel2, envParam: e.target.value })}
-              group={panel2.group}
-              onGroupChange={(e) => setPanel2({ ...panel2, group: e.target.value })}
-              rcp={panel2.rcp}
-              onRcpChange={(e) => handleRcpChange(setPanel2, setPanel1, e.target.value)}
-              model={panel2.model}
-              onModelChange={(e) => handleModelChange(setPanel2, setPanel1, e.target.value)}
-              filteredGroups={filterBiomes(panel2.diversity).groups}
-              filteredScenarios={filterBiomes(panel2.diversity).rcp}
-              filteredModels={filterBiomes(panel2.diversity).models}
-              diversityIndices={diversityIndices}
-              environmentalParameters={environmentalParameters}
-              openInfoModal={openInfoModal}
-            />
+              Control Panels
+            </Typography>
+            <IconButton
+              onClick={() => setPanelsCollapsed(!panelsCollapsed)}
+              sx={{
+                color: '#fff',
+                '&:hover': {
+                  color: '#4FC3F7',
+                  transform: 'scale(1.1)',
+                  transition: '0.2s',
+                },
+              }}
+            >
+              {panelsCollapsed ? <ExpandMore /> : <ExpandLess />}
+            </IconButton>
           </Box>
 
+          {/* Collapsible content */}
+          <Collapse in={!panelsCollapsed}>
+            <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
+              <ControlPanel
+                source={panel1.source}
+                onSourceChange={(e) => setPanel1({ ...panel1, source: e.target.value })}
+                diversity={panel1.diversity}
+                onDiversityChange={(e) => setPanel1({ ...panel1, diversity: e.target.value })}
+                envParam={panel1.envParam}
+                onEnvParamChange={(e) => setPanel1({ ...panel1, envParam: e.target.value })}
+                group={panel1.group}
+                onGroupChange={(e) => setPanel1({ ...panel1, group: e.target.value })}
+                rcp={panel1.rcp}
+                onRcpChange={(e) => handleRcpChange(setPanel1, setPanel2, e.target.value)}
+                model={panel1.model}
+                onModelChange={(e) => handleModelChange(setPanel1, setPanel2, e.target.value)}
+                filteredGroups={filterBiomes(panel1.diversity).groups}
+                filteredScenarios={filterBiomes(panel1.diversity).rcp}
+                filteredModels={filterBiomes(panel1.diversity).models}
+                diversityIndices={diversityIndices}
+                environmentalParameters={environmentalParameters}
+                openInfoModal={openInfoModal}
+              />
+
+              {/* Lock Icons */}
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  gap: 3,
+                  alignSelf: 'center',
+                  pb: 2,
+                }}
+              >
+                {/* Scenario lock */}
+                <Box
+                  sx={{
+                    cursor: 'pointer',
+                    '&:hover': { color: '#1976d2' },
+                    display: 'flex',
+                    alignItems: 'center',
+                  }}
+                  onClick={() => {
+                    const newLock = !lockScenario;
+                    setLockScenario(newLock);
+                    if (newLock) {
+                      setPanel2(prev => ({ ...prev, rcp: panel1.rcp }));
+                    }
+                  }}
+                >
+                  {lockScenario ? <Lock /> : <LockOpen />}
+                </Box>
+
+                {/* Model lock */}
+                <Box
+                  sx={{
+                    cursor: 'pointer',
+                    '&:hover': { color: '#1976d2' },
+                    display: 'flex',
+                    alignItems: 'center',
+                  }}
+                  onClick={() => {
+                    const newLock = !lockModel;
+                    setLockModel(newLock);
+                    if (newLock) {
+                      setPanel2(prev => ({ ...prev, model: panel1.model }));
+                    }
+                  }}
+                >
+                  {lockModel ? <Lock /> : <LockOpen />}
+                </Box>
+              </Box>
+
+              <ControlPanel
+                source={panel2.source}
+                onSourceChange={(e) => setPanel2({ ...panel2, source: e.target.value })}
+                diversity={panel2.diversity}
+                onDiversityChange={(e) => setPanel2({ ...panel2, diversity: e.target.value })}
+                envParam={panel2.envParam}
+                onEnvParamChange={(e) => setPanel2({ ...panel2, envParam: e.target.value })}
+                group={panel2.group}
+                onGroupChange={(e) => setPanel2({ ...panel2, group: e.target.value })}
+                rcp={panel2.rcp}
+                onRcpChange={(e) => handleRcpChange(setPanel2, setPanel1, e.target.value)}
+                model={panel2.model}
+                onModelChange={(e) => handleModelChange(setPanel2, setPanel1, e.target.value)}
+                filteredGroups={filterBiomes(panel2.diversity).groups}
+                filteredScenarios={filterBiomes(panel2.diversity).rcp}
+                filteredModels={filterBiomes(panel2.diversity).models}
+                diversityIndices={diversityIndices}
+                environmentalParameters={environmentalParameters}
+                openInfoModal={openInfoModal}
+              />
+            </Box>
+          </Collapse>
+
+          {/* Combined line plot */}
           <CombinedLinePlot
             point={selectedPoint}
             leftSettings={{
