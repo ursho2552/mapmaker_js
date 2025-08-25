@@ -142,7 +142,7 @@ def get_timeseries(file_path: str, variable_name: str, x: int, y: int,
 def get_environmental_data(env_parameter:str, scenario:str, model:str):
 
     decoded_model = ESMS_ENV[model]
-    decoded_scenario = SCENARIOS_ENV[scenario]
+    decoded_scenario = SCENARIOS[scenario]
     if '-' in decoded_scenario:
         file_path = ENVIRONMENTAL_FILE_DIFF.format(decoded_model, decoded_scenario)
     else:
@@ -157,7 +157,7 @@ def get_file_and_variable(index:str, group:str, scenario:str, model:str):
     decoded_scenario = SCENARIOS[scenario]
 
     if index == 'Biomes':
-        decoded_scenario = SCENARIOS_ENV[scenario]
+        decoded_scenario = SCENARIOS[scenario]
         file_path = BIOMES_FILE
         variable = BIOMES_VARIABLES[decoded_scenario]
 

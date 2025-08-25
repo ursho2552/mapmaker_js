@@ -61,13 +61,6 @@ SCENARIOS = {'RCP 2.6 (Paris Agreement)': 'RCP26',
             'RCP 8.5 - RCP 4.5': 'RCP85-RCP45',
             'RCP 4.5 - RCP 2.6': 'RCP45-RCP26'}
 
-SCENARIOS_ENV = {'RCP 2.6 (Paris Agreement)': 'RCP26',
-            'RCP 4.5': 'RCP45',
-            'RCP 8.5 (Business as Usual)': 'RCP85',
-            'RCP 8.5 - RCP 2.6': 'RCP85-RCP26',
-            'RCP 8.5 - RCP 4.5': 'RCP85-RCP45',
-            'RCP 4.5 - RCP 2.6': 'RCP45-RCP26'}
-
 ESMS = {'Model Mean': 'Model_Mean',
         'CNRM-CM5': 'CNRM-PISCES',
         'GFDL-ESM2M': 'GFDL-TOPAZ',
