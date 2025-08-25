@@ -40,6 +40,7 @@ const App = () => {
   // Locks
   const [lockScenario, setLockScenario] = useState(true);
   const [lockModel, setLockModel] = useState(true);
+  const [lockYear, setLockYear] = useState(true);
 
   // Debounced years
   const [debouncedYear1, setDebouncedYear1] = useState(2012);
@@ -81,6 +82,22 @@ const App = () => {
     }
   };
 
+  const handleYearChange = (panelSetter, otherPanelSetter, year) => {
+    panelSetter(prev => ({ ...prev, year }));
+    if (lockYear) {
+      otherPanelSetter(prev => ({ ...prev, year }));
+    }
+  };
+
+  const handleYearLockToggle = () => {
+    const newLock = !lockYear;
+    setLockYear(newLock);
+
+    if (newLock) {
+      setPanel2(prev => ({ ...prev, year: panel1.year }));
+    }
+  };
+
   return (
     <Box className="App" sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <ProjectExplanationModal
@@ -119,6 +136,10 @@ const App = () => {
             debouncedUpdateYear={debouncedUpdateYear1}
             setSelectedPoint={setSelectedPoint}
             selectedPoint={selectedPoint}
+            lockYear={lockYear}
+            setLockYear={setLockYear}
+            onYearChange={(y) => handleYearChange(setPanel1, setPanel2, y)}
+            onLockToggle={handleYearLockToggle}
           />
         </Box>
 
@@ -292,6 +313,10 @@ const App = () => {
             debouncedUpdateYear={debouncedUpdateYear2}
             setSelectedPoint={setSelectedPoint}
             selectedPoint={selectedPoint}
+            lockYear={lockYear}
+            setLockYear={setLockYear}
+            onYearChange={(y) => handleYearChange(setPanel2, setPanel1, y)}
+            onLockToggle={handleYearLockToggle}
           />
         </Box>
       </Box>
