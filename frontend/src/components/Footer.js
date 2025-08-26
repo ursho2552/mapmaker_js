@@ -34,9 +34,9 @@ const Footer = () => {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              width: 180,
+              width: 150,
               height: 80,
-              backgroundColor: '#f9f9f9',
+              backgroundColor: 'white',
               borderRadius: 2,
               textDecoration: 'none',
               transition: 'box-shadow 0.2s ease-in-out',
@@ -52,7 +52,7 @@ const Footer = () => {
               alt={logo.alt}
               sx={{
                 maxHeight: '60px',
-                maxWidth: '160px',
+                maxWidth: '130px',
                 objectFit: 'contain',
               }}
             />

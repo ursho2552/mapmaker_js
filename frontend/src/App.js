@@ -346,8 +346,6 @@ const App = () => {
           />
         </Box>
       </Box>
-
-      <Footer />
     </Box>
   );
 };

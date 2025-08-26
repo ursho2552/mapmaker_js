@@ -1,7 +1,3 @@
-/**
- * Usage:
- *   <ReferencesModal open={open} onClose={handleClose} />
- */
 import React from 'react';
 import {
   Dialog,
@@ -12,6 +8,7 @@ import {
   Link,
   Button,
 } from '@mui/material';
+import Footer from './Footer';
 
 const ReferencesModal = ({ open, onClose }) => (
   <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
@@ -294,6 +291,8 @@ const ReferencesModal = ({ open, onClose }) => (
         led development of software infrastructure in partnership with the
         Global Organization for Earth System Science Portals.
       </Typography>
+
+      <Footer />
     </DialogContent>
 
     <DialogActions>
