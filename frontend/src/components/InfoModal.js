@@ -11,7 +11,7 @@ import {
     Link
 } from '@mui/material';
 
-function InfoModal({ open, onClose, title, shortText, longText }) {
+function InfoModal({ open, onClose, title, shortText, longText, buttonText = 'Close' }) {
     const [showFullText, setShowFullText] = useState(false);
 
     useEffect(() => {
@@ -32,28 +32,30 @@ function InfoModal({ open, onClose, title, shortText, longText }) {
                     {shortText}
                 </Typography>
 
-                <Box mt={2}>
-                    <Link
-                        component="button"
-                        variant="body2"
-                        underline="hover"
-                        onClick={handleToggleExpand}
-                        sx={{ color: 'primary.main', fontWeight: 500 }}
-                    >
-                        {showFullText ? 'Show Less' : 'Learn More'}
-                    </Link>
+                {longText && (
+                    <Box mt={2}>
+                        <Link
+                            component="button"
+                            variant="body2"
+                            underline="hover"
+                            onClick={handleToggleExpand}
+                            sx={{ color: 'primary.main', fontWeight: 500 }}
+                        >
+                            {showFullText ? 'Show Less' : 'Learn More'}
+                        </Link>
 
-                    <Collapse in={showFullText}>
-                        <Box mt={2}>
-                            <Typography variant="body2" sx={{ whiteSpace: 'pre-line' }}>
-                                {longText}
-                            </Typography>
-                        </Box>
-                    </Collapse>
-                </Box>
+                        <Collapse in={showFullText}>
+                            <Box mt={2}>
+                                <Typography variant="body2" sx={{ whiteSpace: 'pre-line' }}>
+                                    {longText}
+                                </Typography>
+                            </Box>
+                        </Collapse>
+                    </Box>
+                )}
             </DialogContent>
             <DialogActions>
-                <Button onClick={onClose}>Close</Button>
+                <Button onClick={onClose}>{buttonText}</Button>
             </DialogActions>
         </Dialog>
     );

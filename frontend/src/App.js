@@ -106,10 +106,9 @@ const App = () => {
   return (
     <Box className="App" sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       {/* Start Tutorial Button */}
-      <Box sx={{ position: 'absolute', top: 20, right: 20, zIndex: 1500 }}>
+      <Box sx={{ position: 'absolute', top: 30, left: 30, zIndex: 1500 }}>
         <Button
-          variant="contained"
-          color="secondary"
+          variant="outlined"
           onClick={() => setTutorialActive(true)}
         >
           Start Tutorial

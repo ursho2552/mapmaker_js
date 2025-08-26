@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import InfoModal from "./InfoModal";
 
-const Tutorial = ({ start, onFinish, panel1Year, setPanel1Year, setTutorialStep }) => {
+const Tutorial = ({ start, onFinish, panel1Year, setTutorialStep }) => {
     const [step, setStep] = useState(0);
 
     useEffect(() => {
@@ -15,50 +15,15 @@ const Tutorial = ({ start, onFinish, panel1Year, setPanel1Year, setTutorialStep 
     if (!start) return null;
 
     return (
-        <Box
-            sx={{
-                position: "fixed",
-                top: 0,
-                left: 0,
-                width: "100%",
-                height: "100%",
-                zIndex: 3000,
-                pointerEvents: "none",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-            }}
-        >
+        <Box>
             {/* Step 0 - Welcome */}
-            {step === 0 && (
-
-                <Box
-                    sx={{
-                        pointerEvents: "auto",
-                        bgcolor: "rgba(10,20,40,0.95)",
-                        p: 3,
-                        borderRadius: 2,
-                        boxShadow: "0 0 20px #4FC3F7",
-                        maxWidth: 400,
-                        textAlign: "center",
-                    }}
-                >
-                    <Typography variant="h5" gutterBottom sx={{ color: "#fff" }}>
-                        Welcome to the MAPMAKER Tutorial
-                    </Typography>
-                    <Typography variant="body1" gutterBottom sx={{ color: "#ddd" }}>
-                        Learn how to explore plankton diversity scenarios.
-                    </Typography>
-                    <Button
-                        variant="contained"
-                        color="secondary"
-                        onClick={() => setStep(1)}
-                        sx={{ mt: 2 }}
-                    >
-                        Let's Start
-                    </Button>
-                </Box>
-            )}
+            <InfoModal
+                open={step === 0}
+                onClose={() => setStep(1)}
+                title="Welcome to the MAPMAKER Tutorial"
+                shortText="Learn how to explore plankton diversity scenarios."
+                buttonText="Start Tutorial"
+            />
 
             {/* Step 1 - Highlight DataPanel */}
             {step === 1 && (
@@ -71,7 +36,7 @@ const Tutorial = ({ start, onFinish, panel1Year, setPanel1Year, setTutorialStep 
                             left: 0,
                             width: "100%",
                             height: "100%",
-                            backgroundColor: "rgba(0,10,30,0.85)",
+                            backgroundColor: "rgba(0,0,0,0.7)",
                             zIndex: 2999,
                             pointerEvents: "none",
                         }}
@@ -99,39 +64,16 @@ const Tutorial = ({ start, onFinish, panel1Year, setPanel1Year, setTutorialStep 
                 </>
             )}
 
-
             {/* Step 2 - Completion */}
-            {step === 2 && (
-                <Box
-                    sx={{
-                        pointerEvents: "auto",
-                        bgcolor: "rgba(10,20,40,0.95)",
-                        p: 3,
-                        borderRadius: 2,
-                        boxShadow: "0 0 25px #4FC3F7",
-                        maxWidth: 400,
-                        textAlign: "center",
-                    }}
-                >
-                    <Typography variant="h5" gutterBottom sx={{ color: "#fff" }}>
-                        Great job! 🎉
-                    </Typography>
-                    <Typography variant="body1" gutterBottom sx={{ color: "#ddd" }}>
-                        You've set the year to 2050. Tutorial completed.
-                    </Typography>
-                    <Button
-                        variant="contained"
-                        color="secondary"
-                        onClick={() => {
-                            setStep(0);
-                            onFinish();
-                        }}
-                        sx={{ mt: 2 }}
-                    >
-                        Finish
-                    </Button>
-                </Box>
-            )}
+            <InfoModal
+                open={step === 2}
+                onClose={() => {
+                    setStep(0);
+                    onFinish();
+                }}
+                title="Great job!"
+                shortText="You've set the year to 2050. Tutorial completed."
+            />
         </Box>
     );
 };
