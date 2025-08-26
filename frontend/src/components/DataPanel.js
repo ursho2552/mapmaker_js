@@ -19,18 +19,9 @@ const DataPanel = ({
     setSelectedPoint,
     selectedPoint,
     lockYear,
-    setLockYear,
     onYearChange,
     onLockToggle,
 }) => {
-    const handleSliderChange = (event, value) => {
-        setPanel(prev => ({ ...prev, year: value }));
-        debouncedUpdateYear(value);
-
-        if (onYearChange) {
-            onYearChange(value);
-        }
-    };
 
     return (
         <Box sx={{

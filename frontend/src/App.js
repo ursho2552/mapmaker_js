@@ -22,8 +22,8 @@ const App = () => {
   const [selectedPoint, setSelectedPoint] = useState({ x: 0, y: 0 });
 
   const createPanelState = () => ({
-    year: 2012,
-    debouncedYear: 2012,
+    year: 2025,
+    debouncedYear: 2025,
     source: 'plankton',
     view: 'map',
     diversity: diversityIndices[1],
@@ -137,7 +137,6 @@ const App = () => {
             setSelectedPoint={setSelectedPoint}
             selectedPoint={selectedPoint}
             lockYear={lockYear}
-            setLockYear={setLockYear}
             onYearChange={(y) => handleYearChange(setPanel1, setPanel2, y)}
             onLockToggle={handleYearLockToggle}
           />
@@ -314,7 +313,6 @@ const App = () => {
             setSelectedPoint={setSelectedPoint}
             selectedPoint={selectedPoint}
             lockYear={lockYear}
-            setLockYear={setLockYear}
             onYearChange={(y) => handleYearChange(setPanel2, setPanel1, y)}
             onLockToggle={handleYearLockToggle}
           />
