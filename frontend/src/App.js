@@ -128,7 +128,7 @@ const App = () => {
       />
 
       <Box sx={{ flex: 1, display: 'flex', flexDirection: { xs: 'column', md: 'column', lg: 'row' }, gap: 1, px: 1 }}>
-        <Box sx={{ flex: 5, display: 'flex' }}>
+        <Box sx={{ flex: 1, display: 'flex' }}>
           <DataPanel
             panel={panel1}
             setPanel={setPanel1}
@@ -142,7 +142,7 @@ const App = () => {
           />
         </Box>
 
-        <Box sx={{ flex: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
+        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 1 }}>
           {/* Collapsible title */}
           <Box
             sx={{
@@ -181,7 +181,15 @@ const App = () => {
 
           {/* Collapsible content */}
           <Collapse in={!panelsCollapsed}>
-            <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: '1fr auto 1fr',
+                alignItems: 'start',
+                columnGap: 1,
+              }}
+            >
+              {/* Left Control Panel */}
               <Box sx={{ flex: 1, minWidth: 0 }}>
                 <ControlPanel
                   source={panel1.source}
@@ -207,23 +215,18 @@ const App = () => {
               {/* Lock Icons */}
               <Box
                 sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  gap: 3,
-                  alignSelf: 'center',
-                  pb: 2,
+                  display: 'grid',
+                  gridTemplateRows: 'repeat(4, auto)',
+                  rowGap: 3,
+                  justifyItems: 'center',
+                  pt: 8,
                 }}
               >
+                <Box />
+                <Box />
                 {/* Scenario lock */}
                 <Box
-                  sx={{
-                    cursor: 'pointer',
-                    '&:hover': { color: '#1976d2' },
-                    display: 'flex',
-                    alignItems: 'center',
-                  }}
+                  sx={{ cursor: 'pointer', '&:hover': { color: '#1976d2' }, display: 'flex', alignItems: 'center' }}
                   onClick={() => {
                     const newLock = !lockScenario;
                     setLockScenario(newLock);
@@ -237,12 +240,7 @@ const App = () => {
 
                 {/* Model lock */}
                 <Box
-                  sx={{
-                    cursor: 'pointer',
-                    '&:hover': { color: '#1976d2' },
-                    display: 'flex',
-                    alignItems: 'center',
-                  }}
+                  sx={{ cursor: 'pointer', '&:hover': { color: '#1976d2' }, display: 'flex', alignItems: 'center' }}
                   onClick={() => {
                     const newLock = !lockModel;
                     setLockModel(newLock);
@@ -255,6 +253,7 @@ const App = () => {
                 </Box>
               </Box>
 
+              {/* Right Control Panel */}
               <Box sx={{ flex: 1, minWidth: 0 }}>
                 <ControlPanel
                   source={panel2.source}
@@ -304,7 +303,7 @@ const App = () => {
           />
         </Box>
 
-        <Box sx={{ flex: 5, display: 'flex' }}>
+        <Box sx={{ flex: 1, display: 'flex' }}>
           <DataPanel
             panel={panel2}
             setPanel={setPanel2}
