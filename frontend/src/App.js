@@ -6,13 +6,18 @@ import DataPanel from './components/DataPanel';
 import ControlPanel from './components/ControlPanel';
 import InfoModal from './components/InfoModal';
 import ProjectExplanationModal from './components/ProjectExplanationModal';
+import Tutorial from './components/Tutorial';
 import _ from 'lodash';
 import './App.css';
-import { Box, Typography, Divider, IconButton, Collapse } from '@mui/material';
+import { Box, Typography, Divider, IconButton, Collapse, Button } from '@mui/material';
 import { diversityIndices, environmentalParameters, planktonGroups, rcpScenarios, earthModels, infoMessages, infoMessagesShort } from './constants';
 import { Lock, LockOpen, ExpandLess, ExpandMore } from '@mui/icons-material';
 
 const App = () => {
+  // Tutorial state
+  const [tutorialActive, setTutorialActive] = useState(false);
+  const [tutorialStep, setTutorialStep] = useState(0);
+
   // Top-level state
   const [infoModalOpen, setInfoModalOpen] = useState(false);
   const [infoModalText, setInfoModalText] = useState('');
@@ -100,6 +105,29 @@ const App = () => {
 
   return (
     <Box className="App" sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      {/* Start Tutorial Button */}
+      <Box sx={{ position: 'absolute', top: 20, right: 20, zIndex: 1500 }}>
+        <Button
+          variant="contained"
+          color="secondary"
+          onClick={() => setTutorialActive(true)}
+        >
+          Start Tutorial
+        </Button>
+      </Box>
+
+      {/* Tutorial Overlay */}
+      <Tutorial
+        start={tutorialActive}
+        onFinish={() => {
+          setTutorialActive(false);
+          setTutorialStep(0);
+        }}
+        panel1Year={panel1.year}
+        setPanel1Year={(y) => handleYearChange(setPanel1, setPanel2, y)}
+        setTutorialStep={setTutorialStep}
+      />
+
       <ProjectExplanationModal
         open={projectModalOpen}
         onClose={() => setProjectModalOpen(false)}
@@ -129,9 +157,11 @@ const App = () => {
 
       <Box sx={{ flex: 1, display: 'flex', flexDirection: { xs: 'column', md: 'column', lg: 'row' }, gap: 1, px: 1 }}>
         <Box sx={{ flex: 1, display: 'flex' }}>
+          {/* Left DataPanel */}
           <DataPanel
             panel={panel1}
             setPanel={setPanel1}
+            tutorialStep={tutorialStep}
             debouncedYear={debouncedYear1}
             debouncedUpdateYear={debouncedUpdateYear1}
             setSelectedPoint={setSelectedPoint}

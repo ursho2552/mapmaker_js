@@ -15,6 +15,7 @@ import MapDisplay from './MapDisplay';
 const DataPanel = ({
     panel,
     setPanel,
+    tutorialStep,
     debouncedUpdateYear,
     setSelectedPoint,
     selectedPoint,
@@ -24,15 +25,27 @@ const DataPanel = ({
 }) => {
 
     return (
-        <Box sx={{
-            p: 2,
-            backgroundColor: 'rgba(0, 0, 0, 0.25)',
-            borderRadius: 1,
-            flex: 1,
-            width: 500,
-            display: 'flex',
-            flexDirection: 'column',
-        }}>
+        <Box
+            sx={{
+                p: 2,
+                backgroundColor: 'rgba(0, 0, 0, 0.25)',
+                borderRadius: 1,
+                flex: 1,
+                width: 500,
+                display: 'flex',
+                flexDirection: 'column',
+                border: tutorialStep === 1 ? '4px solid #4FC3F7' : 'none',
+                boxShadow:
+                    tutorialStep === 1
+                        ? '0 0 30px 10px rgba(79,195,247,0.6)'
+                        : 'none',
+                animation:
+                    tutorialStep === 1 ? 'pulse 1.5s infinite' : 'none',
+                position: 'relative',
+                zIndex: tutorialStep === 1 ? 3000 : 'auto',
+            }}
+        >
+
             {/* View Switch */}
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
                 <FormControl component="fieldset">
