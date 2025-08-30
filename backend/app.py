@@ -143,10 +143,7 @@ def get_environmental_data(env_parameter:str, scenario:str, model:str):
 
     decoded_model = ESMS_ENV[model]
     decoded_scenario = SCENARIOS[scenario]
-    if '-' in decoded_scenario:
-        file_path = ENVIRONMENTAL_FILE_DIFF.format(decoded_model, decoded_scenario)
-    else:
-        file_path = ENVIRONMENTAL_FILE.format(decoded_model, decoded_scenario)
+    file_path = ENVIRONMENTAL_FILE.format(decoded_model, decoded_scenario)
     variable = ENVIRONMENTALS_VARIABLES[env_parameter]
 
     return file_path, variable

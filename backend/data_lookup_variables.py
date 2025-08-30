@@ -47,7 +47,6 @@ DIVERSITY_VARIABLES = {'Total Plankton': 'hotspot_div_changeTot',
                         'Dinoflagellates': 'hotspot_div_changeDinofl'}
 
 ENVIRONMENTAL_FILE = './data/Env_var_annual_mean_{}_{}.nc'
-ENVIRONMENTAL_FILE_DIFF = './data/env_diff/Env_var_annual_mean_{}_{}.nc'
 
 ENVIRONMENTALS_VARIABLES = {'Temperature': 'SST',
                             'Oxygen': 'dO2',
