@@ -1,6 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import CombinedLinePlot from './components/CombinedLinePlot';
-import Footer from './components/Footer';
 import ReferencesButton from './components/ReferencesButton';
 import DataPanel from './components/DataPanel';
 import ControlPanel from './components/ControlPanel';
