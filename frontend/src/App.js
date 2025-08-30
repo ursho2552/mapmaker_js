@@ -335,6 +335,7 @@ const App = () => {
           <DataPanel
             panel={panel2}
             setPanel={setPanel2}
+            tutorialStep={tutorialStep}
             debouncedYear={debouncedYear2}
             debouncedUpdateYear={debouncedUpdateYear2}
             setSelectedPoint={setSelectedPoint}
