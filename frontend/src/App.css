@@ -41,21 +41,6 @@ body {
     z-index: 3000;
 }
 
-.control-panel {
-    padding: 8px 16px;
-    background-color: rgba(0, 0, 0, 0.25);
-    backdrop-filter: blur(8px);
-    border-radius: 8px;
-    position: relative;
-}
-
-.control-panel.highlight {
-    border: 4px solid #4FC3F7;
-    box-shadow: 0 0 30px 10px rgba(79, 195, 247, 0.6);
-    animation: pulse 1.5s infinite;
-    z-index: 3000;
-}
-
 .radio-white .MuiSvgIcon-root {
     color: white;
 }
@@ -96,45 +81,6 @@ body {
     align-items: center;
     gap: 4px;
     margin-bottom: 8px;
-}
-
-.labeled-select {
-    display: flex;
-    flex-direction: row;
-    margin-bottom: 8px;
-    gap: 8px;
-}
-
-.labeled-select-control {
-    background-color: rgba(255, 255, 255, 0.12);
-    backdrop-filter: blur(12px);
-    border-radius: 8px;
-    flex: 1;
-    min-width: 180px;
-    max-width: 220px;
-    margin-right: 4px;
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-.labeled-select-control .MuiInputBase-input,
-.labeled-select-control .MuiSvgIcon-root {
-    color: white;
-}
-
-.labeled-select-menu-paper {
-    background-color: rgba(255, 255, 255, 0.08) !important;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-}
-
-.labeled-select-menu-paper .MuiMenuItem-root {
-    color: #FFFFFF;
-}
-
-.labeled-select-menu-paper .MuiMenuItem-root:hover {
-    background-color: rgba(255, 255, 255, 0.15);
 }
 
 @keyframes pulse {

@@ -21,11 +21,27 @@ const LabeledSelect = ({
   infoText,
   openInfoModal,
 }) => (
-  <Box className="labeled-select">
+  <Box sx={{ display: 'flex', flexDirection: 'row', mb: 1, gap: 1 }}>
     <FormControl
       variant="outlined"
       size="small"
-      className="labeled-select-control"
+      sx={{
+        backgroundColor: 'rgba(255, 255, 255, 0.12)',
+        backdropFilter: 'blur(12px)',
+        borderRadius: 2,
+        flex: 1,
+        minWidth: 180,
+        maxWidth: 220,
+        mr: 0.5,
+        border: '1px solid rgba(255, 255, 255, 0.25)',
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+        '& .MuiInputBase-input': {
+          color: '#FFFFFF',
+        },
+        '& .MuiSvgIcon-root': {
+          color: '#FFFFFF',
+        },
+      }}
     >
       <Select
         id={id}
@@ -38,7 +54,18 @@ const LabeledSelect = ({
         }
         MenuProps={{
           PaperProps: {
-            className: "labeled-select-menu-paper",
+            sx: {
+              backgroundColor: 'rgba(255, 255, 255, 0.08)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255, 255, 255, 0.25)',
+              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.4)',
+              '& .MuiMenuItem-root': {
+                color: '#FFFFFF',
+                '&:hover': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                },
+              },
+            },
           },
         }}
       >
@@ -81,21 +108,35 @@ const ControlPanel = ({
   environmentalParameters,
   tutorialStep,
 }) => (
-  <Box className={`control-panel ${tutorialStep === 6 ? 'highlight' : ''}`}>
+  <Box
+    sx={{
+      px: 2,
+      py: 1,
+      backgroundColor: 'rgba(0, 0, 0, 0.25)',
+      backdropFilter: 'blur(8px)',
+      borderRadius: 1,
+      border: [6].includes(tutorialStep) ? '4px solid #4FC3F7' : 'none',
+      boxShadow: [6].includes(tutorialStep)
+        ? '0 0 30px 10px rgba(79,195,247,0.6)'
+        : 'none',
+      animation: [6].includes(tutorialStep) ? 'pulse 1.5s infinite' : 'none',
+      position: 'relative',
+      zIndex: [6].includes(tutorialStep) ? 3000 : 'auto',
+    }}
+  >
     {/* Data Source Row */}
     <Box sx={{ alignItems: 'center', mb: 1 }}>
       <FormControl component="fieldset" sx={{ color: 'white' }}>
         <RadioGroup row name="source" value={source} onChange={onSourceChange}>
           <FormControlLabel
             value="plankton"
-            control={<Radio className="radio-white" />}
-            label={<Typography className="radio-label">Plankton Diversity</Typography>}
+            control={<Radio sx={{ color: 'white', '&.Mui-checked': { color: 'white' } }} />}
+            label={<Typography color="white">Plankton Diversity</Typography>}
           />
-
           <FormControlLabel
             value="environmental"
-            control={<Radio className="radio-white" />}
-            label={<Typography className="radio-label">Environmental Conditions</Typography>}
+            control={<Radio sx={{ color: 'white', '&.Mui-checked': { color: 'white' } }} />}
+            label={<Typography color="white">Environmental Conditions</Typography>}
           />
         </RadioGroup>
       </FormControl>
