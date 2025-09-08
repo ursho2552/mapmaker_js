@@ -12,23 +12,35 @@ import {
 } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
-// Reusable select component with an info button
-const LabeledSelect = ({ label, id, value, options, onChange, infoText, openInfoModal }) => (
-  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, gap: 1 }}>
+const LabeledSelect = ({
+  label,
+  id,
+  value,
+  options,
+  onChange,
+  infoText,
+  openInfoModal,
+}) => (
+  <Box sx={{ display: 'flex', flexDirection: 'row', mb: 1, gap: 1 }}>
     <FormControl
       variant="outlined"
       size="small"
       sx={{
-        flex: 1,
-        minWidth: 180,
-        maxWidth: 220,
         backgroundColor: 'rgba(255, 255, 255, 0.12)',
         backdropFilter: 'blur(12px)',
         borderRadius: 2,
+        flex: 1,
+        minWidth: 180,
+        maxWidth: 220,
+        mr: 0.5,
         border: '1px solid rgba(255, 255, 255, 0.25)',
         boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
-        '& .MuiInputBase-input': { color: '#FFFFFF' },
-        '& .MuiSvgIcon-root': { color: '#FFFFFF' },
+        '& .MuiInputBase-input': {
+          color: '#FFFFFF',
+        },
+        '& .MuiSvgIcon-root': {
+          color: '#FFFFFF',
+        },
       }}
     >
       <Select
@@ -49,25 +61,31 @@ const LabeledSelect = ({ label, id, value, options, onChange, infoText, openInfo
               boxShadow: '0 4px 20px rgba(0, 0, 0, 0.4)',
               '& .MuiMenuItem-root': {
                 color: '#FFFFFF',
-                '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.15)' },
+                '&:hover': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                },
               },
             },
           },
         }}
       >
-        {options.map(opt => (
-          <MenuItem key={opt} value={opt}>{opt}</MenuItem>
+        {options.map((opt) => (
+          <MenuItem key={opt} value={opt}>
+            {opt}
+          </MenuItem>
         ))}
       </Select>
     </FormControl>
 
-    <IconButton onClick={() => openInfoModal(label, infoText)} size="small" sx={{ color: 'white', p: 0 }}>
+    <IconButton
+      onClick={() => openInfoModal(label, infoText)}
+      size="small"
+      sx={{ color: 'white', p: 0, m: 0 }}
+    >
       <InfoOutlinedIcon fontSize="small" />
     </IconButton>
   </Box>
 );
-
-// Control panel for selecting source, scenario, model, metrics, and groups
 
 const ControlPanel = ({
   source,
@@ -89,27 +107,26 @@ const ControlPanel = ({
   diversityIndices,
   environmentalParameters,
   tutorialStep,
-}) => {
-  const isPlankton = source === 'plankton';
-
-  const borderStyles = [6].includes(tutorialStep)
-    ? { border: '4px solid #4FC3F7', boxShadow: '0 0 30px 10px rgba(79,195,247,0.6)', animation: 'pulse 1.5s infinite', zIndex: 3000 }
-    : {};
-
-  return (
-    <Box
-      sx={{
-        px: 2,
-        py: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.25)',
-        backdropFilter: 'blur(8px)',
-        borderRadius: 1,
-        position: 'relative',
-        ...borderStyles,
-      }}
-    >
-      {/* Source Selection */}
-      <FormControl component="fieldset" sx={{ color: 'white', mb: 1 }}>
+}) => (
+  <Box
+    sx={{
+      px: 2,
+      py: 1,
+      backgroundColor: 'rgba(0, 0, 0, 0.25)',
+      backdropFilter: 'blur(8px)',
+      borderRadius: 1,
+      border: [6].includes(tutorialStep) ? '4px solid #4FC3F7' : 'none',
+      boxShadow: [6].includes(tutorialStep)
+        ? '0 0 30px 10px rgba(79,195,247,0.6)'
+        : 'none',
+      animation: [6].includes(tutorialStep) ? 'pulse 1.5s infinite' : 'none',
+      position: 'relative',
+      zIndex: [6].includes(tutorialStep) ? 3000 : 'auto',
+    }}
+  >
+    {/* Data Source Row */}
+    <Box sx={{ alignItems: 'center', mb: 1 }}>
+      <FormControl component="fieldset" sx={{ color: 'white' }}>
         <RadioGroup row name="source" value={source} onChange={onSourceChange}>
           <FormControlLabel
             value="plankton"
@@ -123,54 +140,54 @@ const ControlPanel = ({
           />
         </RadioGroup>
       </FormControl>
-
-      {/* Scenario */}
-      <LabeledSelect
-        label="Scenario"
-        id="rcp"
-        value={rcp}
-        options={filteredScenarios}
-        onChange={onRcpChange}
-        infoText="RCP Scenarios general"
-        openInfoModal={openInfoModal}
-      />
-
-      {/* Model */}
-      <LabeledSelect
-        label="Model"
-        id="model"
-        value={model}
-        options={filteredModels}
-        onChange={onModelChange}
-        infoText="Earth System Models general"
-        openInfoModal={openInfoModal}
-      />
-
-      {/* Metric */}
-      <LabeledSelect
-        label="Metric"
-        id={isPlankton ? 'diversity' : 'env-param'}
-        value={isPlankton ? diversity : envParam}
-        options={isPlankton ? diversityIndices : environmentalParameters}
-        onChange={isPlankton ? onDiversityChange : onEnvParamChange}
-        infoText={isPlankton ? 'Diversity Indices general' : 'Environmental Parameters general'}
-        openInfoModal={openInfoModal}
-      />
-
-      {/* Group (only for plankton) */}
-      {isPlankton && (
-        <LabeledSelect
-          label="Group"
-          id="group"
-          value={group}
-          options={filteredGroups}
-          onChange={onGroupChange}
-          infoText="Plankton Groups general"
-          openInfoModal={openInfoModal}
-        />
-      )}
     </Box>
-  );
-};
+
+    {/* Scenario */}
+    <LabeledSelect
+      label="Scenario"
+      id="rcp"
+      value={rcp}
+      options={filteredScenarios}
+      onChange={onRcpChange}
+      infoText="RCP Scenarios general"
+      openInfoModal={openInfoModal}
+    />
+
+    {/* Model */}
+    <LabeledSelect
+      label="Model"
+      id="model"
+      value={model}
+      options={filteredModels}
+      onChange={onModelChange}
+      infoText="Earth System Models general"
+      openInfoModal={openInfoModal}
+    />
+
+    {/* Metric */}
+    <LabeledSelect
+      label={'Metric'}
+      id={source === 'plankton' ? 'diversity' : 'env-param'}
+      value={source === 'plankton' ? diversity : envParam}
+      options={source === 'plankton' ? diversityIndices : environmentalParameters}
+      onChange={source === 'plankton' ? onDiversityChange : onEnvParamChange}
+      infoText={source === 'plankton' ? 'Diversity Indices general' : 'Environmental Parameters general'}
+      openInfoModal={openInfoModal}
+    />
+
+    {/* Group (Plankton only) */}
+    {source === 'plankton' && (
+      <LabeledSelect
+        label="Group"
+        id="group"
+        value={group}
+        options={filteredGroups}
+        onChange={onGroupChange}
+        infoText="Plankton Groups general"
+        openInfoModal={openInfoModal}
+      />
+    )}
+  </Box>
+);
 
 export default ControlPanel;

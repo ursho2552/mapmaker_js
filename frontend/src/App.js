@@ -193,8 +193,7 @@ const App = () => {
               />
 
               {/* Locks */}
-              <Box sx={{ display: 'grid', gridTemplateRows: 'repeat(4, auto)', rowGap: 3, justifyItems: 'center', pt: 14 }}>
-
+              <Box sx={{ display: 'grid', gridTemplateRows: 'repeat(4, auto)', rowGap: 3, justifyItems: 'center', pt: 8 }}>
                 {/* Scenario Lock */}
                 <Box sx={{ cursor: 'pointer', '&:hover': { color: '#1976d2' }, display: 'flex', alignItems: 'center' }}
                   onClick={() => setLockScenario(prev => { if (!prev) setPanel2(p => ({ ...p, rcp: panel1.rcp })); return !prev; })}>
