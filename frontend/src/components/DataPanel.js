@@ -34,15 +34,13 @@ const DataPanel = ({
                 width: 500,
                 display: 'flex',
                 flexDirection: 'column',
-                border: tutorialStep === 1 ? '4px solid #4FC3F7' : 'none',
-                boxShadow:
-                    tutorialStep === 1
-                        ? '0 0 30px 10px rgba(79,195,247,0.6)'
-                        : 'none',
-                animation:
-                    tutorialStep === 1 ? 'pulse 1.5s infinite' : 'none',
+                border: [1, 2, 3, 7].includes(tutorialStep) ? '4px solid #4FC3F7' : 'none',
+                boxShadow: [1, 2, 3, 7].includes(tutorialStep)
+                    ? '0 0 30px 10px rgba(79,195,247,0.6)'
+                    : 'none',
+                animation: [1, 2, 3, 7].includes(tutorialStep) ? 'pulse 1.5s infinite' : 'none',
                 position: 'relative',
-                zIndex: tutorialStep === 1 ? 3000 : 'auto',
+                zIndex: [1, 2, 3, 7].includes(tutorialStep) ? 3000 : 'auto',
             }}
         >
 

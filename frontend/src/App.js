@@ -170,7 +170,12 @@ const App = () => {
           />
         </Box>
 
-        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 1 }}>
+        <Box sx={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 1,
+        }}>
           {/* Collapsible title */}
           <Box
             sx={{
@@ -215,6 +220,13 @@ const App = () => {
                 gridTemplateColumns: '1fr auto 1fr',
                 alignItems: 'start',
                 columnGap: 1,
+                border: [4, 5].includes(tutorialStep) ? '4px solid #4FC3F7' : 'none',
+                boxShadow: [4, 5].includes(tutorialStep)
+                  ? '0 0 30px 10px rgba(79,195,247,0.6)'
+                  : 'none',
+                animation: [4, 5].includes(tutorialStep) ? 'pulse 1.5s infinite' : 'none',
+                zIndex: [4, 5].includes(tutorialStep) ? 3000 : 'auto',
+                position: 'relative',
               }}
             >
               {/* Left Control Panel */}
@@ -238,6 +250,7 @@ const App = () => {
                   diversityIndices={diversityIndices}
                   environmentalParameters={environmentalParameters}
                   openInfoModal={openInfoModal}
+                  tutorialStep={tutorialStep}
                 />
               </Box>
               {/* Lock Icons */}
@@ -306,36 +319,45 @@ const App = () => {
               </Box>
             </Box>
           </Collapse>
-
-          {/* Combined line plot */}
-          <CombinedLinePlot
-            point={selectedPoint}
-            leftSettings={{
-              source: panel1.source,
-              index: panel1.diversity,
-              group: panel1.group,
-              scenario: panel1.rcp,
-              model: panel1.model,
-              envParam: panel1.envParam
-            }}
-            rightSettings={{
-              source: panel2.source,
-              index: panel2.diversity,
-              group: panel2.group,
-              scenario: panel2.rcp,
-              model: panel2.model,
-              envParam: panel2.envParam
-            }}
-            startYear={2012}
-            endYear={2100}
-          />
+          <Box sx={{
+            border: [8].includes(tutorialStep) ? '4px solid #4FC3F7' : 'none',
+            boxShadow: [8].includes(tutorialStep)
+              ? '0 0 30px 10px rgba(79,195,247,0.6)'
+              : 'none',
+            animation: [8].includes(tutorialStep) ? 'pulse 1.5s infinite' : 'none',
+            position: 'relative',
+            zIndex: [8].includes(tutorialStep) ? 3000 : 'auto',
+          }}>
+            {/* Combined line plot */}
+            <CombinedLinePlot
+              point={selectedPoint}
+              leftSettings={{
+                source: panel1.source,
+                index: panel1.diversity,
+                group: panel1.group,
+                scenario: panel1.rcp,
+                model: panel1.model,
+                envParam: panel1.envParam
+              }}
+              rightSettings={{
+                source: panel2.source,
+                index: panel2.diversity,
+                group: panel2.group,
+                scenario: panel2.rcp,
+                model: panel2.model,
+                envParam: panel2.envParam
+              }}
+              startYear={2012}
+              endYear={2100}
+            />
+          </Box>
         </Box>
 
         <Box sx={{ flex: 1, display: 'flex' }}>
           <DataPanel
             panel={panel2}
             setPanel={setPanel2}
-            tutorialStep={tutorialStep}
+            tutorialStep={tutorialStep === 1 ? tutorialStep : null}
             debouncedYear={debouncedYear2}
             debouncedUpdateYear={debouncedUpdateYear2}
             setSelectedPoint={setSelectedPoint}
@@ -346,7 +368,7 @@ const App = () => {
           />
         </Box>
       </Box>
-    </Box>
+    </Box >
   );
 };
 
