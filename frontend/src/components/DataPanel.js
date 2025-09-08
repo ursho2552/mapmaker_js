@@ -23,29 +23,12 @@ const DataPanel = ({
     onYearChange,
     onLockToggle,
 }) => {
+    const isHighlighted = [1, 2, 3, 7].includes(tutorialStep);
 
     return (
-        <Box
-            sx={{
-                p: 2,
-                backgroundColor: 'rgba(0, 0, 0, 0.25)',
-                borderRadius: 1,
-                flex: 1,
-                width: 500,
-                display: 'flex',
-                flexDirection: 'column',
-                border: [1, 2, 3, 7].includes(tutorialStep) ? '4px solid #4FC3F7' : 'none',
-                boxShadow: [1, 2, 3, 7].includes(tutorialStep)
-                    ? '0 0 30px 10px rgba(79,195,247,0.6)'
-                    : 'none',
-                animation: [1, 2, 3, 7].includes(tutorialStep) ? 'pulse 1.5s infinite' : 'none',
-                position: 'relative',
-                zIndex: [1, 2, 3, 7].includes(tutorialStep) ? 3000 : 'auto',
-            }}
-        >
-
+        <Box className={`data-panel ${isHighlighted ? 'highlight' : ''}`}>
             {/* View Switch */}
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
+            <Box className="view-switch">
                 <FormControl component="fieldset">
                     <RadioGroup
                         row
@@ -54,34 +37,25 @@ const DataPanel = ({
                     >
                         <FormControlLabel
                             value="map"
-                            control={<Radio sx={{ color: 'white', '&.Mui-checked': { color: 'white' } }} />}
-                            label={<Typography color="white">Map</Typography>}
+                            control={<Radio className="radio-white" />}
+                            label={<Typography className="radio-label">Map</Typography>}
                         />
                         <FormControlLabel
                             value="globe"
-                            control={<Radio sx={{ color: 'white', '&.Mui-checked': { color: 'white' } }} />}
-                            label={<Typography color="white">Globe</Typography>}
+                            control={<Radio className="radio-white" />}
+                            label={<Typography className="radio-label">Globe</Typography>}
                         />
                     </RadioGroup>
                 </FormControl>
             </Box>
 
             {/* Year Slider */}
-            <Box sx={{ mb: 1, px: 1 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, px: 1, gap: 1 }}>
+            <Box className="year-slider">
+                <Box className="year-slider-header">
                     <Typography color="white" variant="subtitle2">
                         Year: {panel.year}
                     </Typography>
-                    <Box
-                        sx={{
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            color: 'white',
-                            '&:hover': { color: '#1976d2' },
-                        }}
-                        onClick={() => onLockToggle && onLockToggle()}
-                    >
+                    <Box className="lock-icon" onClick={onLockToggle}>
                         {lockYear ? <Lock /> : <LockOpen />}
                     </Box>
                 </Box>
@@ -92,15 +66,15 @@ const DataPanel = ({
                     onChange={(e, v) => {
                         setPanel(prev => ({ ...prev, year: v }));
                         debouncedUpdateYear(v);
-                        if (onYearChange) onYearChange(v);
+                        onYearChange?.(v);
                     }}
                     valueLabelDisplay="auto"
-                    sx={{ color: '#1976d2' }}
+                    className="slider"
                 />
             </Box>
 
             {/* Display Map or Globe */}
-            <Box sx={{ width: '100%', height: 400, position: 'relative' }}>
+            <Box className="display-container">
                 {panel.source === 'plankton' && panel.view === 'map' && (
                     <MapDisplay
                         year={panel.year}
