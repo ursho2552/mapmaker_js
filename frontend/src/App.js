@@ -325,7 +325,7 @@ const App = () => {
                   diversityIndices={diversityIndices}
                   environmentalParameters={environmentalParameters}
                   openInfoModal={openInfoModal}
-                  tutorialStep={tutorialStep}
+                  tutorialStep={tutorialStep === 6 ? null : tutorialStep}
                 />
               </Box>
             </Collapse>
@@ -372,7 +372,7 @@ const App = () => {
           <DataPanel
             panel={panel2}
             setPanel={setPanel2}
-            tutorialStep={tutorialStep}
+            tutorialStep={tutorialStep === 1 ? 1 : null}
             debouncedYear={debouncedYear2}
             debouncedUpdateYear={debouncedUpdateYear2}
             setSelectedPoint={setSelectedPoint}
