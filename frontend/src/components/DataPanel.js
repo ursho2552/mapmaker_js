@@ -18,6 +18,7 @@ const DataPanel = ({
     tutorialStep,
     debouncedUpdateYear,
     setSelectedPoint,
+    setAverageValue,
     selectedPoint,
     lockYear,
     onYearChange,
@@ -109,6 +110,7 @@ const DataPanel = ({
                         model={panel.model}
                         sourceType="plankton"
                         onPointClick={(x, y) => setSelectedPoint({ x, y })}
+                        onAverageChange={(average) => { setAverageValue(average) }}
                         selectedPoint={selectedPoint}
                     />
                 )}
@@ -132,6 +134,7 @@ const DataPanel = ({
                         model={panel.model}
                         sourceType="environmental"
                         onPointClick={(x, y) => setSelectedPoint({ x, y })}
+                        onAverageChange={(average) => { setAverageValue(average) }}
                         selectedPoint={selectedPoint}
                     />
                 )}

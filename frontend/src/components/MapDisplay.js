@@ -31,6 +31,7 @@ const MapDisplay = ({
   model,
   sourceType = 'plankton',
   onPointClick,
+  onAverageChange,
   selectedPoint,
 }) => {
   const [lats, setLats] = useState([]);
@@ -214,19 +215,6 @@ const MapDisplay = ({
     if (ranges) setZoomRange(ranges);
   };
 
-  const handleClick = (evt) => {
-    if (!evt.points?.length) return;
-
-    // ignore clicks immediately after autorange reset
-    if (zoomResetRef.current) {
-      zoomResetRef.current = false;
-      return;
-    }
-
-    const { x, y } = evt.points[0];
-    onPointClick?.(x, y);
-  };
-
   // recompute the average for the visible (zoomed) area
   useEffect(() => {
     if (!zoomRange || !Array.isArray(data) || data.length === 0) return;
@@ -246,8 +234,9 @@ const MapDisplay = ({
         if (typeof v === 'number' && !Number.isNaN(v)) values.push(v);
       }
     }
-
-    setZoomedAvg(values.length ? values.reduce((s, v) => s + v, 0) / values.length : null);
+    const average = values.length ? values.reduce((s, v) => s + v, 0) / values.length : null;
+    onAverageChange(average);
+    setZoomedAvg(average);
   }, [zoomRange, data, lats, lons]);
 
   const fullTitle = useMemo(() => {

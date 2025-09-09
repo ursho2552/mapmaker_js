@@ -47,6 +47,8 @@ const App = () => {
 
   const [selectedPoint, setSelectedPoint] = useState({ x: 0, y: 0 });
 
+  const [averageValue, setAverageValue] = useState(null);
+
   // Panel states
   const [panel1, setPanel1] = useState(() => ({ ...initialPanel }));
   const [panel2, setPanel2] = useState(() => ({ ...initialPanel, source: 'environmental', view: 'globe' }));
@@ -188,6 +190,7 @@ const App = () => {
             debouncedYear={debouncedYear1}
             debouncedUpdateYear={debouncedUpdateYear1}
             setSelectedPoint={setSelectedPoint}
+            setAverageValue={setAverageValue}
             selectedPoint={selectedPoint}
             lockYear={lockYear}
             onYearChange={(y) => handleYearChange(setPanel1, setPanel2, y)}
@@ -345,7 +348,7 @@ const App = () => {
             {/* Combined line plot */}
             <CombinedLinePlot
               point={selectedPoint}
-              average={panel1.average}
+              averageValue={averageValue}
               leftSettings={{
                 source: panel1.source,
                 index: panel1.diversity,
