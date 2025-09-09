@@ -6,26 +6,23 @@ import ControlPanel from './components/ControlPanel';
 import InfoModal from './components/InfoModal';
 import ProjectExplanationModal from './components/ProjectExplanationModal';
 import Tutorial from './components/Tutorial';
-import _ from 'lodash';
+import debounce from 'lodash/debounce';
 import './App.css';
 import { Box, Typography, Divider, IconButton, Collapse, Button } from '@mui/material';
-import { diversityIndices, environmentalParameters, planktonGroups, rcpScenarios, earthModels, infoMessages, infoMessagesShort } from './constants';
+import {
+  diversityIndices,
+  environmentalParameters,
+  planktonGroups,
+  rcpScenarios,
+  earthModels,
+  infoMessages,
+  infoMessagesShort,
+} from './constants';
 import { Lock, LockOpen, ExpandLess, ExpandMore } from '@mui/icons-material';
 
 const App = () => {
-  // Tutorial state
-  const [tutorialActive, setTutorialActive] = useState(false);
-  const [tutorialStep, setTutorialStep] = useState(0);
-
-  // Top-level state
-  const [infoModalOpen, setInfoModalOpen] = useState(false);
-  const [infoModalText, setInfoModalText] = useState('');
-  const [infoModalShortText, setInfoModalShortText] = useState('');
-  const [infoModalTitle, setInfoModalTitle] = useState('');
-
-  const [selectedPoint, setSelectedPoint] = useState({ x: 0, y: 0 });
-
-  const createPanelState = () => ({
+  // Initial panel definition
+  const initialPanel = {
     year: 2025,
     debouncedYear: 2025,
     source: 'plankton',
@@ -35,26 +32,54 @@ const App = () => {
     group: planktonGroups[0],
     rcp: rcpScenarios[0],
     model: earthModels[0],
-  });
+  };
 
-  const [panel1, setPanel1] = useState(createPanelState);
-  const [panel2, setPanel2] = useState({ ...createPanelState(), source: 'environmental', view: 'globe' });
+  // Tutorial state
+  const [tutorialActive, setTutorialActive] = useState(false);
+  const [tutorialStep, setTutorialStep] = useState(0);
+
+  // Top-level UI / modal state
+  const [infoModalOpen, setInfoModalOpen] = useState(false);
+  const [infoModalText, setInfoModalText] = useState('');
+  const [infoModalShortText, setInfoModalShortText] = useState('');
+  const [infoModalTitle, setInfoModalTitle] = useState('');
   const [projectModalOpen, setProjectModalOpen] = useState(true);
+
+  const [selectedPoint, setSelectedPoint] = useState({ x: 0, y: 0 });
+
+  // Panel states
+  const [panel1, setPanel1] = useState(() => ({ ...initialPanel }));
+  const [panel2, setPanel2] = useState(() => ({ ...initialPanel, source: 'environmental', view: 'globe' }));
 
   // Locks
   const [lockScenario, setLockScenario] = useState(true);
   const [lockModel, setLockModel] = useState(true);
   const [lockYear, setLockYear] = useState(true);
 
-  // Debounced years
-  const [debouncedYear1, setDebouncedYear1] = useState(2012);
-  const [debouncedYear2, setDebouncedYear2] = useState(2012);
-  const debouncedUpdateYear1 = useMemo(() => _.debounce((y) => setDebouncedYear1(y), 500), []);
-  const debouncedUpdateYear2 = useMemo(() => _.debounce((y) => setDebouncedYear2(y), 500), []);
+  // Debounced years (keep initial in sync with initialPanel.year)
+  const [debouncedYear1, setDebouncedYear1] = useState(initialPanel.year);
+  const [debouncedYear2, setDebouncedYear2] = useState(initialPanel.year);
 
-  // Collapsible state
+  const debouncedUpdateYear1 = useMemo(
+    () => debounce((y) => setDebouncedYear1(y), 500),
+    []
+  );
+  const debouncedUpdateYear2 = useMemo(
+    () => debounce((y) => setDebouncedYear2(y), 500),
+    []
+  );
+
+  useEffect(() => {
+    return () => {
+      debouncedUpdateYear1.cancel();
+      debouncedUpdateYear2.cancel();
+    };
+  }, [debouncedUpdateYear1, debouncedUpdateYear2]);
+
+  //  Collapsible state
   const [panelsCollapsed, setPanelsCollapsed] = useState(false);
 
+  // Info modal helpers
   const openInfoModal = (title, key) => {
     setInfoModalShortText(infoMessagesShort[key] ?? 'No short description available');
     setInfoModalText(infoMessages[key] ?? 'No information available');
@@ -63,15 +88,14 @@ const App = () => {
   };
   const closeInfoModal = () => setInfoModalOpen(false);
 
+  // Filtering helper
   const filterBiomes = (diversity) => ({
     groups: diversity === 'Biomes' ? planktonGroups.slice(0, 1) : planktonGroups,
     rcp: diversity === 'Biomes' ? rcpScenarios.slice(0, 3) : rcpScenarios,
     models: diversity === 'Biomes' ? earthModels.slice(0, 1) : earthModels,
   });
 
-  useEffect(() => setProjectModalOpen(true), []);
-
-  // Scenario & Model handlers
+  // Scenario & Model & Year handlers
   const handleRcpChange = (panelSetter, otherPanelSetter, value) => {
     panelSetter(prev => ({ ...prev, rcp: value }));
     if (lockScenario) {
@@ -98,6 +122,7 @@ const App = () => {
     setLockYear(newLock);
 
     if (newLock) {
+      // synchronize panel2 year to panel1 when enabling the lock
       setPanel2(prev => ({ ...prev, year: panel1.year }));
     }
   };
@@ -106,12 +131,7 @@ const App = () => {
     <Box className="App" sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       {/* Start Tutorial Button */}
       <Box sx={{ position: 'absolute', top: 30, left: 30, zIndex: 1500 }}>
-        <Button
-          variant="outlined"
-          onClick={() => setTutorialActive(true)}
-        >
-          Start Tutorial
-        </Button>
+        <Button variant="outlined" onClick={() => setTutorialActive(true)}>Start Tutorial</Button>
       </Box>
 
       {/* Tutorial Overlay */}
@@ -126,16 +146,11 @@ const App = () => {
         setTutorialStep={setTutorialStep}
       />
 
-      <ProjectExplanationModal
-        open={projectModalOpen}
-        onClose={() => setProjectModalOpen(false)}
-      />
+      <ProjectExplanationModal open={projectModalOpen} onClose={() => setProjectModalOpen(false)} />
 
       {/* Header */}
       <Box component="header" sx={{ backgroundColor: 'transparent', mt: 2, px: 4, position: 'relative', textAlign: 'center' }}>
-        <Typography variant="h1" sx={{ fontSize: '3.5rem', fontWeight: 'bold', color: "white" }}>
-          MAPMAKER
-        </Typography>
+        <Typography variant="h1" sx={{ fontSize: '3.5rem', fontWeight: 'bold', color: 'white' }}>MAPMAKER</Typography>
         <Typography variant="h6" sx={{ fontSize: '1.25rem', color: 'white', mt: 1 }}>
           MArine Plankton diversity bioindicator scenarios for policy MAKERs
         </Typography>
@@ -153,8 +168,17 @@ const App = () => {
         longText={infoModalText}
       />
 
-      <Box sx={{ flex: 1, display: 'flex', flexDirection: { xs: 'column', md: 'column', lg: 'row' }, gap: 1, px: 1 }}>
-        <Box sx={{ flex: 1, display: 'flex' }}>
+      <Box
+        sx={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: { xs: 'column', md: 'column', lg: 'row' },
+          gap: 1,
+          px: 1,
+          alignItems: 'stretch',
+        }}
+      >
+        <Box sx={{ flex: 1, minWidth: 0, width: '100%' }}>
           {/* Left DataPanel */}
           <DataPanel
             panel={panel1}
@@ -170,12 +194,7 @@ const App = () => {
           />
         </Box>
 
-        <Box sx={{
-          flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 1,
-        }}>
+        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 1, width: '100%' }}>
           {/* Collapsible title */}
           <Box
             sx={{
@@ -189,23 +208,12 @@ const App = () => {
               borderRadius: 2,
             }}
           >
-            <Typography
-              variant="h6"
-              sx={{
-                color: 'white',
-              }}
-            >
-              Control Panels
-            </Typography>
+            <Typography variant="h6" sx={{ color: 'white' }}>Control Panels</Typography>
             <IconButton
               onClick={() => setPanelsCollapsed(!panelsCollapsed)}
               sx={{
                 color: '#fff',
-                '&:hover': {
-                  color: '#4FC3F7',
-                  transform: 'scale(1.1)',
-                  transition: '0.2s',
-                },
+                '&:hover': { color: '#4FC3F7', transform: 'scale(1.1)', transition: '0.2s' },
               }}
             >
               {panelsCollapsed ? <ExpandMore /> : <ExpandLess />}
@@ -216,14 +224,12 @@ const App = () => {
           <Collapse in={!panelsCollapsed}>
             <Box
               sx={{
-                display: 'grid',
-                gridTemplateColumns: '1fr auto 1fr',
-                alignItems: 'start',
-                columnGap: 1,
+                display: 'flex',
+                flexDirection: { xs: 'column', md: 'column', lg: 'row' },
+                gap: 1,
+                alignItems: { xs: 'stretch', md: 'stretch', lg: 'flex-start' },
                 border: [4, 5].includes(tutorialStep) ? '4px solid #4FC3F7' : 'none',
-                boxShadow: [4, 5].includes(tutorialStep)
-                  ? '0 0 30px 10px rgba(79,195,247,0.6)'
-                  : 'none',
+                boxShadow: [4, 5].includes(tutorialStep) ? '0 0 30px 10px rgba(79,195,247,0.6)' : 'none',
                 animation: [4, 5].includes(tutorialStep) ? 'pulse 1.5s infinite' : 'none',
                 zIndex: [4, 5].includes(tutorialStep) ? 3000 : 'auto',
                 position: 'relative',
@@ -233,13 +239,13 @@ const App = () => {
               <Box sx={{ flex: 1, minWidth: 0 }}>
                 <ControlPanel
                   source={panel1.source}
-                  onSourceChange={(e) => setPanel1({ ...panel1, source: e.target.value })}
+                  onSourceChange={(e) => setPanel1(prev => ({ ...prev, source: e.target.value }))}
                   diversity={panel1.diversity}
-                  onDiversityChange={(e) => setPanel1({ ...panel1, diversity: e.target.value })}
+                  onDiversityChange={(e) => setPanel1(prev => ({ ...prev, diversity: e.target.value }))}
                   envParam={panel1.envParam}
-                  onEnvParamChange={(e) => setPanel1({ ...panel1, envParam: e.target.value })}
+                  onEnvParamChange={(e) => setPanel1(prev => ({ ...prev, envParam: e.target.value }))}
                   group={panel1.group}
-                  onGroupChange={(e) => setPanel1({ ...panel1, group: e.target.value })}
+                  onGroupChange={(e) => setPanel1(prev => ({ ...prev, group: e.target.value }))}
                   rcp={panel1.rcp}
                   onRcpChange={(e) => handleRcpChange(setPanel1, setPanel2, e.target.value)}
                   model={panel1.model}
@@ -253,27 +259,29 @@ const App = () => {
                   tutorialStep={tutorialStep}
                 />
               </Box>
+
               {/* Lock Icons */}
               <Box
                 sx={{
-                  display: 'grid',
-                  gridTemplateRows: 'repeat(4, auto)',
-                  rowGap: 3,
-                  justifyItems: 'center',
-                  pt: 8,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 3,
+                  mt: 8,
+                  py: { xs: 2, lg: 0 },
                 }}
               >
                 <Box />
                 <Box />
+
                 {/* Scenario lock */}
                 <Box
                   sx={{ cursor: 'pointer', '&:hover': { color: '#1976d2' }, display: 'flex', alignItems: 'center' }}
                   onClick={() => {
                     const newLock = !lockScenario;
                     setLockScenario(newLock);
-                    if (newLock) {
-                      setPanel2(prev => ({ ...prev, rcp: panel1.rcp }));
-                    }
+                    if (newLock) setPanel2(prev => ({ ...prev, rcp: panel1.rcp }));
                   }}
                 >
                   {lockScenario ? <Lock /> : <LockOpen />}
@@ -285,9 +293,7 @@ const App = () => {
                   onClick={() => {
                     const newLock = !lockModel;
                     setLockModel(newLock);
-                    if (newLock) {
-                      setPanel2(prev => ({ ...prev, model: panel1.model }));
-                    }
+                    if (newLock) setPanel2(prev => ({ ...prev, model: panel1.model }));
                   }}
                 >
                   {lockModel ? <Lock /> : <LockOpen />}
@@ -298,13 +304,13 @@ const App = () => {
               <Box sx={{ flex: 1, minWidth: 0 }}>
                 <ControlPanel
                   source={panel2.source}
-                  onSourceChange={(e) => setPanel2({ ...panel2, source: e.target.value })}
+                  onSourceChange={(e) => setPanel2(prev => ({ ...prev, source: e.target.value }))}
                   diversity={panel2.diversity}
-                  onDiversityChange={(e) => setPanel2({ ...panel2, diversity: e.target.value })}
+                  onDiversityChange={(e) => setPanel2(prev => ({ ...prev, diversity: e.target.value }))}
                   envParam={panel2.envParam}
-                  onEnvParamChange={(e) => setPanel2({ ...panel2, envParam: e.target.value })}
+                  onEnvParamChange={(e) => setPanel2(prev => ({ ...prev, envParam: e.target.value }))}
                   group={panel2.group}
-                  onGroupChange={(e) => setPanel2({ ...panel2, group: e.target.value })}
+                  onGroupChange={(e) => setPanel2(prev => ({ ...prev, group: e.target.value }))}
                   rcp={panel2.rcp}
                   onRcpChange={(e) => handleRcpChange(setPanel2, setPanel1, e.target.value)}
                   model={panel2.model}
@@ -315,29 +321,32 @@ const App = () => {
                   diversityIndices={diversityIndices}
                   environmentalParameters={environmentalParameters}
                   openInfoModal={openInfoModal}
+                  tutorialStep={tutorialStep}
                 />
               </Box>
             </Box>
           </Collapse>
-          <Box sx={{
-            border: [8].includes(tutorialStep) ? '4px solid #4FC3F7' : 'none',
-            boxShadow: [8].includes(tutorialStep)
-              ? '0 0 30px 10px rgba(79,195,247,0.6)'
-              : 'none',
-            animation: [8].includes(tutorialStep) ? 'pulse 1.5s infinite' : 'none',
-            position: 'relative',
-            zIndex: [8].includes(tutorialStep) ? 3000 : 'auto',
-          }}>
+
+          <Box
+            sx={{
+              border: [8].includes(tutorialStep) ? '4px solid #4FC3F7' : 'none',
+              boxShadow: [8].includes(tutorialStep) ? '0 0 30px 10px rgba(79,195,247,0.6)' : 'none',
+              animation: [8].includes(tutorialStep) ? 'pulse 1.5s infinite' : 'none',
+              position: 'relative',
+              zIndex: [8].includes(tutorialStep) ? 3000 : 'auto',
+            }}
+          >
             {/* Combined line plot */}
             <CombinedLinePlot
               point={selectedPoint}
+              average={panel1.average}
               leftSettings={{
                 source: panel1.source,
                 index: panel1.diversity,
                 group: panel1.group,
                 scenario: panel1.rcp,
                 model: panel1.model,
-                envParam: panel1.envParam
+                envParam: panel1.envParam,
               }}
               rightSettings={{
                 source: panel2.source,
@@ -345,7 +354,7 @@ const App = () => {
                 group: panel2.group,
                 scenario: panel2.rcp,
                 model: panel2.model,
-                envParam: panel2.envParam
+                envParam: panel2.envParam,
               }}
               startYear={2012}
               endYear={2100}
@@ -353,11 +362,11 @@ const App = () => {
           </Box>
         </Box>
 
-        <Box sx={{ flex: 1, display: 'flex' }}>
+        <Box sx={{ flex: 1, display: 'flex', width: '100%' }}>
           <DataPanel
             panel={panel2}
             setPanel={setPanel2}
-            tutorialStep={tutorialStep === 1 ? tutorialStep : null}
+            tutorialStep={tutorialStep}
             debouncedYear={debouncedYear2}
             debouncedUpdateYear={debouncedUpdateYear2}
             setSelectedPoint={setSelectedPoint}
@@ -368,7 +377,7 @@ const App = () => {
           />
         </Box>
       </Box>
-    </Box >
+    </Box>
   );
 };
 
