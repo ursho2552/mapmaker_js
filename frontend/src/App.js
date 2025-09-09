@@ -210,7 +210,7 @@ const App = () => {
               px: 2,
               py: 1,
               mb: 1,
-              borderRadius: 2,
+              borderRadius: 1,
             }}
           >
             <Typography variant="h6" sx={{ color: 'white' }}>Control Panels</Typography>
