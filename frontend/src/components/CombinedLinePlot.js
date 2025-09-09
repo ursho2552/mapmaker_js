@@ -4,7 +4,7 @@ import { Box, IconButton, Tooltip } from '@mui/material';
 import DownloadIcon from '@mui/icons-material/Download';
 import { nameToLabelMapping } from '../constants';
 
-const CombinedLinePlot = ({ point, leftSettings, rightSettings, startYear, endYear, averageValue }) => {
+const CombinedLinePlot = ({ point, leftSettings, rightSettings, startYear, endYear, zoomedArea }) => {
   const [leftData, setLeftData] = useState(null);
   const [rightData, setRightData] = useState(null);
   const [error, setError] = useState(null);
@@ -143,15 +143,6 @@ const CombinedLinePlot = ({ point, leftSettings, rightSettings, startYear, endYe
               yaxis: 'y2',
               showlegend: false,
             },
-            ...(averageValue != null ? [{
-              x: [startYear, endYear],
-              y: [averageValue, averageValue],
-              type: 'scatter',
-              mode: 'lines',
-              line: { color: 'blue', dash: 'dash' },
-              name: 'Zoomed Area Average',
-              yaxis: 'y',
-            }] : [])
           ]}
           layout={layout}
           config={{ displayModeBar: false }}
