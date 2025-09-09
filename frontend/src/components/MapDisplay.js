@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import Plot from 'react-plotly.js';
 import { nameToLabelMapping, mapGlobeTitleStyle, sequentialColors } from '../constants';
 import {
@@ -41,19 +41,20 @@ const MapDisplay = ({
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [colorscale, setColorscale] = useState(generateColorStops(sequentialColors));
+  const [zoomRange, setZoomRange] = useState(null);
+  const [zoomedAvg, setZoomedAvg] = useState(null);
 
-  // Memoized readable title
-  const fullTitle = useMemo(() => {
-    const readableIndex = nameToLabelMapping[index] || index;
-    const readableGroup = group ? ` and ${group}` : '';
-    return `${readableIndex}${readableGroup} predicted by ${scenario} on ${model} in ${year}`;
-  }, [index, group, scenario, model, year]);
+  // unique key per dataset -> tied to layout.uirevision so Plotly preserves user zoom
+  const uiRevisionKey = useMemo(
+    () => `${year}-${index}-${group ?? ''}-${scenario}-${model}`,
+    [year, index, group, scenario, model]
+  );
 
-  // Memoized colorbar ticks
-  const { tickvals, ticktext } = useMemo(() => {
-    if (minValue == null || maxValue == null || !colorscale.length) return { tickvals: [], ticktext: [] };
-    return generateColorbarTicks(minValue, maxValue, colorscale.length / 2);
-  }, [minValue, maxValue, colorscale]);
+  // clear zoom state when dataset changes (uirevision will reset the view but our state must follow)
+  useEffect(() => {
+    setZoomRange(null);
+    setZoomedAvg(null);
+  }, [uiRevisionKey]);
 
   // Fetch data
   useEffect(() => {
@@ -94,11 +95,16 @@ const MapDisplay = ({
     };
 
     fetchData();
-
     return () => controller.abort();
   }, [year, index, group, scenario, model, sourceType]);
 
-  // Memoized Plot data
+  // Memoized colorbar ticks
+  const { tickvals, ticktext } = useMemo(() => {
+    if (minValue == null || maxValue == null || !colorscale.length) return { tickvals: [], ticktext: [] };
+    return generateColorbarTicks(minValue, maxValue, colorscale.length / 2);
+  }, [minValue, maxValue, colorscale]);
+
+  // Memoized plot data (heatmap + optional marker)
   const plotData = useMemo(() => {
     const heatmap = {
       type: 'heatmap',
@@ -136,12 +142,26 @@ const MapDisplay = ({
     return [heatmap];
   }, [data, lons, lats, colorscale, minValue, maxValue, tickvals, ticktext, selectedPoint, index]);
 
-  const layout = {
+  // stable layout: includes uirevision and dragmode so zoom persists across re-renders
+  const layout = useMemo(() => ({
     margin: { l: 10, r: 0, t: 60, b: 10 },
     paper_bgcolor: 'rgba(18, 18, 18, 0.6)',
     plot_bgcolor: 'rgba(18, 18, 18, 0.6)',
-    xaxis: { showgrid: false, zeroline: false, visible: false, tickfont: { color: 'white' } },
-    yaxis: { showgrid: false, zeroline: false, visible: false, tickfont: { color: 'white' } },
+    autosize: true,
+    uirevision: uiRevisionKey,
+    dragmode: 'zoom',
+    xaxis: {
+      showgrid: false,
+      zeroline: false,
+      showticklabels: false,
+      tickfont: { color: 'white' }
+    },
+    yaxis: {
+      showgrid: false,
+      zeroline: false,
+      showticklabels: false,
+      tickfont: { color: 'white' }
+    },
     images: [
       {
         source: '//unpkg.com/three-globe/example/img/earth-water.png',
@@ -156,33 +176,109 @@ const MapDisplay = ({
         layer: 'below',
       },
     ],
+  }), [uiRevisionKey]);
+
+  // robust relayout parser (handles both "xaxis.range" arrays and "xaxis.range[0]" keys)
+  const parseRelayoutRanges = (eventData) => {
+    // case: xaxis.range as array
+    if (Array.isArray(eventData['xaxis.range']) && Array.isArray(eventData['yaxis.range'])) {
+      return { x: eventData['xaxis.range'], y: eventData['yaxis.range'] };
+    }
+
+    // case: indexed keys (Plotly sometimes emits these)
+    const x0 = eventData['xaxis.range[0]'];
+    const x1 = eventData['xaxis.range[1]'];
+    const y0 = eventData['yaxis.range[0]'];
+    const y1 = eventData['yaxis.range[1]'];
+    if (x0 !== undefined && x1 !== undefined && y0 !== undefined && y1 !== undefined) {
+      return { x: [x0, x1], y: [y0, y1] };
+    }
+
+    return null;
   };
+
+  // inside MapDisplay
+  const zoomResetRef = useRef(false);
+
+  const handleRelayout = (eventData) => {
+    if (eventData['xaxis.autorange'] || eventData['yaxis.autorange']) {
+      setZoomRange(null);
+      setZoomedAvg(null);
+
+      // flag to ignore click immediately after reset
+      zoomResetRef.current = true;
+      return;
+    }
+
+    const ranges = parseRelayoutRanges(eventData);
+    if (ranges) setZoomRange(ranges);
+  };
+
+  const handleClick = (evt) => {
+    if (!evt.points?.length) return;
+
+    // ignore clicks immediately after autorange reset
+    if (zoomResetRef.current) {
+      zoomResetRef.current = false;
+      return;
+    }
+
+    const { x, y } = evt.points[0];
+    onPointClick?.(x, y);
+  };
+
+  // recompute the average for the visible (zoomed) area
+  useEffect(() => {
+    if (!zoomRange || !Array.isArray(data) || data.length === 0) return;
+
+    const { x: [xMin, xMax], y: [yMin, yMax] } = zoomRange;
+    const values = [];
+
+    // iterate only rows/cols inside the lat/lon range
+    for (let i = 0; i < lats.length; i++) {
+      const lat = lats[i];
+      if (lat < yMin || lat > yMax) continue;
+      const row = data[i] || [];
+      for (let j = 0; j < lons.length; j++) {
+        const lon = lons[j];
+        if (lon < xMin || lon > xMax) continue;
+        const v = row[j];
+        if (typeof v === 'number' && !Number.isNaN(v)) values.push(v);
+      }
+    }
+
+    setZoomedAvg(values.length ? values.reduce((s, v) => s + v, 0) / values.length : null);
+  }, [zoomRange, data, lats, lons]);
+
+  const fullTitle = useMemo(() => {
+    const readableIndex = nameToLabelMapping[index] || index;
+    const readableGroup = group ? ` and ${group}` : '';
+    return `${readableIndex}${readableGroup} predicted by ${scenario} on ${model} in ${year}`;
+  }, [index, group, scenario, model, year]);
+
+  const handlePointClick = useCallback((evt) => {
+    if (!evt.points?.length) return;
+    const { x, y } = evt.points[0];
+    if (typeof onPointClick === 'function') onPointClick(x, y);
+  }, [onPointClick]);
 
   return (
     <div style={containerStyle}>
-
-      {/* Title */}
       <div style={mapGlobeTitleStyle}>{fullTitle}</div>
 
-      {/* Error / No Data */}
       {error && <div style={{ color: 'red' }}>{error}</div>}
       {!loading && !error && data.length === 0 && (
         <div style={{ color: 'gray' }}>No data available for this selection</div>
       )}
 
-      {/* Plot */}
       <div style={plotWrapperStyle}>
         <Plot
           data={plotData}
-          layout={{ ...layout, autosize: true }}
-          useResizeHandler={true}
+          layout={layout}
+          useResizeHandler
           style={{ width: '100%', height: '100%' }}
-          onClick={(evt) => {
-            if (evt.points?.length > 0) {
-              const { x, y } = evt.points[0];
-              onPointClick(x, y);
-            }
-          }}
+          onRelayout={handleRelayout}
+          onClick={handlePointClick}
           config={{
             displayModeBar: false,
             responsive: true,
@@ -191,6 +287,12 @@ const MapDisplay = ({
           }}
         />
       </div>
+
+      {zoomedAvg !== null && (
+        <div style={{ color: 'white', marginTop: '4px' }}>
+          Avg in zoomed area: {zoomedAvg.toFixed(2)}
+        </div>
+      )}
     </div>
   );
 };
