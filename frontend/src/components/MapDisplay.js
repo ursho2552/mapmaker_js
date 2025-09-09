@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Plot from 'react-plotly.js';
 import { nameToLabelMapping, mapGlobeTitleStyle, sequentialColors } from '../constants';
 import {
@@ -31,7 +31,7 @@ const MapDisplay = ({
   model,
   sourceType = 'plankton',
   onPointClick,
-  onAverageChange,
+  onZoomedAreaChange,
   selectedPoint,
 }) => {
   const [lats, setLats] = useState([]);
@@ -42,20 +42,16 @@ const MapDisplay = ({
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [colorscale, setColorscale] = useState(generateColorStops(sequentialColors));
-  const [zoomRange, setZoomRange] = useState(null);
-  const [zoomedAvg, setZoomedAvg] = useState(null);
 
-  // unique key per dataset -> tied to layout.uirevision so Plotly preserves user zoom
   const uiRevisionKey = useMemo(
     () => `${year}-${index}-${group ?? ''}-${scenario}-${model}`,
     [year, index, group, scenario, model]
   );
 
-  // clear zoom state when dataset changes (uirevision will reset the view but our state must follow)
+  // Reset zoom state when dataset changes
   useEffect(() => {
-    setZoomRange(null);
-    setZoomedAvg(null);
-  }, [uiRevisionKey]);
+    onZoomedAreaChange?.(null);
+  }, [uiRevisionKey, onZoomedAreaChange]);
 
   // Fetch data
   useEffect(() => {
@@ -65,10 +61,10 @@ const MapDisplay = ({
     const fetchData = async () => {
       setLoading(true);
       try {
-        const isEnv = sourceType === 'environmental';
-        const url = isEnv
-          ? `/api/globe-data?source=env&year=${year}&index=${index}&scenario=${scenario}&model=${model}`
-          : `/api/map-data?year=${year}&index=${index}&group=${group}&scenario=${scenario}&model=${model}`;
+        const url =
+          sourceType === 'environmental'
+            ? `/api/globe-data?source=env&year=${year}&index=${index}&scenario=${scenario}&model=${model}`
+            : `/api/map-data?year=${year}&index=${index}&group=${group}&scenario=${scenario}&model=${model}`;
 
         setColorscale(getColorscaleForIndex(index, scenario));
 
@@ -83,7 +79,6 @@ const MapDisplay = ({
         const [min, max] = getColorDomainForIndex(json.minValue, json.maxValue, index, scenario);
         setMinValue(min);
         setMaxValue(max);
-
         setError(null);
       } catch (err) {
         if (err.name !== 'AbortError') {
@@ -99,13 +94,13 @@ const MapDisplay = ({
     return () => controller.abort();
   }, [year, index, group, scenario, model, sourceType]);
 
-  // Memoized colorbar ticks
+  // Colorbar ticks
   const { tickvals, ticktext } = useMemo(() => {
     if (minValue == null || maxValue == null || !colorscale.length) return { tickvals: [], ticktext: [] };
     return generateColorbarTicks(minValue, maxValue, colorscale.length / 2);
   }, [minValue, maxValue, colorscale]);
 
-  // Memoized plot data (heatmap + optional marker)
+  // Plot data
   const plotData = useMemo(() => {
     const heatmap = {
       type: 'heatmap',
@@ -143,7 +138,7 @@ const MapDisplay = ({
     return [heatmap];
   }, [data, lons, lats, colorscale, minValue, maxValue, tickvals, ticktext, selectedPoint, index]);
 
-  // stable layout: includes uirevision and dragmode so zoom persists across re-renders
+  // Layout
   const layout = useMemo(() => ({
     margin: { l: 10, r: 0, t: 60, b: 10 },
     paper_bgcolor: 'rgba(18, 18, 18, 0.6)',
@@ -151,42 +146,16 @@ const MapDisplay = ({
     autosize: true,
     uirevision: uiRevisionKey,
     dragmode: 'zoom',
-    xaxis: {
-      showgrid: false,
-      zeroline: false,
-      showticklabels: false,
-      tickfont: { color: 'white' }
-    },
-    yaxis: {
-      showgrid: false,
-      zeroline: false,
-      showticklabels: false,
-      tickfont: { color: 'white' }
-    },
-    images: [
-      {
-        source: '//unpkg.com/three-globe/example/img/earth-water.png',
-        xref: 'x',
-        yref: 'y',
-        x: -180,
-        y: 90,
-        sizex: 360,
-        sizey: 180,
-        sizing: 'stretch',
-        opacity: 0.5,
-        layer: 'below',
-      },
-    ],
+    xaxis: { showgrid: false, zeroline: false, showticklabels: false, tickfont: { color: 'white' } },
+    yaxis: { showgrid: false, zeroline: false, showticklabels: false, tickfont: { color: 'white' } },
   }), [uiRevisionKey]);
 
-  // robust relayout parser (handles both "xaxis.range" arrays and "xaxis.range[0]" keys)
+  // Parse relayout event
   const parseRelayoutRanges = (eventData) => {
-    // case: xaxis.range as array
     if (Array.isArray(eventData['xaxis.range']) && Array.isArray(eventData['yaxis.range'])) {
       return { x: eventData['xaxis.range'], y: eventData['yaxis.range'] };
     }
 
-    // case: indexed keys (Plotly sometimes emits these)
     const x0 = eventData['xaxis.range[0]'];
     const x1 = eventData['xaxis.range[1]'];
     const y0 = eventData['yaxis.range[0]'];
@@ -194,51 +163,25 @@ const MapDisplay = ({
     if (x0 !== undefined && x1 !== undefined && y0 !== undefined && y1 !== undefined) {
       return { x: [x0, x1], y: [y0, y1] };
     }
-
     return null;
   };
 
-  // inside MapDisplay
-  const zoomResetRef = useRef(false);
-
+  // Handle zoom/relayout
   const handleRelayout = (eventData) => {
     if (eventData['xaxis.autorange'] || eventData['yaxis.autorange']) {
-      setZoomRange(null);
-      setZoomedAvg(null);
-      onAverageChange(null);
-
-      // flag to ignore click immediately after reset
-      zoomResetRef.current = true;
+      onZoomedAreaChange?.(null);
       return;
     }
 
     const ranges = parseRelayoutRanges(eventData);
-    if (ranges) setZoomRange(ranges);
+    if (ranges) onZoomedAreaChange?.(ranges);
   };
 
-  // recompute the average for the visible (zoomed) area
-  useEffect(() => {
-    if (!zoomRange || !Array.isArray(data) || data.length === 0) return;
-
-    const { x: [xMin, xMax], y: [yMin, yMax] } = zoomRange;
-    const values = [];
-
-    // iterate only rows/cols inside the lat/lon range
-    for (let i = 0; i < lats.length; i++) {
-      const lat = lats[i];
-      if (lat < yMin || lat > yMax) continue;
-      const row = data[i] || [];
-      for (let j = 0; j < lons.length; j++) {
-        const lon = lons[j];
-        if (lon < xMin || lon > xMax) continue;
-        const v = row[j];
-        if (typeof v === 'number' && !Number.isNaN(v)) values.push(v);
-      }
-    }
-    const average = values.length ? values.reduce((s, v) => s + v, 0) / values.length : null;
-    onAverageChange(average);
-    setZoomedAvg(average);
-  }, [zoomRange, data, lats, lons]);
+  const handlePointClick = useCallback((evt) => {
+    if (!evt.points?.length) return;
+    const { x, y } = evt.points[0];
+    onPointClick?.(x, y);
+  }, [onPointClick]);
 
   const fullTitle = useMemo(() => {
     const readableIndex = nameToLabelMapping[index] || index;
@@ -246,21 +189,11 @@ const MapDisplay = ({
     return `${readableIndex}${readableGroup} predicted by ${scenario} on ${model} in ${year}`;
   }, [index, group, scenario, model, year]);
 
-  const handlePointClick = useCallback((evt) => {
-    if (!evt.points?.length) return;
-    const { x, y } = evt.points[0];
-    if (typeof onPointClick === 'function') onPointClick(x, y);
-  }, [onPointClick]);
-
   return (
     <div style={containerStyle}>
       <div style={mapGlobeTitleStyle}>{fullTitle}</div>
-
       {error && <div style={{ color: 'red' }}>{error}</div>}
-      {!loading && !error && data.length === 0 && (
-        <div style={{ color: 'gray' }}>No data available for this selection</div>
-      )}
-
+      {!loading && !error && data.length === 0 && <div style={{ color: 'gray' }}>No data available for this selection</div>}
       <div style={plotWrapperStyle}>
         <Plot
           data={plotData}
@@ -269,20 +202,9 @@ const MapDisplay = ({
           style={{ width: '100%', height: '100%' }}
           onRelayout={handleRelayout}
           onClick={handlePointClick}
-          config={{
-            displayModeBar: false,
-            responsive: true,
-            displaylogo: false,
-            showTips: false,
-          }}
+          config={{ displayModeBar: false, responsive: true, displaylogo: false, showTips: false }}
         />
       </div>
-
-      {zoomedAvg !== null && (
-        <div style={{ color: 'white', marginTop: '4px' }}>
-          Avg in zoomed area: {zoomedAvg.toFixed(2)}
-        </div>
-      )}
     </div>
   );
 };
