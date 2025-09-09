@@ -30,8 +30,8 @@ const DataPanel = ({
                 p: 2,
                 backgroundColor: 'rgba(0, 0, 0, 0.25)',
                 borderRadius: 1,
-                flex: 1,
-                width: 500,
+                flex: '1 1 300px',
+                minWidth: 300,
                 display: 'flex',
                 flexDirection: 'column',
                 border: [1, 2, 3, 7].includes(tutorialStep) ? '4px solid #4FC3F7' : 'none',
@@ -43,7 +43,6 @@ const DataPanel = ({
                 zIndex: [1, 2, 3, 7].includes(tutorialStep) ? 3000 : 'auto',
             }}
         >
-
             {/* View Switch */}
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
                 <FormControl component="fieldset">

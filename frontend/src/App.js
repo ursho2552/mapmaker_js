@@ -170,15 +170,16 @@ const App = () => {
 
       <Box
         sx={{
-          flex: 1,
           display: 'flex',
-          flexDirection: { xs: 'column', md: 'column', lg: 'row' },
+          flexDirection: 'row',
           gap: 1,
           px: 1,
-          alignItems: 'stretch',
+          '@media (max-width: 1500px)': {
+            flexDirection: 'column',
+          },
         }}
       >
-        <Box sx={{ flex: 1, minWidth: 0, width: '100%' }}>
+        <Box sx={{ flex: '1 1 500px', minWidth: 500 }}>
           {/* Left DataPanel */}
           <DataPanel
             panel={panel1}
@@ -194,7 +195,7 @@ const App = () => {
           />
         </Box>
 
-        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 1, width: '100%' }}>
+        <Box sx={{ flex: '1 1 500px', minWidth: 500 }}>
           {/* Collapsible title */}
           <Box
             sx={{
@@ -205,6 +206,7 @@ const App = () => {
               backdropFilter: 'blur(8px)',
               px: 2,
               py: 1,
+              mb: 1,
               borderRadius: 2,
             }}
           >
@@ -219,24 +221,32 @@ const App = () => {
               {panelsCollapsed ? <ExpandMore /> : <ExpandLess />}
             </IconButton>
           </Box>
-
-          {/* Collapsible content */}
-          <Collapse in={!panelsCollapsed}>
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: { xs: 'column', md: 'column', lg: 'row' },
-                gap: 1,
-                alignItems: { xs: 'stretch', md: 'stretch', lg: 'flex-start' },
-                border: [4, 5].includes(tutorialStep) ? '4px solid #4FC3F7' : 'none',
-                boxShadow: [4, 5].includes(tutorialStep) ? '0 0 30px 10px rgba(79,195,247,0.6)' : 'none',
-                animation: [4, 5].includes(tutorialStep) ? 'pulse 1.5s infinite' : 'none',
-                zIndex: [4, 5].includes(tutorialStep) ? 3000 : 'auto',
-                position: 'relative',
-              }}
-            >
-              {/* Left Control Panel */}
-              <Box sx={{ flex: 1, minWidth: 0 }}>
+          <Box
+            sx={{
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 1,
+              minWidth: 0,
+            }}
+          >
+            {/* Collapsible content */}
+            <Collapse in={!panelsCollapsed}>
+              <Box
+                sx={{
+                  flex: '1 1 500px',
+                  minWidth: 500,
+                  display: 'flex',
+                  flexDirection: 'row',
+                  gap: 1,
+                  mb: 1,
+                  border: [4, 5].includes(tutorialStep) ? '4px solid #4FC3F7' : 'none',
+                  boxShadow: [4, 5].includes(tutorialStep) ? '0 0 30px 10px rgba(79,195,247,0.6)' : 'none',
+                  animation: [4, 5].includes(tutorialStep) ? 'pulse 1.5s infinite' : 'none',
+                  zIndex: [4, 5].includes(tutorialStep) ? 3000 : 'auto',
+                  position: 'relative',
+                }}
+              >
                 <ControlPanel
                   source={panel1.source}
                   onSourceChange={(e) => setPanel1(prev => ({ ...prev, source: e.target.value }))}
@@ -258,50 +268,44 @@ const App = () => {
                   openInfoModal={openInfoModal}
                   tutorialStep={tutorialStep}
                 />
-              </Box>
 
-              {/* Lock Icons */}
-              <Box
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 3,
-                  mt: 8,
-                  py: { xs: 2, lg: 0 },
-                }}
-              >
-                <Box />
-                <Box />
-
-                {/* Scenario lock */}
+                {/* Lock Icons */}
                 <Box
-                  sx={{ cursor: 'pointer', '&:hover': { color: '#1976d2' }, display: 'flex', alignItems: 'center' }}
-                  onClick={() => {
-                    const newLock = !lockScenario;
-                    setLockScenario(newLock);
-                    if (newLock) setPanel2(prev => ({ ...prev, rcp: panel1.rcp }));
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'start',
+                    gap: 3,
+                    mt: 14,
                   }}
                 >
-                  {lockScenario ? <Lock /> : <LockOpen />}
+                  {/* Scenario lock */}
+                  <Box
+                    sx={{ cursor: 'pointer', '&:hover': { color: '#1976d2' }, display: 'flex', alignItems: 'center' }}
+                    onClick={() => {
+                      const newLock = !lockScenario;
+                      setLockScenario(newLock);
+                      if (newLock) setPanel2(prev => ({ ...prev, rcp: panel1.rcp }));
+                    }}
+                  >
+                    {lockScenario ? <Lock /> : <LockOpen />}
+                  </Box>
+
+                  {/* Model lock */}
+                  <Box
+                    sx={{ cursor: 'pointer', '&:hover': { color: '#1976d2' }, display: 'flex', alignItems: 'center' }}
+                    onClick={() => {
+                      const newLock = !lockModel;
+                      setLockModel(newLock);
+                      if (newLock) setPanel2(prev => ({ ...prev, model: panel1.model }));
+                    }}
+                  >
+                    {lockModel ? <Lock /> : <LockOpen />}
+                  </Box>
                 </Box>
 
-                {/* Model lock */}
-                <Box
-                  sx={{ cursor: 'pointer', '&:hover': { color: '#1976d2' }, display: 'flex', alignItems: 'center' }}
-                  onClick={() => {
-                    const newLock = !lockModel;
-                    setLockModel(newLock);
-                    if (newLock) setPanel2(prev => ({ ...prev, model: panel1.model }));
-                  }}
-                >
-                  {lockModel ? <Lock /> : <LockOpen />}
-                </Box>
-              </Box>
-
-              {/* Right Control Panel */}
-              <Box sx={{ flex: 1, minWidth: 0 }}>
+                {/* Right Control Panel */}
                 <ControlPanel
                   source={panel2.source}
                   onSourceChange={(e) => setPanel2(prev => ({ ...prev, source: e.target.value }))}
@@ -324,11 +328,13 @@ const App = () => {
                   tutorialStep={tutorialStep}
                 />
               </Box>
-            </Box>
-          </Collapse>
+            </Collapse>
+          </Box>
 
           <Box
             sx={{
+              minWidth: 0,
+              flexShrink: 0,
               border: [8].includes(tutorialStep) ? '4px solid #4FC3F7' : 'none',
               boxShadow: [8].includes(tutorialStep) ? '0 0 30px 10px rgba(79,195,247,0.6)' : 'none',
               animation: [8].includes(tutorialStep) ? 'pulse 1.5s infinite' : 'none',
@@ -362,7 +368,7 @@ const App = () => {
           </Box>
         </Box>
 
-        <Box sx={{ flex: 1, display: 'flex', width: '100%' }}>
+        <Box sx={{ flex: '1 1 500px', minWidth: 500 }}>
           <DataPanel
             panel={panel2}
             setPanel={setPanel2}
