@@ -205,6 +205,7 @@ const MapDisplay = ({
     if (eventData['xaxis.autorange'] || eventData['yaxis.autorange']) {
       setZoomRange(null);
       setZoomedAvg(null);
+      onAverageChange(null);
 
       // flag to ignore click immediately after reset
       zoomResetRef.current = true;
