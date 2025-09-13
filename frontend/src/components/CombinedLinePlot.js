@@ -5,15 +5,17 @@ import DownloadIcon from '@mui/icons-material/Download';
 import { nameToLabelMapping } from '../constants';
 
 const CombinedLinePlot = ({ point, leftSettings, rightSettings, startYear, endYear, zoomedArea }) => {
+  console.log('Zoomed Area in CombinedLinePlot:', zoomedArea);
   const [leftData, setLeftData] = useState(null);
   const [rightData, setRightData] = useState(null);
   const [error, setError] = useState(null);
+  const [leftAreaData, setLeftAreaData] = useState(null);
 
   useEffect(() => {
     if (point.x == null || point.y == null) return;
     setError(null);
 
-    const buildUrl = (settings) =>
+    const buildPointUrl = (settings) =>
       `/api/line-data?x=${point.x}&y=${point.y}` +
       `&startYear=${startYear}&endYear=${endYear}` +
       `&index=${encodeURIComponent(settings.index)}` +
@@ -22,18 +24,33 @@ const CombinedLinePlot = ({ point, leftSettings, rightSettings, startYear, endYe
       `&model=${encodeURIComponent(settings.model)}` +
       `&envParam=${encodeURIComponent(settings.envParam)}`;
 
+    const buildAreaUrl = (settings) =>
+      `/api/line-data?xMin=${zoomedArea?.x[0]}&xMax=${zoomedArea?.x[1]}` +
+      `&yMin=${zoomedArea?.y[0]}&yMax=${zoomedArea?.y[1]}` +
+      `&startYear=${startYear}&endYear=${endYear}` +
+      `&index=${encodeURIComponent(settings.index)}` +
+      `&group=${encodeURIComponent(settings.group || '')}` +
+      `&scenario=${encodeURIComponent(settings.scenario)}` +
+      `&model=${encodeURIComponent(settings.model)}` +
+      `&envParam=${encodeURIComponent(settings.envParam)}`;
+
     Promise.all([
-      fetch(buildUrl(leftSettings)).then(r => r.json()),
-      fetch(buildUrl(rightSettings)).then(r => r.json()),
+      fetch(buildPointUrl(leftSettings)).then(r => r.json()),
+      fetch(buildPointUrl(rightSettings)).then(r => r.json()),
+      zoomedArea ? fetch(buildAreaUrl(leftSettings)).then(r => r.json()) : null,
     ])
-      .then(([d1, d2]) => {
+      .then(([d1, d2, a1]) => {
         const leftTrace = leftSettings.source === 'plankton' ? d1.data[0] : d1.data[1];
         const rightTrace = rightSettings.source === 'plankton' ? d2.data[0] : d2.data[1];
         setLeftData(leftTrace);
         setRightData(rightTrace);
+        if (a1) {
+          console.log('area a1', a1);
+          setLeftAreaData(leftSettings.source === 'plankton' ? a1.data[0] : a1.data[1]);
+        }
       })
       .catch(err => setError(err.toString()));
-  }, [point, leftSettings, rightSettings, startYear, endYear]);
+  }, [point, zoomedArea, leftSettings, rightSettings, startYear, endYear]);
 
   const handleDownload = () => {
     if (!leftData || !rightData) return;
@@ -143,6 +160,15 @@ const CombinedLinePlot = ({ point, leftSettings, rightSettings, startYear, endYe
               yaxis: 'y2',
               showlegend: false,
             },
+            // Area mean traces
+            ...(leftAreaData ? [{
+              x: leftAreaData.x,
+              y: leftAreaData.y,
+              type: 'scatter',
+              mode: 'lines',
+              line: { color: 'blue', dash: 'dot' },
+              name: `${leftName} (area mean)`,
+            }] : []),
           ]}
           layout={layout}
           config={{ displayModeBar: false }}

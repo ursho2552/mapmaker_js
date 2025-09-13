@@ -56,18 +56,39 @@ def read_netcdf(file_path: str, variable_name: str, year: int = None):
     return data
 
 
-def get_timeseries(file_path: str, variable_name: str, x: int, y: int,
-                    year_start: int = 2012, year_end: int = 2100,
-                    file_path_env: str = None, variable_name_env: str = None):
+def get_timeseries(
+    file_path: str,
+    variable_name: str,
+    x: float = None, y: float = None,
+    x_min: float = None, x_max: float = None,
+    y_min: float = None, y_max: float = None,
+    year_start: int = 2012, year_end: int = 2100,
+    file_path_env: str = None, variable_name_env: str = None
+):
     file_lock.acquire()
     try:
         with xr.open_dataset(file_path) as ds:
             variable = ds[variable_name]
-            data_at_point = variable.sel(lat=y, lon=x, method='nearest')
+
+            if x is not None and y is not None:
+                # Single point
+                data_series = variable.sel(lat=y, lon=x, method='nearest')
+            elif None not in (x_min, x_max, y_min, y_max):
+                if ds.lat.values[0] > ds.lat.values[-1]:
+                    lat_slice = slice(y_max, y_min)
+                else:
+                    lat_slice = slice(y_min, y_max)
+                # Area mean
+                data_series = variable.sel(
+                    lat=lat_slice,
+                    lon=slice(x_min, x_max)
+                ).mean(dim=["lat", "lon"])
+            else:
+                raise ValueError("Either (x,y) or (xMin,xMax,yMin,yMax) must be provided")
 
             year_start_index = year_start - 2012
             year_end_index = year_end - 2012 + 1
-            variable = data_at_point[year_start_index:year_end_index].compute()
+            variable = data_series[year_start_index:year_end_index].compute()
             variable = np.where(np.isnan(variable), None, variable.round(2))
 
             # Compute the trend line using linear regression
@@ -234,23 +255,42 @@ def get_map_data():
 @app.route('/api/line-data', methods=['GET'])
 def get_line_data():
 
+    # Area bounds (may be None if not provided)
+    x_min = request.args.get('xMin', type=float)
+    x_max = request.args.get('xMax', type=float)
+    y_min = request.args.get('yMin', type=float)
+    y_max = request.args.get('yMax', type=float)
+
+    # Single point (may be None if area is provided)
     x = request.args.get('x', type=float)
     y = request.args.get('y', type=float)
+
+    # Time range
     year_start = request.args.get('startYear', type=int)
     year_end = request.args.get('endYear', type=int)
 
-    index = request.args.get('index', type=str)  # Get the index parameter
+    # Data identifiers
+    index = request.args.get('index', type=str)
     group = request.args.get('group', type=str)
     scenario = request.args.get('scenario', type=str)
     model = request.args.get('model', type=str)
     env_parameter = request.args.get('envParam', type=str)
 
+    # Resolve file paths & variable names
     file_path, variable = get_file_and_variable(index, group, scenario, model)
     file_path_env, variable_env = get_environmental_data(env_parameter, scenario, model)
 
-    # Run the timeseries processing asynchronously
-    future = executor.submit(get_timeseries, file_path, variable, x, y, year_start, year_end, file_path_env, variable_env)
-    data = future.result()  # Wait for the result
+    # Run timeseries (handles point OR area)
+    future = executor.submit(
+        get_timeseries,
+        file_path, variable,
+        x=x, y=y,
+        x_min=x_min, x_max=x_max,
+        y_min=y_min, y_max=y_max,
+        year_start=year_start, year_end=year_end,
+        file_path_env=file_path_env, variable_name_env=variable_env
+    )
+    data = future.result()
 
     response = jsonify(data)
     response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
