@@ -230,18 +230,17 @@ const App = () => {
               display: 'flex',
               flexDirection: 'column',
               gap: 1,
-              minWidth: 0,
             }}
           >
             {/* Collapsible content */}
             <Collapse in={!panelsCollapsed}>
               <Box
                 sx={{
-                  flex: '1 1 500px',
-                  minWidth: 500,
                   display: 'flex',
                   flexDirection: 'row',
+                  flex: 1,
                   gap: 1,
+                  justifyContent: 'space-between',
                   mb: 1,
                   border: [4, 5].includes(tutorialStep) ? '4px solid #4FC3F7' : 'none',
                   boxShadow: [4, 5].includes(tutorialStep) ? '0 0 30px 10px rgba(79,195,247,0.6)' : 'none',
@@ -250,27 +249,29 @@ const App = () => {
                   position: 'relative',
                 }}
               >
-                <ControlPanel
-                  source={panel1.source}
-                  onSourceChange={(e) => setPanel1(prev => ({ ...prev, source: e.target.value }))}
-                  diversity={panel1.diversity}
-                  onDiversityChange={(e) => setPanel1(prev => ({ ...prev, diversity: e.target.value }))}
-                  envParam={panel1.envParam}
-                  onEnvParamChange={(e) => setPanel1(prev => ({ ...prev, envParam: e.target.value }))}
-                  group={panel1.group}
-                  onGroupChange={(e) => setPanel1(prev => ({ ...prev, group: e.target.value }))}
-                  rcp={panel1.rcp}
-                  onRcpChange={(e) => handleRcpChange(setPanel1, setPanel2, e.target.value)}
-                  model={panel1.model}
-                  onModelChange={(e) => handleModelChange(setPanel1, setPanel2, e.target.value)}
-                  filteredGroups={filterBiomes(panel1.diversity).groups}
-                  filteredScenarios={filterBiomes(panel1.diversity).rcp}
-                  filteredModels={filterBiomes(panel1.diversity).models}
-                  diversityIndices={diversityIndices}
-                  environmentalParameters={environmentalParameters}
-                  openInfoModal={openInfoModal}
-                  tutorialStep={tutorialStep}
-                />
+                <Box sx={{ flex: 1, minWidth: 200 }}>
+                  <ControlPanel
+                    source={panel1.source}
+                    onSourceChange={(e) => setPanel1(prev => ({ ...prev, source: e.target.value }))}
+                    diversity={panel1.diversity}
+                    onDiversityChange={(e) => setPanel1(prev => ({ ...prev, diversity: e.target.value }))}
+                    envParam={panel1.envParam}
+                    onEnvParamChange={(e) => setPanel1(prev => ({ ...prev, envParam: e.target.value }))}
+                    group={panel1.group}
+                    onGroupChange={(e) => setPanel1(prev => ({ ...prev, group: e.target.value }))}
+                    rcp={panel1.rcp}
+                    onRcpChange={(e) => handleRcpChange(setPanel1, setPanel2, e.target.value)}
+                    model={panel1.model}
+                    onModelChange={(e) => handleModelChange(setPanel1, setPanel2, e.target.value)}
+                    filteredGroups={filterBiomes(panel1.diversity).groups}
+                    filteredScenarios={filterBiomes(panel1.diversity).rcp}
+                    filteredModels={filterBiomes(panel1.diversity).models}
+                    diversityIndices={diversityIndices}
+                    environmentalParameters={environmentalParameters}
+                    openInfoModal={openInfoModal}
+                    tutorialStep={tutorialStep}
+                  />
+                </Box>
 
                 {/* Lock Icons */}
                 <Box
@@ -309,34 +310,35 @@ const App = () => {
                 </Box>
 
                 {/* Right Control Panel */}
-                <ControlPanel
-                  source={panel2.source}
-                  onSourceChange={(e) => setPanel2(prev => ({ ...prev, source: e.target.value }))}
-                  diversity={panel2.diversity}
-                  onDiversityChange={(e) => setPanel2(prev => ({ ...prev, diversity: e.target.value }))}
-                  envParam={panel2.envParam}
-                  onEnvParamChange={(e) => setPanel2(prev => ({ ...prev, envParam: e.target.value }))}
-                  group={panel2.group}
-                  onGroupChange={(e) => setPanel2(prev => ({ ...prev, group: e.target.value }))}
-                  rcp={panel2.rcp}
-                  onRcpChange={(e) => handleRcpChange(setPanel2, setPanel1, e.target.value)}
-                  model={panel2.model}
-                  onModelChange={(e) => handleModelChange(setPanel2, setPanel1, e.target.value)}
-                  filteredGroups={filterBiomes(panel2.diversity).groups}
-                  filteredScenarios={filterBiomes(panel2.diversity).rcp}
-                  filteredModels={filterBiomes(panel2.diversity).models}
-                  diversityIndices={diversityIndices}
-                  environmentalParameters={environmentalParameters}
-                  openInfoModal={openInfoModal}
-                  tutorialStep={tutorialStep === 6 ? null : tutorialStep}
-                />
+                <Box sx={{ flex: 1, minWidth: 200 }}>
+                  <ControlPanel
+                    source={panel2.source}
+                    onSourceChange={(e) => setPanel2(prev => ({ ...prev, source: e.target.value }))}
+                    diversity={panel2.diversity}
+                    onDiversityChange={(e) => setPanel2(prev => ({ ...prev, diversity: e.target.value }))}
+                    envParam={panel2.envParam}
+                    onEnvParamChange={(e) => setPanel2(prev => ({ ...prev, envParam: e.target.value }))}
+                    group={panel2.group}
+                    onGroupChange={(e) => setPanel2(prev => ({ ...prev, group: e.target.value }))}
+                    rcp={panel2.rcp}
+                    onRcpChange={(e) => handleRcpChange(setPanel2, setPanel1, e.target.value)}
+                    model={panel2.model}
+                    onModelChange={(e) => handleModelChange(setPanel2, setPanel1, e.target.value)}
+                    filteredGroups={filterBiomes(panel2.diversity).groups}
+                    filteredScenarios={filterBiomes(panel2.diversity).rcp}
+                    filteredModels={filterBiomes(panel2.diversity).models}
+                    diversityIndices={diversityIndices}
+                    environmentalParameters={environmentalParameters}
+                    openInfoModal={openInfoModal}
+                    tutorialStep={tutorialStep === 6 ? null : tutorialStep}
+                  />
+                </Box>
               </Box>
             </Collapse>
           </Box>
 
           <Box
             sx={{
-              minWidth: 0,
               flexShrink: 0,
               border: [8].includes(tutorialStep) ? '4px solid #4FC3F7' : 'none',
               boxShadow: [8].includes(tutorialStep) ? '0 0 30px 10px rgba(79,195,247,0.6)' : 'none',
