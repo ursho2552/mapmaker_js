@@ -1,6 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Plot from 'react-plotly.js';
-import { nameToLabelMapping, mapGlobeTitleStyle, sequentialColors } from '../constants';
+import {
+  nameToLabelMapping,
+  mapGlobeTitleStyle,
+  sequentialColors,
+} from '../constants';
 import {
   generateColorStops,
   generateColorbarTicks,
@@ -33,6 +37,7 @@ const MapDisplay = ({
   onPointClick,
   onZoomedAreaChange,
   selectedPoint,
+  selectedArea
 }) => {
   const [lats, setLats] = useState([]);
   const [lons, setLons] = useState([]);
@@ -42,16 +47,17 @@ const MapDisplay = ({
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [colorscale, setColorscale] = useState(generateColorStops(sequentialColors));
+  const [isZoomed, setIsZoomed] = useState(false);
 
   const uiRevisionKey = useMemo(
     () => `${year}-${index}-${group ?? ''}-${scenario}-${model}`,
     [year, index, group, scenario, model]
   );
 
-  // Reset zoom state when dataset changes
+  // Reset zoom when dataset changes
   useEffect(() => {
-    onZoomedAreaChange?.(null);
-  }, [uiRevisionKey, onZoomedAreaChange]);
+    setIsZoomed(false);
+  }, [uiRevisionKey]);
 
   // Fetch data
   useEffect(() => {
@@ -76,7 +82,12 @@ const MapDisplay = ({
         setLons(json.lons || []);
         setData(json.variable || []);
 
-        const [min, max] = getColorDomainForIndex(json.minValue, json.maxValue, index, scenario);
+        const [min, max] = getColorDomainForIndex(
+          json.minValue,
+          json.maxValue,
+          index,
+          scenario
+        );
         setMinValue(min);
         setMaxValue(max);
         setError(null);
@@ -96,7 +107,8 @@ const MapDisplay = ({
 
   // Colorbar ticks
   const { tickvals, ticktext } = useMemo(() => {
-    if (minValue == null || maxValue == null || !colorscale.length) return { tickvals: [], ticktext: [] };
+    if (minValue == null || maxValue == null || !colorscale.length)
+      return { tickvals: [], ticktext: [] };
     return generateColorbarTicks(minValue, maxValue, colorscale.length / 2);
   }, [minValue, maxValue, colorscale]);
 
@@ -120,7 +132,7 @@ const MapDisplay = ({
       },
     };
 
-    if (selectedPoint) {
+    if (!isZoomed && selectedPoint) {
       return [
         heatmap,
         {
@@ -136,32 +148,58 @@ const MapDisplay = ({
       ];
     }
     return [heatmap];
-  }, [data, lons, lats, colorscale, minValue, maxValue, tickvals, ticktext, selectedPoint, index]);
+  }, [
+    data,
+    lons,
+    lats,
+    colorscale,
+    minValue,
+    maxValue,
+    tickvals,
+    ticktext,
+    selectedPoint,
+    selectedArea,
+    index,
+    isZoomed,
+  ]);
 
   // Layout
-  const layout = useMemo(() => ({
-    margin: { l: 10, r: 0, t: 60, b: 10 },
-    paper_bgcolor: 'rgba(18, 18, 18, 0.6)',
-    plot_bgcolor: 'rgba(18, 18, 18, 0.6)',
-    autosize: true,
-    uirevision: uiRevisionKey,
-    dragmode: 'zoom',
-    xaxis: { showgrid: false, zeroline: false, showticklabels: false, tickfont: { color: 'white' } },
-    yaxis: { showgrid: false, zeroline: false, showticklabels: false, tickfont: { color: 'white' } },
-  }), [uiRevisionKey]);
+  const layout = useMemo(
+    () => ({
+      margin: { l: 10, r: 0, t: 60, b: 10 },
+      paper_bgcolor: 'rgba(18, 18, 18, 0.6)',
+      plot_bgcolor: 'rgba(18, 18, 18, 0.6)',
+      autosize: true,
+      uirevision: uiRevisionKey,
+      dragmode: 'zoom',
+      xaxis: {
+        showgrid: false,
+        zeroline: false,
+        showticklabels: false,
+        tickfont: { color: 'white' },
+      },
+      yaxis: {
+        showgrid: false,
+        zeroline: false,
+        showticklabels: false,
+        tickfont: { color: 'white' },
+      },
+    }),
+    [uiRevisionKey]
+  );
 
-  // Parse relayout event
+  // Parse relayout ranges
   const parseRelayoutRanges = (eventData) => {
-    if (Array.isArray(eventData['xaxis.range']) && Array.isArray(eventData['yaxis.range'])) {
-      return { x: eventData['xaxis.range'], y: eventData['yaxis.range'] };
-    }
-
-    const x0 = eventData['xaxis.range[0]'];
-    const x1 = eventData['xaxis.range[1]'];
-    const y0 = eventData['yaxis.range[0]'];
-    const y1 = eventData['yaxis.range[1]'];
-    if (x0 !== undefined && x1 !== undefined && y0 !== undefined && y1 !== undefined) {
-      return { x: [x0, x1], y: [y0, y1] };
+    const xr = eventData['xaxis.range'] || [
+      eventData['xaxis.range[0]'],
+      eventData['xaxis.range[1]'],
+    ];
+    const yr = eventData['yaxis.range'] || [
+      eventData['yaxis.range[0]'],
+      eventData['yaxis.range[1]'],
+    ];
+    if (xr?.[0] != null && xr?.[1] != null && yr?.[0] != null && yr?.[1] != null) {
+      return { x: xr, y: yr };
     }
     return null;
   };
@@ -169,19 +207,28 @@ const MapDisplay = ({
   // Handle zoom/relayout
   const handleRelayout = (eventData) => {
     if (eventData['xaxis.autorange'] || eventData['yaxis.autorange']) {
+      setIsZoomed(false);
       onZoomedAreaChange?.(null);
       return;
     }
 
     const ranges = parseRelayoutRanges(eventData);
-    if (ranges) onZoomedAreaChange?.(ranges);
+    if (ranges) {
+      setIsZoomed(true);
+      onZoomedAreaChange?.(ranges);
+    }
   };
 
-  const handlePointClick = useCallback((evt) => {
-    if (!evt.points?.length) return;
-    const { x, y } = evt.points[0];
-    onPointClick?.(x, y);
-  }, [onPointClick]);
+  // Handle point click only when not zoomed
+  const handlePointClick = useCallback(
+    (evt) => {
+      if (isZoomed) return;
+      if (!evt.points?.length) return;
+      const { x, y } = evt.points[0];
+      onPointClick?.(x, y);
+    },
+    [onPointClick, isZoomed]
+  );
 
   const fullTitle = useMemo(() => {
     const readableIndex = nameToLabelMapping[index] || index;
@@ -193,7 +240,11 @@ const MapDisplay = ({
     <div style={containerStyle}>
       <div style={mapGlobeTitleStyle}>{fullTitle}</div>
       {error && <div style={{ color: 'red' }}>{error}</div>}
-      {!loading && !error && data.length === 0 && <div style={{ color: 'gray' }}>No data available for this selection</div>}
+      {!loading && !error && data.length === 0 && (
+        <div style={{ color: 'gray' }}>
+          No data available for this selection
+        </div>
+      )}
       <div style={plotWrapperStyle}>
         <Plot
           data={plotData}
@@ -202,7 +253,12 @@ const MapDisplay = ({
           style={{ width: '100%', height: '100%' }}
           onRelayout={handleRelayout}
           onClick={handlePointClick}
-          config={{ displayModeBar: false, responsive: true, displaylogo: false, showTips: false }}
+          config={{
+            displayModeBar: false,
+            responsive: true,
+            displaylogo: false,
+            showTips: false,
+          }}
         />
       </div>
     </div>

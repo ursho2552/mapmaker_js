@@ -129,6 +129,9 @@ const App = () => {
     }
   };
 
+  console.log('selectedArea', area);
+  console.log('selectedPoint', selectedPoint);
+
   return (
     <Box className="App" sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       {/* Start Tutorial Button */}
@@ -192,6 +195,7 @@ const App = () => {
             setSelectedPoint={setSelectedPoint}
             setArea={setArea}
             selectedPoint={selectedPoint}
+            selectedArea={area}
             lockYear={lockYear}
             onYearChange={(y) => handleYearChange(setPanel1, setPanel2, y)}
             onLockToggle={handleYearLockToggle}
@@ -381,7 +385,9 @@ const App = () => {
             debouncedYear={debouncedYear2}
             debouncedUpdateYear={debouncedUpdateYear2}
             setSelectedPoint={setSelectedPoint}
+            setArea={setArea}
             selectedPoint={selectedPoint}
+            selectedArea={area}
             lockYear={lockYear}
             onYearChange={(y) => handleYearChange(setPanel2, setPanel1, y)}
             onLockToggle={handleYearLockToggle}

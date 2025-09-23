@@ -20,6 +20,7 @@ const DataPanel = ({
     setSelectedPoint,
     setArea,
     selectedPoint,
+    selectedArea,
     lockYear,
     onYearChange,
     onLockToggle,
@@ -110,6 +111,7 @@ const DataPanel = ({
                         onPointClick={(x, y) => setSelectedPoint({ x, y })}
                         onZoomedAreaChange={(area) => setArea(area)}
                         selectedPoint={selectedPoint}
+                        selectedArea={selectedArea}
                     />
                 )}
                 {panel.source === 'plankton' && panel.view === 'globe' && (
@@ -134,6 +136,7 @@ const DataPanel = ({
                         onPointClick={(x, y) => setSelectedPoint({ x, y })}
                         onZoomedAreaChange={(area) => setArea(area)}
                         selectedPoint={selectedPoint}
+                        selectedArea={selectedArea}
                     />
                 )}
                 {panel.source === 'environmental' && panel.view === 'globe' && (

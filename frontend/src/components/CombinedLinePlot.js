@@ -39,6 +39,7 @@ const CombinedLinePlot = ({
   const [leftData, setLeftData] = useState(null);
   const [rightData, setRightData] = useState(null);
   const [leftAreaData, setLeftAreaData] = useState(null);
+  const [rightAreaData, setRightAreaData] = useState(null);
   const [error, setError] = useState(null);
 
   // Fetch data
@@ -49,23 +50,26 @@ const CombinedLinePlot = ({
       try {
         setError(null);
 
-        const [leftRes, rightRes, areaRes] = await Promise.all([
+        const [leftRes, rightRes, leftAreaRes, rightAreaRes] = await Promise.all([
           fetch(buildUrl(leftSettings, point, startYear, endYear)).then((r) => r.json()),
           fetch(buildUrl(rightSettings, point, startYear, endYear)).then((r) => r.json()),
           zoomedArea
-            ? fetch(buildUrl(leftSettings, point, startYear, endYear, zoomedArea)).then((r) =>
-              r.json()
-            )
+            ? fetch(buildUrl(leftSettings, point, startYear, endYear, zoomedArea)).then((r) => r.json())
+            : null,
+          zoomedArea
+            ? fetch(buildUrl(rightSettings, point, startYear, endYear, zoomedArea)).then((r) => r.json())
             : null,
         ]);
 
         setLeftData(getTrace(leftRes, leftSettings.source));
         setRightData(getTrace(rightRes, rightSettings.source));
 
-        if (zoomedArea && areaRes) {
-          setLeftAreaData(getTrace(areaRes, leftSettings.source));
+        if (zoomedArea) {
+          setLeftAreaData(leftAreaRes ? getTrace(leftAreaRes, leftSettings.source) : null);
+          setRightAreaData(rightAreaRes ? getTrace(rightAreaRes, rightSettings.source) : null);
         } else {
           setLeftAreaData(null);
+          setRightAreaData(null);
         }
       } catch (err) {
         setError(err.message || 'Error fetching data');
@@ -102,45 +106,48 @@ const CombinedLinePlot = ({
 
   // Layout memoization
   const layout = useMemo(
-    () => ({
-      margin: { l: 70, r: 70, t: 50, b: 50, pad: 2 },
-      title: {
-        text: `${getName(leftSettings)} and ${getName(
-          rightSettings
-        )}<br>at ${point.x.toFixed(2)}°E, ${point.y.toFixed(2)}°N`,
-        font: { color: 'white' },
-      },
-      paper_bgcolor: 'rgba(18, 18, 18, 0.6)',
-      plot_bgcolor: 'rgba(18, 18, 18, 0.6)',
-      xaxis: {
-        title: { text: 'Year', font: { color: 'white' } },
-        tickfont: { color: 'white' },
-        linecolor: 'white',
-        tickcolor: 'white',
-        gridcolor: '#444',
-        zeroline: false,
-      },
-      yaxis: {
-        title: getName(leftSettings),
-        color: 'cyan',
-        showgrid: false,
-        zeroline: false,
-        linecolor: 'cyan',
-        tickcolor: 'cyan',
-      },
-      yaxis2: {
-        title: getName(rightSettings),
-        color: 'orange',
-        overlaying: 'y',
-        side: 'right',
-        showgrid: false,
-        linecolor: 'orange',
-        tickcolor: 'orange',
-        zeroline: false,
-      },
-      legend: { x: 0, y: 1, font: { color: 'white' } },
-    }),
-    [leftSettings, rightSettings, point]
+    () => {
+      const title = zoomedArea ?
+        `Zoomed Area Mean of<br> ${getName(leftSettings)} and ${getName(rightSettings)}` :
+        `${getName(leftSettings)} and ${getName(rightSettings)}<br> at ${point.x.toFixed(2)}°E, ${point.y.toFixed(2)}°N`;
+      return {
+        margin: { l: 70, r: 70, t: 70, b: 50, pad: 2 },
+        title: {
+          text: title,
+          font: { color: 'white' },
+        },
+        paper_bgcolor: 'rgba(18, 18, 18, 0.6)',
+        plot_bgcolor: 'rgba(18, 18, 18, 0.6)',
+        xaxis: {
+          title: { text: 'Year', font: { color: 'white' } },
+          tickfont: { color: 'white' },
+          linecolor: 'white',
+          tickcolor: 'white',
+          gridcolor: '#444',
+          zeroline: false,
+        },
+        yaxis: {
+          title: getName(leftSettings),
+          color: 'cyan',
+          showgrid: false,
+          zeroline: false,
+          linecolor: 'cyan',
+          tickcolor: 'cyan',
+        },
+        yaxis2: {
+          title: getName(rightSettings),
+          color: 'orange',
+          overlaying: 'y',
+          side: 'right',
+          showgrid: false,
+          linecolor: 'orange',
+          tickcolor: 'orange',
+          zeroline: false,
+        },
+        showlegend: false,
+      };
+    },
+    [leftSettings, rightSettings, point, zoomedArea]
   );
 
   // Render states
@@ -160,35 +167,49 @@ const CombinedLinePlot = ({
       <Box sx={{ position: 'relative' }}>
         <Plot
           data={[
-            {
-              x: leftData.x,
-              y: leftData.y,
-              type: 'scatter',
-              mode: 'lines+markers',
-              line: { color: 'cyan' },
-              showlegend: false,
-            },
-            {
-              x: rightData.x,
-              y: rightData.y,
-              type: 'scatter',
-              mode: 'lines+markers',
-              line: { color: 'orange' },
-              yaxis: 'y2',
-              showlegend: false,
-            },
-            ...(leftAreaData
+            // Left panel trace
+            ...(zoomedArea && leftAreaData
               ? [
                 {
                   x: leftAreaData.x,
                   y: leftAreaData.y,
                   type: 'scatter',
-                  mode: 'lines',
-                  line: { color: 'blue', dash: 'dot' },
-                  name: `${getName(leftSettings)} (area mean)`,
+                  mode: 'lines+markers',
+                  line: { color: 'cyan' },
                 },
               ]
-              : []),
+              : [
+                {
+                  x: leftData.x,
+                  y: leftData.y,
+                  type: 'scatter',
+                  mode: 'lines+markers',
+                  line: { color: 'cyan' },
+                },
+              ]),
+
+            // Right panel trace
+            ...(zoomedArea && rightAreaData
+              ? [
+                {
+                  x: rightAreaData.x,
+                  y: rightAreaData.y,
+                  type: 'scatter',
+                  mode: 'lines+markers',
+                  line: { color: 'orange' },
+                  yaxis: 'y2',
+                },
+              ]
+              : [
+                {
+                  x: rightData.x,
+                  y: rightData.y,
+                  type: 'scatter',
+                  mode: 'lines+markers',
+                  line: { color: 'orange' },
+                  yaxis: 'y2',
+                },
+              ]),
           ]}
           layout={layout}
           config={{ displayModeBar: false }}
