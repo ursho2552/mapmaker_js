@@ -25,7 +25,17 @@ function InfoModal({ open, onClose, title, shortText, longText, buttonText = 'Cl
     };
 
     return (
-        <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+        <Dialog
+            open={open}
+            onClose={onClose}
+            maxWidth="sm"
+            fullWidth
+            sx={{
+                '& .MuiPaper-root': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.85)',
+                    backdropFilter: 'blur(4px)',
+                }
+            }}>
             <DialogTitle>{title}</DialogTitle>
             <DialogContent dividers>
                 <Typography variant="body1" sx={{ whiteSpace: 'pre-line' }}>

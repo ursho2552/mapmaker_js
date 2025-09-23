@@ -4,7 +4,6 @@ import ReferencesButton from './components/ReferencesButton';
 import DataPanel from './components/DataPanel';
 import ControlPanel from './components/ControlPanel';
 import InfoModal from './components/InfoModal';
-import ProjectExplanationModal from './components/ProjectExplanationModal';
 import Tutorial from './components/Tutorial';
 import debounce from 'lodash/debounce';
 import './App.css';
@@ -17,6 +16,8 @@ import {
   earthModels,
   infoMessages,
   infoMessagesShort,
+  shortProjectDescription,
+  projectDescription,
 } from './constants';
 import { Lock, LockOpen, ExpandLess, ExpandMore } from '@mui/icons-material';
 
@@ -133,7 +134,10 @@ const App = () => {
     <Box className="App" sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       {/* Start Tutorial Button */}
       <Box sx={{ position: 'absolute', top: 30, left: 30, zIndex: 1500 }}>
-        <Button variant="outlined" onClick={() => setTutorialActive(true)}>Start Tutorial</Button>
+        <Button
+          variant="outlined"
+          color="white"
+          onClick={() => setTutorialActive(true)}>Start Tutorial</Button>
       </Box>
 
       {/* Tutorial Overlay */}
@@ -148,7 +152,14 @@ const App = () => {
         setTutorialStep={setTutorialStep}
       />
 
-      <ProjectExplanationModal open={projectModalOpen} onClose={() => setProjectModalOpen(false)} />
+      {/* Project Explanation Modal */}
+      <InfoModal
+        open={projectModalOpen}
+        onClose={() => setProjectModalOpen(false)}
+        title={"Welcome to MAPMAKER!"}
+        shortText={shortProjectDescription}
+        longText={projectDescription}
+      />
 
       {/* Header */}
       <Box component="header" sx={{ backgroundColor: 'transparent', mt: 2, px: 4, position: 'relative', textAlign: 'center' }}>
