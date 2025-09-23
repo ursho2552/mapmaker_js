@@ -129,9 +129,6 @@ const App = () => {
     }
   };
 
-  console.log('selectedArea', area);
-  console.log('selectedPoint', selectedPoint);
-
   return (
     <Box className="App" sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       {/* Start Tutorial Button */}
