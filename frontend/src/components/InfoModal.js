@@ -20,7 +20,8 @@ function InfoModal({
     shortText,
     longText,
     buttonText = 'Close',
-    onDontShowAgainChange
+    onDontShowAgainChange,
+    showDontShowAgain = false,
 }) {
     const [showFullText, setShowFullText] = useState(false);
     const [dontShowAgain, setDontShowAgain] = useState(false);
@@ -92,19 +93,21 @@ function InfoModal({
                     </Box>
                 )}
 
-                {/* Don't show again checkbox */}
-                <Box mt={3}>
-                    <FormControlLabel
-                        control={
-                            <Checkbox
-                                checked={dontShowAgain}
-                                onChange={handleCheckboxChange}
-                                color="primary"
-                            />
-                        }
-                        label="Don’t show this again"
-                    />
-                </Box>
+                {/* Optional Don't show again checkbox */}
+                {showDontShowAgain && (
+                    <Box mt={3}>
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    checked={dontShowAgain}
+                                    onChange={handleCheckboxChange}
+                                    color="primary"
+                                />
+                            }
+                            label="Don’t show this again"
+                        />
+                    </Box>
+                )}
             </DialogContent>
 
             <DialogActions>

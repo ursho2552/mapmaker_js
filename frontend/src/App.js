@@ -162,6 +162,7 @@ const App = () => {
         title={"Welcome to MAPMAKER!"}
         shortText={shortProjectDescription}
         longText={projectDescription}
+        showDontShowAgain={true}
       />
 
       {/* Header */}
