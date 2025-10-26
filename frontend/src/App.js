@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import CombinedLinePlot from './components/CombinedLinePlot';
 import ReferencesButton from './components/ReferencesButton';
 import DataPanel from './components/DataPanel';
+import Footer from './components/Footer';
 import ControlPanel from './components/ControlPanel';
 import InfoModal from './components/InfoModal';
 import Tutorial from './components/Tutorial';
@@ -135,14 +136,6 @@ const App = () => {
 
   return (
     <Box className="App" sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      {/* Start Tutorial Button */}
-      <Box sx={{ position: 'absolute', top: 30, left: 30, zIndex: 1500 }}>
-        <Button
-          variant="outlined"
-          color="white"
-          onClick={() => setTutorialActive(true)}>Start Tutorial</Button>
-      </Box>
-
       {/* Tutorial Overlay */}
       <Tutorial
         start={tutorialActive}
@@ -167,14 +160,21 @@ const App = () => {
 
       {/* Header */}
       <Box component="header" sx={{ backgroundColor: 'transparent', mt: 2, px: 4, position: 'relative', textAlign: 'center' }}>
+        {/* Start Tutorial Button */}
+        <Box sx={{ position: 'absolute', top: '30%', left: 16, zIndex: 1500, transform: 'translateY(-50%)' }}>
+          <Button
+            variant="outlined"
+            color="white"
+            onClick={() => setTutorialActive(true)}>Start Tutorial</Button>
+        </Box>
         <Typography variant="h1" sx={{ fontSize: '3.5rem', fontWeight: 'bold', color: 'white' }}>MAPMAKER</Typography>
         <Typography variant="h6" sx={{ fontSize: '1.25rem', color: 'white', mt: 1 }}>
           MArine Plankton diversity bioindicator scenarios for policy MAKERs
         </Typography>
-        <ReferencesButton sx={{ position: 'absolute', top: '30%', right: 16, transform: 'translateY(-50%)' }} />
+        <ReferencesButton />
       </Box>
 
-      <Divider sx={{ bgcolor: 'rgba(255,255,255,0.3)', mb: 2 }} />
+      <Divider sx={{ bgcolor: 'rgba(255,255,255,0.3)', mt: 1, mb: 2 }} />
 
       {/* Info Modal */}
       <InfoModal
@@ -410,6 +410,10 @@ const App = () => {
           />
         </Box>
       </Box>
+
+      <Divider sx={{ bgcolor: 'rgba(255,255,255,0.3)', my: 2 }} />
+
+      <Footer />
     </Box>
   );
 };

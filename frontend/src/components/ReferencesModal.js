@@ -8,7 +8,6 @@ import {
   Link,
   Button,
 } from '@mui/material';
-import Footer from './Footer';
 
 const ReferencesModal = ({ open, onClose }) => (
   <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
@@ -292,7 +291,6 @@ const ReferencesModal = ({ open, onClose }) => (
         Global Organization for Earth System Science Portals.
       </Typography>
 
-      <Footer />
     </DialogContent>
 
     <DialogActions>

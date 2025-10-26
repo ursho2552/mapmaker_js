@@ -266,27 +266,27 @@ export const infoMessages = {
 export const logos = [
     {
         alt: 'ETH Zurich',
-        src: '/assets/ETH_logo.png',
+        src: '/assets/ETH_logo_black.png',
         href: 'https://up.ethz.ch/research/ongoing-projects.html',
     },
     {
         alt: 'GSPI',
-        src: '/assets/GSPI_logo.png',
+        src: '/assets/GSPI_logo_black.png',
         href: 'https://gspi.ch/collaboration_projec/marine-plankton-diversity-bioindicator-scenarios-for-policy-makers-mapmaker/',
     },
     {
         alt: 'IUCN',
-        src: '/assets/IUCN_logo.png',
+        src: '/assets/IUCN_logo_black.png',
         href: 'https://www.iucn.org/theme/marine-and-polar',
     },
     {
         alt: 'CMIP5 Data Archive',
-        src: '/assets/CMIP5_Data_Archive_3.png',
+        src: '/assets/CMIP5_logo_black.png',
         href: 'https://esgf-node.llnl.gov/search/cmip5/',
     },
     {
         alt: 'Appsilon',
-        src: '/assets/Appsilon_logo.png',
+        src: '/assets/appsilon_logo_black.png',
         href: 'https://www.appsilon.com/',
     }
 ];
