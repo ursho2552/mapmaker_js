@@ -52,9 +52,23 @@ const DataPanel = ({
 
             {/* Year Slider */}
             <Box sx={{ mb: 1, px: 1 }}>
-                <Typography color="white" variant="subtitle2" gutterBottom>
-                    Year: {panel.year}
-                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, gap: 1 }}>
+                    <Typography color="white" variant="subtitle">
+                        Year: {panel.year}
+                    </Typography>
+                    <Box
+                        sx={{
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            color: 'white',
+                            '&:hover': { color: '#1976d2' },
+                        }}
+                        onClick={() => onLockToggle && onLockToggle()}
+                    >
+                        {lockYear ? <Lock /> : <LockOpen />}
+                    </Box>
+                </Box>
                 <MuiSlider
                     min={2012}
                     max={2100}

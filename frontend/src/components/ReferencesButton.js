@@ -14,14 +14,23 @@ const ReferencesButton = ({ sx, ...buttonProps }) => {
   const handleClose = () => setOpen(false);
 
   return (
-    <>
+    <Box sx={{
+      position: 'absolute',
+      top: '15%',
+      right: 16,
+      gap: 1,
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'flex-end',
+      flexWrap: 'wrap',
+    }}>
       <Button
         onClick={handleOpen}
         sx={{
           color: 'white',
           textTransform: 'none',
           p: 0,
-          fontSize: 16,
+          fontSize: 17,
           '&:hover': {
             backgroundColor: 'transparent',
             textDecoration: 'underline',
