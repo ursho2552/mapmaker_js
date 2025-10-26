@@ -108,8 +108,8 @@ const CombinedLinePlot = ({
   const layout = useMemo(
     () => {
       const title = zoomedArea ?
-        `Zoomed Area Mean of<br> ${getName(leftSettings)} and ${getName(rightSettings)}` :
-        `${getName(leftSettings)} and ${getName(rightSettings)}<br> at ${point.x.toFixed(2)}°E, ${point.y.toFixed(2)}°N`;
+        `Zoomed Area Mean of ${getName(leftSettings)}<br> and ${getName(rightSettings)}` :
+        `${getName(leftSettings)} and<br> ${getName(rightSettings)} at ${point.x.toFixed(2)}°E, ${point.y.toFixed(2)}°N`;
       return {
         margin: { l: 70, r: 70, t: 70, b: 50, pad: 2 },
         title: {
