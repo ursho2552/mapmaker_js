@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Button, Box } from '@mui/material';
 import ReferencesModal from './ReferencesModal';
-import Footer from './Footer';
 
 const ReferencesButton = ({ sx, ...buttonProps }) => {
   const [open, setOpen] = useState(false);
@@ -26,7 +25,7 @@ const ReferencesButton = ({ sx, ...buttonProps }) => {
           color: 'white',
           textTransform: 'none',
           p: 0,
-          fontSize: 16,
+          fontSize: 17,
           '&:hover': {
             backgroundColor: 'transparent',
             textDecoration: 'underline',

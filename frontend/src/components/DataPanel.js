@@ -69,8 +69,8 @@ const DataPanel = ({
 
             {/* Year Slider */}
             <Box sx={{ mb: 1, px: 1 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, px: 1, gap: 1 }}>
-                    <Typography color="white" variant="subtitle2">
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, gap: 1 }}>
+                    <Typography color="white" variant="subtitle">
                         Year: {panel.year}
                     </Typography>
                     <Box
