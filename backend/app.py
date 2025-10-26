@@ -83,6 +83,11 @@ def get_timeseries(
                     lat=lat_slice,
                     lon=slice(x_min, x_max)
                 ).mean(dim=["lat", "lon"])
+                # Area standard deviation
+                data_series_std = variable.sel(
+                    lat=lat_slice,
+                    lon=slice(x_min, x_max)
+                ).std(dim=["lat", "lon"])
             else:
                 raise ValueError("Either (x,y) or (xMin,xMax,yMin,yMax) must be provided")
 
@@ -90,6 +95,12 @@ def get_timeseries(
             year_end_index = year_end - 2012 + 1
             variable = data_series[year_start_index:year_end_index].compute()
             variable = np.where(np.isnan(variable), None, variable.round(2))
+
+            if 'data_series_std' in locals():
+                variable_std = data_series_std[year_start_index:year_end_index].compute()
+                variable_std = np.where(np.isnan(variable_std), None, variable_std.round(2))
+            else:
+                variable_std = np.zeros_like(variable)
 
             # Compute the trend line using linear regression
             years = np.arange(year_start, year_end + 1).astype(float)
@@ -151,7 +162,27 @@ def get_timeseries(
                     "mode": "lines",
                     "name": f"{variable_name_env} trend",
                     "line": {"dash": "dot", "color": "grey"}
-                }
+                },
+                {
+                    "type": "scatter",
+                    "x": years.tolist(),
+                    "y": (valid_data + variable_std).tolist(),
+                    "mode": "lines",
+                    "line": {"width": 0},
+                    "name": f"{variable_name} + std",
+                    "showlegend": False
+                },
+                {
+                    "type": "scatter",
+                    "x": years.tolist(),
+                    "y": (valid_data - variable_std).tolist(),
+                    "mode": "lines",
+                    "fill": "tonexty",
+                    "fillcolor": "rgba(255,255,255,0.2)",
+                    "line": {"width": 0},
+                    "name": f"{variable_name} - std",
+                    "showlegend": False
+                },
             ]
         }
     finally:
