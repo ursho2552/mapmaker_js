@@ -37,7 +37,8 @@ const MapDisplay = ({
   onPointClick,
   onZoomedAreaChange,
   selectedPoint,
-  selectedArea
+  selectedArea,
+  zoomedArea,
 }) => {
   const [lats, setLats] = useState([]);
   const [lons, setLons] = useState([]);
@@ -132,7 +133,7 @@ const MapDisplay = ({
       },
     };
 
-    if (!isZoomed && selectedPoint) {
+    if (selectedPoint) {
       return [
         heatmap,
         {
@@ -164,8 +165,8 @@ const MapDisplay = ({
   ]);
 
   // Layout
-  const layout = useMemo(
-    () => ({
+  const layout = useMemo(() => {
+    const baseLayout = {
       margin: { l: 10, r: 0, t: 60, b: 10 },
       paper_bgcolor: 'rgba(18, 18, 18, 0.6)',
       plot_bgcolor: 'rgba(18, 18, 18, 0.6)',
@@ -184,9 +185,20 @@ const MapDisplay = ({
         showticklabels: false,
         tickfont: { color: 'white' },
       },
-    }),
-    [uiRevisionKey]
-  );
+    };
+
+    if (zoomedArea?.x && zoomedArea?.y) {
+      baseLayout.xaxis.range = zoomedArea.x;
+      baseLayout.yaxis.range = zoomedArea.y;
+      baseLayout.xaxis.autorange = false;
+      baseLayout.yaxis.autorange = false;
+    } else {
+      baseLayout.xaxis.autorange = true;
+      baseLayout.yaxis.autorange = true;
+    }
+
+    return baseLayout;
+  }, [uiRevisionKey, zoomedArea]);
 
   // Parse relayout ranges
   const parseRelayoutRanges = (eventData) => {
@@ -215,19 +227,23 @@ const MapDisplay = ({
     const ranges = parseRelayoutRanges(eventData);
     if (ranges) {
       setIsZoomed(true);
-      onZoomedAreaChange?.(ranges);
+      onZoomedAreaChange?.(prev => {
+        if (JSON.stringify(prev) !== JSON.stringify(ranges)) {
+          return ranges;
+        }
+        return prev;
+      });
     }
   };
 
-  // Handle point click only when not zoomed
+  // Handle point click
   const handlePointClick = useCallback(
     (evt) => {
-      if (isZoomed) return;
       if (!evt.points?.length) return;
       const { x, y } = evt.points[0];
       onPointClick?.(x, y);
     },
-    [onPointClick, isZoomed]
+    [onPointClick]
   );
 
   const fullTitle = useMemo(() => {

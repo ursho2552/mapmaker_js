@@ -50,8 +50,8 @@ const App = () => {
   });
 
   const [selectedPoint, setSelectedPoint] = useState({ x: 0, y: 0 });
-
   const [area, setArea] = useState(null);
+  const [sharedZoom, setSharedZoom] = useState(null);
 
   // Panel states
   const [panel1, setPanel1] = useState(() => ({ ...initialPanel }));
@@ -210,6 +210,8 @@ const App = () => {
             lockYear={lockYear}
             onYearChange={(y) => handleYearChange(setPanel1, setPanel2, y)}
             onLockToggle={handleYearLockToggle}
+            sharedZoom={sharedZoom}
+            onSharedZoomChange={setSharedZoom}
           />
         </Box>
 
@@ -402,6 +404,8 @@ const App = () => {
             lockYear={lockYear}
             onYearChange={(y) => handleYearChange(setPanel2, setPanel1, y)}
             onLockToggle={handleYearLockToggle}
+            sharedZoom={sharedZoom}
+            onSharedZoomChange={setSharedZoom}
           />
         </Box>
       </Box>

@@ -24,6 +24,8 @@ const DataPanel = ({
     lockYear,
     onYearChange,
     onLockToggle,
+    sharedZoom,
+    onSharedZoomChange
 }) => {
 
     return (
@@ -109,9 +111,13 @@ const DataPanel = ({
                         model={panel.model}
                         sourceType="plankton"
                         onPointClick={(x, y) => setSelectedPoint({ x, y })}
-                        onZoomedAreaChange={(area) => setArea(area)}
                         selectedPoint={selectedPoint}
                         selectedArea={selectedArea}
+                        onZoomedAreaChange={(area) => {
+                            setArea(area);
+                            onSharedZoomChange?.(area);
+                        }}
+                        zoomedArea={sharedZoom}
                     />
                 )}
                 {panel.source === 'plankton' && panel.view === 'globe' && (
@@ -134,9 +140,13 @@ const DataPanel = ({
                         model={panel.model}
                         sourceType="environmental"
                         onPointClick={(x, y) => setSelectedPoint({ x, y })}
-                        onZoomedAreaChange={(area) => setArea(area)}
                         selectedPoint={selectedPoint}
                         selectedArea={selectedArea}
+                        onZoomedAreaChange={(area) => {
+                            setArea(area);
+                            onSharedZoomChange?.(area);
+                        }}
+                        zoomedArea={sharedZoom}
                     />
                 )}
                 {panel.source === 'environmental' && panel.view === 'globe' && (
