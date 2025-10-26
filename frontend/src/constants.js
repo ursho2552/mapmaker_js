@@ -45,7 +45,7 @@ export const tooltips = [
 
 // Colorbar label mapping
 export const nameToLabelMapping = {
-    'Biomes': 'Biome',
+    'Biomes': 'Biomes',
     'Species Richness': 'Species Richness [% species]',
     'Hotspots of Change in Diversity': 'Diversity changes [%]',
     'Habitat Suitability Index (HSI)': 'HSI [%]',

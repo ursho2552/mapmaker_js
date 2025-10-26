@@ -70,126 +70,113 @@ def get_timeseries(
         with xr.open_dataset(file_path) as ds:
             variable = ds[variable_name]
 
+            # --- Select data: single point or area mean ---
             if x is not None and y is not None:
-                # Single point
-                data_series = variable.sel(lat=y, lon=x, method='nearest')
+                # Single point selection
+                data_series = variable.sel(lat=y, lon=x, method="nearest")
+                data_series_std = None
             elif None not in (x_min, x_max, y_min, y_max):
+                # Area selection (mean and std)
                 if ds.lat.values[0] > ds.lat.values[-1]:
                     lat_slice = slice(y_max, y_min)
                 else:
                     lat_slice = slice(y_min, y_max)
-                # Area mean
+
                 data_series = variable.sel(
-                    lat=lat_slice,
-                    lon=slice(x_min, x_max)
+                    lat=lat_slice, lon=slice(x_min, x_max)
                 ).mean(dim=["lat", "lon"])
-                # Area standard deviation
                 data_series_std = variable.sel(
-                    lat=lat_slice,
-                    lon=slice(x_min, x_max)
+                    lat=lat_slice, lon=slice(x_min, x_max)
                 ).std(dim=["lat", "lon"])
             else:
-                raise ValueError("Either (x,y) or (xMin,xMax,yMin,yMax) must be provided")
+                raise ValueError("Either (x, y) or (xMin, xMax, yMin, yMax) must be provided")
 
+            # --- Year slicing ---
             year_start_index = year_start - 2012
             year_end_index = year_end - 2012 + 1
-            variable = data_series[year_start_index:year_end_index].compute()
-            variable = np.where(np.isnan(variable), None, variable.round(2))
+            years = np.arange(year_start, year_end + 1).astype(float)
 
-            if 'data_series_std' in locals():
+            # --- Main variable values ---
+            variable_vals = data_series[year_start_index:year_end_index].compute()
+            variable_vals = np.where(np.isnan(variable_vals), None, variable_vals.round(2))
+
+            # --- Standard deviation (if area) ---
+            if data_series_std is not None:
                 variable_std = data_series_std[year_start_index:year_end_index].compute()
                 variable_std = np.where(np.isnan(variable_std), None, variable_std.round(2))
             else:
-                variable_std = np.zeros_like(variable)
+                variable_std = np.zeros_like(variable_vals)
 
-            # Compute the trend line using linear regression
-            years = np.arange(year_start, year_end + 1).astype(float)
-            valid_data = np.array(variable)
-
-            if valid_data.tolist().count(None) == 0 and not 'biomes' in variable_name:
-                trend = np.polyfit(years, valid_data.astype(float), 1)  # 1st-degree polynomial (linear)
+            # --- Trend line ---
+            valid_data = np.array(variable_vals)
+            if valid_data.tolist().count(None) == 0 and "biomes" not in variable_name:
+                trend = np.polyfit(years, valid_data.astype(float), 1)
                 trend_line = np.polyval(trend, years).tolist()
             else:
                 trend_line = [None]
 
-        # Get the environmental data if available
+        # --- Environmental variable (optional) ---
+        variable_env = variable_env_std = trend_line_env = None
         if file_path_env is not None:
             with xr.open_dataset(file_path_env) as ds_env:
-                variable_env = ds_env[variable_name_env]
-                data_at_point_env = variable_env.sel(lat=y, lon=x, method='nearest')
+                variable_env_data = ds_env[variable_name_env]
 
-                variable_env = data_at_point_env[year_start_index:year_end_index].compute()
+                if x is not None and y is not None:
+                    # Single point
+                    data_series_env = variable_env_data.sel(lat=y, lon=x, method="nearest")
+                    data_series_env_std = None
+                else:
+                    # Area selection
+                    if ds_env.lat.values[0] > ds_env.lat.values[-1]:
+                        lat_slice_env = slice(y_max, y_min)
+                    else:
+                        lat_slice_env = slice(y_min, y_max)
+
+                    data_series_env = variable_env_data.sel(
+                        lat=lat_slice_env, lon=slice(x_min, x_max)
+                    ).mean(dim=["lat", "lon"])
+                    data_series_env_std = variable_env_data.sel(
+                        lat=lat_slice_env, lon=slice(x_min, x_max)
+                    ).std(dim=["lat", "lon"])
+
+                # --- Extract values ---
+                variable_env = data_series_env[year_start_index:year_end_index].compute()
                 variable_env = np.where(np.isnan(variable_env), None, variable_env.round(2))
 
-                valid_data_env = np.array(variable_env)
+                # --- Compute std if applicable ---
+                if data_series_env_std is not None:
+                    variable_env_std = data_series_env_std[year_start_index:year_end_index].compute()
+                    variable_env_std = np.where(np.isnan(variable_env_std), None, variable_env_std.round(2))
+                else:
+                    variable_env_std = np.zeros_like(variable_env)
 
+                # --- Compute trend line ---
+                valid_data_env = np.array(variable_env)
                 if valid_data_env.tolist().count(None) == 0:
                     trend_env = np.polyfit(years, valid_data_env.astype(float), 1)
                     trend_line_env = np.polyval(trend_env, years).tolist()
                 else:
                     trend_line_env = [None]
 
-        data = {
-            "data": [
-                {
-                    "type": "scatter",
-                    "x": years.tolist(),
-                    "y": valid_data.tolist(),
-                    "mode": "lines+markers",
-                    "name": variable_name,
-                    "line": {"color": "white"}
-                },
-                {
-                    "type": "scatter",
-                    "x": years.tolist(),
-                    "y": valid_data_env.tolist(),
-                    "mode": "lines+markers",
-                    "name": variable_name_env,
-                    "line": {"color": "grey"}
-                },
-                {
-                    "type": "scatter",
-                    "x": years.tolist(),
-                    "y": trend_line,
-                    "mode": "lines",
-                    "name": f"{variable_name} trend",
-                    "line": {"dash": "dot", "color": "white"}
-                },
-                {
-                    "type": "scatter",
-                    "x": years.tolist(),
-                    "y": trend_line_env,
-                    "mode": "lines",
-                    "name": f"{variable_name_env} trend",
-                    "line": {"dash": "dot", "color": "grey"}
-                },
-                {
-                    "type": "scatter",
-                    "x": years.tolist(),
-                    "y": (valid_data + variable_std).tolist(),
-                    "mode": "lines",
-                    "line": {"width": 0},
-                    "name": f"{variable_name} + std",
-                    "showlegend": False
-                },
-                {
-                    "type": "scatter",
-                    "x": years.tolist(),
-                    "y": (valid_data - variable_std).tolist(),
-                    "mode": "lines",
-                    "fill": "tonexty",
-                    "fillcolor": "rgba(255,255,255,0.2)",
-                    "line": {"width": 0},
-                    "name": f"{variable_name} - std",
-                    "showlegend": False
-                },
-            ]
+        # --- Return structured numeric result ---
+        return {
+            "years": years.tolist(),
+            "variable": {
+                "name": variable_name,
+                "values": valid_data.tolist(),
+                "std": variable_std.tolist(),
+                "trend": trend_line,
+            },
+            "environmental_variable": {
+                "name": variable_name_env,
+                "values": variable_env.tolist() if variable_env is not None else None,
+                "std": variable_env_std.tolist() if variable_env_std is not None else None,
+                "trend": trend_line_env,
+            },
         }
+
     finally:
         file_lock.release()
-
-    return data
-
 
 def get_environmental_data(env_parameter:str, scenario:str, model:str):
 
