@@ -8,20 +8,47 @@ import {
     Button,
     Box,
     Collapse,
-    Link
+    Link,
+    FormControlLabel,
+    Checkbox
 } from '@mui/material';
 
-function InfoModal({ open, onClose, title, shortText, longText, buttonText = 'Close' }) {
+function InfoModal({
+    open,
+    onClose,
+    title,
+    shortText,
+    longText,
+    buttonText = 'Close',
+    onDontShowAgainChange
+}) {
     const [showFullText, setShowFullText] = useState(false);
+    const [dontShowAgain, setDontShowAgain] = useState(false);
 
     useEffect(() => {
         if (open) {
             setShowFullText(false);
+            setDontShowAgain(false);
         }
     }, [open]);
 
-    const handleToggleExpand = () => {
-        setShowFullText(prev => !prev);
+    const handleToggleExpand = () => setShowFullText(prev => !prev);
+
+    const handleCheckboxChange = (event) => {
+        const checked = event.target.checked;
+        setDontShowAgain(checked);
+        if (onDontShowAgainChange) {
+            onDontShowAgainChange(checked);
+        }
+    };
+
+    const handleClose = () => {
+        if (dontShowAgain) {
+            localStorage.setItem('hideProjectExplanation', 'true');
+        } else {
+            localStorage.removeItem('hideProjectExplanation');
+        }
+        onClose();
     };
 
     return (
@@ -34,8 +61,9 @@ function InfoModal({ open, onClose, title, shortText, longText, buttonText = 'Cl
                 '& .MuiPaper-root': {
                     backgroundColor: 'rgba(255, 255, 255, 0.85)',
                     backdropFilter: 'blur(4px)',
-                }
-            }}>
+                },
+            }}
+        >
             <DialogTitle>{title}</DialogTitle>
             <DialogContent dividers>
                 <Typography variant="body1" sx={{ whiteSpace: 'pre-line' }}>
@@ -63,9 +91,24 @@ function InfoModal({ open, onClose, title, shortText, longText, buttonText = 'Cl
                         </Collapse>
                     </Box>
                 )}
+
+                {/* Don't show again checkbox */}
+                <Box mt={3}>
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={dontShowAgain}
+                                onChange={handleCheckboxChange}
+                                color="primary"
+                            />
+                        }
+                        label="Don’t show this again"
+                    />
+                </Box>
             </DialogContent>
+
             <DialogActions>
-                <Button onClick={onClose}>{buttonText}</Button>
+                <Button onClick={handleClose}>{buttonText}</Button>
             </DialogActions>
         </Dialog>
     );

@@ -44,7 +44,10 @@ const App = () => {
   const [infoModalText, setInfoModalText] = useState('');
   const [infoModalShortText, setInfoModalShortText] = useState('');
   const [infoModalTitle, setInfoModalTitle] = useState('');
-  const [projectModalOpen, setProjectModalOpen] = useState(true);
+  const [projectModalOpen, setProjectModalOpen] = useState(() => {
+    const hideModal = localStorage.getItem('hideProjectExplanation');
+    return !hideModal;
+  });
 
   const [selectedPoint, setSelectedPoint] = useState({ x: 0, y: 0 });
 
