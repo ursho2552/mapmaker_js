@@ -8,43 +8,26 @@ import {
     Radio,
     Slider as MuiSlider,
 } from '@mui/material';
-import { Lock, LockOpen } from '@mui/icons-material';
 import GlobeDisplay from './GlobeDisplay';
 import MapDisplay from './MapDisplay';
 
 const DataPanel = ({
     panel,
     setPanel,
-    tutorialStep,
     debouncedUpdateYear,
     setSelectedPoint,
-    setArea,
     selectedPoint,
-    selectedArea,
-    lockYear,
-    onYearChange,
-    onLockToggle,
-    sharedZoom,
-    onSharedZoomChange
 }) => {
-
     return (
-        <Box
-            sx={{
-                p: 2,
-                backgroundColor: 'rgba(0, 0, 0, 0.25)',
-                borderRadius: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                border: [1, 2, 3, 7].includes(tutorialStep) ? '4px solid #4FC3F7' : 'none',
-                boxShadow: [1, 2, 3, 7].includes(tutorialStep)
-                    ? '0 0 30px 10px rgba(79,195,247,0.6)'
-                    : 'none',
-                animation: [1, 2, 3, 7].includes(tutorialStep) ? 'pulse 1.5s infinite' : 'none',
-                position: 'relative',
-                zIndex: [1, 2, 3, 7].includes(tutorialStep) ? 3000 : 'auto',
-            }}
-        >
+        <Box sx={{
+            p: 2,
+            backgroundColor: 'rgba(0, 0, 0, 0.25)',
+            borderRadius: 1,
+            flex: 1,
+            width: 500,
+            display: 'flex',
+            flexDirection: 'column',
+        }}>
             {/* View Switch */}
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
                 <FormControl component="fieldset">
@@ -69,31 +52,16 @@ const DataPanel = ({
 
             {/* Year Slider */}
             <Box sx={{ mb: 1, px: 1 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, px: 1, gap: 1 }}>
-                    <Typography color="white" variant="subtitle2">
-                        Year: {panel.year}
-                    </Typography>
-                    <Box
-                        sx={{
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            color: 'white',
-                            '&:hover': { color: '#1976d2' },
-                        }}
-                        onClick={() => onLockToggle && onLockToggle()}
-                    >
-                        {lockYear ? <Lock /> : <LockOpen />}
-                    </Box>
-                </Box>
+                <Typography color="white" variant="subtitle2" gutterBottom>
+                    Year: {panel.year}
+                </Typography>
                 <MuiSlider
                     min={2012}
                     max={2100}
                     value={panel.year}
                     onChange={(e, v) => {
-                        setPanel(prev => ({ ...prev, year: v }));
+                        setPanel((prev) => ({ ...prev, year: v }));
                         debouncedUpdateYear(v);
-                        if (onYearChange) onYearChange(v);
                     }}
                     valueLabelDisplay="auto"
                     sx={{ color: '#1976d2' }}
@@ -112,12 +80,6 @@ const DataPanel = ({
                         sourceType="plankton"
                         onPointClick={(x, y) => setSelectedPoint({ x, y })}
                         selectedPoint={selectedPoint}
-                        selectedArea={selectedArea}
-                        onZoomedAreaChange={(area) => {
-                            setArea(area);
-                            onSharedZoomChange?.(area);
-                        }}
-                        zoomedArea={sharedZoom}
                     />
                 )}
                 {panel.source === 'plankton' && panel.view === 'globe' && (
@@ -141,12 +103,6 @@ const DataPanel = ({
                         sourceType="environmental"
                         onPointClick={(x, y) => setSelectedPoint({ x, y })}
                         selectedPoint={selectedPoint}
-                        selectedArea={selectedArea}
-                        onZoomedAreaChange={(area) => {
-                            setArea(area);
-                            onSharedZoomChange?.(area);
-                        }}
-                        zoomedArea={sharedZoom}
                     />
                 )}
                 {panel.source === 'environmental' && panel.view === 'globe' && (

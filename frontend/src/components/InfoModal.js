@@ -8,110 +8,52 @@ import {
     Button,
     Box,
     Collapse,
-    Link,
-    FormControlLabel,
-    Checkbox
+    Link
 } from '@mui/material';
 
-function InfoModal({
-    open,
-    onClose,
-    title,
-    shortText,
-    longText,
-    buttonText = 'Close',
-    onDontShowAgainChange,
-    showDontShowAgain = false,
-}) {
+function InfoModal({ open, onClose, title, shortText, longText }) {
     const [showFullText, setShowFullText] = useState(false);
-    const [dontShowAgain, setDontShowAgain] = useState(false);
 
     useEffect(() => {
         if (open) {
             setShowFullText(false);
-            setDontShowAgain(false);
         }
     }, [open]);
 
-    const handleToggleExpand = () => setShowFullText(prev => !prev);
-
-    const handleCheckboxChange = (event) => {
-        const checked = event.target.checked;
-        setDontShowAgain(checked);
-        if (onDontShowAgainChange) {
-            onDontShowAgainChange(checked);
-        }
-    };
-
-    const handleClose = () => {
-        if (dontShowAgain) {
-            localStorage.setItem('hideProjectExplanation', 'true');
-        } else {
-            localStorage.removeItem('hideProjectExplanation');
-        }
-        onClose();
+    const handleToggleExpand = () => {
+        setShowFullText(prev => !prev);
     };
 
     return (
-        <Dialog
-            open={open}
-            onClose={onClose}
-            maxWidth="sm"
-            fullWidth
-            sx={{
-                '& .MuiPaper-root': {
-                    backgroundColor: 'rgba(255, 255, 255, 0.85)',
-                    backdropFilter: 'blur(4px)',
-                },
-            }}
-        >
+        <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
             <DialogTitle>{title}</DialogTitle>
             <DialogContent dividers>
                 <Typography variant="body1" sx={{ whiteSpace: 'pre-line' }}>
                     {shortText}
                 </Typography>
 
-                {longText && (
-                    <Box mt={2}>
-                        <Link
-                            component="button"
-                            variant="body2"
-                            underline="hover"
-                            onClick={handleToggleExpand}
-                            sx={{ color: 'primary.main', fontWeight: 500 }}
-                        >
-                            {showFullText ? 'Show Less' : 'Learn More'}
-                        </Link>
+                <Box mt={2}>
+                    <Link
+                        component="button"
+                        variant="body2"
+                        underline="hover"
+                        onClick={handleToggleExpand}
+                        sx={{ color: 'primary.main', fontWeight: 500 }}
+                    >
+                        {showFullText ? 'Show Less' : 'Learn More'}
+                    </Link>
 
-                        <Collapse in={showFullText}>
-                            <Box mt={2}>
-                                <Typography variant="body2" sx={{ whiteSpace: 'pre-line' }}>
-                                    {longText}
-                                </Typography>
-                            </Box>
-                        </Collapse>
-                    </Box>
-                )}
-
-                {/* Optional Don't show again checkbox */}
-                {showDontShowAgain && (
-                    <Box mt={3}>
-                        <FormControlLabel
-                            control={
-                                <Checkbox
-                                    checked={dontShowAgain}
-                                    onChange={handleCheckboxChange}
-                                    color="primary"
-                                />
-                            }
-                            label="Don’t show this again"
-                        />
-                    </Box>
-                )}
+                    <Collapse in={showFullText}>
+                        <Box mt={2}>
+                            <Typography variant="body2" sx={{ whiteSpace: 'pre-line' }}>
+                                {longText}
+                            </Typography>
+                        </Box>
+                    </Collapse>
+                </Box>
             </DialogContent>
-
             <DialogActions>
-                <Button onClick={handleClose}>{buttonText}</Button>
+                <Button onClick={onClose}>Close</Button>
             </DialogActions>
         </Dialog>
     );

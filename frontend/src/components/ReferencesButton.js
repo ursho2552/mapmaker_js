@@ -1,7 +1,11 @@
+/**
+ * Usage (inside the header):
+ *   <ReferencesButton sx={{ position: 'absolute', top: '50%', right: 16,
+ *                           transform: 'translateY(-50%)' }} />
+ */
 import React, { useState } from 'react';
-import { Button, Box } from '@mui/material';
+import { Button } from '@mui/material';
 import ReferencesModal from './ReferencesModal';
-import Footer from './Footer';
 
 const ReferencesButton = ({ sx, ...buttonProps }) => {
   const [open, setOpen] = useState(false);
@@ -10,16 +14,7 @@ const ReferencesButton = ({ sx, ...buttonProps }) => {
   const handleClose = () => setOpen(false);
 
   return (
-    <Box sx={{
-      position: 'absolute',
-      top: '10%',
-      right: 16,
-      gap: 1,
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'flex-end',
-      flexWrap: 'wrap',
-    }}>
+    <>
       <Button
         onClick={handleOpen}
         sx={{
@@ -37,8 +32,9 @@ const ReferencesButton = ({ sx, ...buttonProps }) => {
       >
         References&nbsp;&amp;&nbsp;Data&nbsp;Courtesy
       </Button>
+
       <ReferencesModal open={open} onClose={handleClose} />
-    </Box>
+    </>
   );
 };
 

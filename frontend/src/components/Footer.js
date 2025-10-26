@@ -6,50 +6,59 @@ import { logos } from '../constants';
 const Footer = () => {
   return (
     <Box
+      component="footer"
       sx={{
-        display: 'flex',
-        gap: 1,
-        flexWrap: 'wrap',
-        justifyContent: 'center',
+        backgroundColor: 'transparent',
+        mt: 1,
         mb: 1,
+        textAlign: 'center',
       }}
     >
-      {logos.map((logo) => (
-        <Paper
-          key={logo.alt}
-          component="a"
-          href={logo.href}
-          target="_blank"
-          rel="noopener noreferrer"
-          elevation={2}
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: 200,
-            height: 70,
-            backgroundColor: 'rgba(0, 0, 0, 0.25)',
-            borderRadius: 1,
-            textDecoration: 'none',
-            transition: 'box-shadow 0.2s ease-in-out',
-            '&:hover': {
-              boxShadow: (theme) => theme.shadows[6],
-              backgroundColor: alpha('#000000', 0.03),
-            },
-          }}
-        >
-          <Box
-            component="img"
-            src={logo.src}
-            alt={logo.alt}
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          gap: 2,
+          flexWrap: 'wrap',
+        }}
+      >
+        {logos.map((logo) => (
+          <Paper
+            key={logo.alt}
+            component="a"
+            href={logo.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            elevation={2}
             sx={{
-              maxHeight: '65px',
-              maxWidth: '190px',
-              objectFit: 'contain',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 180,
+              height: 80,
+              backgroundColor: '#f9f9f9',
+              borderRadius: 2,
+              textDecoration: 'none',
+              transition: 'box-shadow 0.2s ease-in-out',
+              '&:hover': {
+                boxShadow: (theme) => theme.shadows[6],
+                backgroundColor: alpha('#000000', 0.03),
+              },
             }}
-          />
-        </Paper>
-      ))}
+          >
+            <Box
+              component="img"
+              src={logo.src}
+              alt={logo.alt}
+              sx={{
+                maxHeight: '60px',
+                maxWidth: '160px',
+                objectFit: 'contain',
+              }}
+            />
+          </Paper>
+        ))}
+      </Box>
     </Box>
   );
 };
