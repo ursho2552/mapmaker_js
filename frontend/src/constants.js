@@ -1,6 +1,51 @@
+// Tutorial steps
+export const tooltips = [
+    null, // Step 0: Welcome modal
+    { // Step 1
+        text: "You can compare different scenarios, models, and datasets side by side.",
+        top: "30%",
+        left: "50%",
+    },
+    { // Step 2
+        text: "Each data panel allows you to switch between a flat map and a 3D globe for convenience.",
+        top: "30%",
+        left: "25%",
+    },
+    { // Step 3
+        text: "Use the year slider to visualize changes over time.",
+        top: "35%",
+        left: "16%",
+    },
+    { // Step 4
+        text: "Each panel has a corresponding control panel, where you can select the scenario, model, and other parameters to display.",
+        top: "60%",
+        left: "50%",
+    },
+    { // Step 5
+        text: "Use locks to sync or separate panels. By default, the left and right data panels are synchronized, meaning the year, scenario, and model are linked. You can unlock these parameters individually if you want to compare different settings.",
+        top: "65%",
+        left: "50%",
+    },
+    { // Step 6
+        text: "For any parameter, click on the info icons to learn more about its meaning and source.",
+        top: "60%",
+        left: "40%",
+    },
+    { // Step 7
+        text: "You can select any point on the map or globe to explore how parameters evolve over time.",
+        top: "75%",
+        left: "17%",
+    },
+    { // Step 8
+        text: "Observe the time series for the selected point.",
+        top: "43%",
+        left: "50%",
+    }
+];
+
 // Colorbar label mapping
 export const nameToLabelMapping = {
-    'Biomes': 'Biome',
+    'Biomes': 'Biomes',
     'Species Richness': 'Species Richness [% species]',
     'Hotspots of Change in Diversity': 'Diversity changes [%]',
     'Habitat Suitability Index (HSI)': 'HSI [%]',
@@ -89,6 +134,8 @@ export const environmentalParameters = [
     'Change in Temperature',
     'Chlorophyll-a Concentration',
 ];
+
+export const shortProjectDescription = "Marine plankton biodiversity is essential for ocean productivity, climate regulation, and biogeochemical cycles, but climate change threatens these critical ecosystem services. The MArine Plankton diversity bioindicator scenarios for policy MAKERs project mapped 859 plankton species, defined ocean biomes, projected biodiversity changes, and identified hotspots using observational data and machine learning. An interactive web tool visualizes these findings, helping policymakers incorporate plankton diversity into global marine management decisions.";
 
 export const projectDescription = "Global marine biodiversity supplies essential ecosystem services to human societies. Marine plankton ecosystems fuel ocean productivity, drive global biogeochemical cycles and regulate the Earth's climate. Climate-mediated loss of biodiversity has been suggested to negatively impact ocean ecosystem services, but future projections of climate change impacts on biodiversity and ecosystem function are poorly constrained due to a lack of observational data. Hence, policy makers lack quantitative evidence on the vulnerability of marine ecosystems. The MArine Plankton diversity bioindicator scenarios for policy MAKERs project is a collaboration between IUCN Global Marine and Polar Programme and ETH Environmental Physics Group (UP) to inform data-driven decision-making on marine biodiversity protection at the international policy level and was financed through the Geneva Science Policy Interface (GSPI). Based on observational data and novel machine learning algorithms we have mapped the biogeography of 859 plankton species. We defined ocean biomes, projected future changes in biodiversity and identified hotspots of diversity change. The interactive web tool for policy makers visualizes the results on a global map and is the first step in narrowing the gap between science and policy makers in regard to plankton diversity and their impact on ecosystem functions to be incorporated in marine management decisions.";
 
@@ -219,27 +266,27 @@ export const infoMessages = {
 export const logos = [
     {
         alt: 'ETH Zurich',
-        src: '/assets/ETH_logo.png',
+        src: '/assets/ETH_logo_black.png',
         href: 'https://up.ethz.ch/research/ongoing-projects.html',
     },
     {
         alt: 'GSPI',
-        src: '/assets/GSPI_logo.png',
+        src: '/assets/GSPI_logo_black.png',
         href: 'https://gspi.ch/collaboration_projec/marine-plankton-diversity-bioindicator-scenarios-for-policy-makers-mapmaker/',
     },
     {
         alt: 'IUCN',
-        src: '/assets/IUCN_logo.png',
+        src: '/assets/IUCN_logo_black.png',
         href: 'https://www.iucn.org/theme/marine-and-polar',
     },
     {
         alt: 'CMIP5 Data Archive',
-        src: '/assets/CMIP5_Data_Archive_3.png',
+        src: '/assets/CMIP5_logo_black.png',
         href: 'https://esgf-node.llnl.gov/search/cmip5/',
     },
     {
         alt: 'Appsilon',
-        src: '/assets/Appsilon_logo.png',
+        src: '/assets/appsilon_logo_black.png',
         href: 'https://www.appsilon.com/',
     }
 ];

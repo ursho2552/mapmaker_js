@@ -1,7 +1,3 @@
-/**
- * Usage:
- *   <ReferencesModal open={open} onClose={handleClose} />
- */
 import React from 'react';
 import {
   Dialog,
@@ -294,6 +290,7 @@ const ReferencesModal = ({ open, onClose }) => (
         led development of software infrastructure in partnership with the
         Global Organization for Earth System Science Portals.
       </Typography>
+
     </DialogContent>
 
     <DialogActions>
