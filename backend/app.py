@@ -70,7 +70,7 @@ def get_timeseries(
         with xr.open_dataset(file_path) as ds:
             variable = ds[variable_name]
 
-            # --- Select data: single point or area mean ---
+            # Select data: single point or area mean
             if x is not None and y is not None:
                 # Single point selection
                 data_series = variable.sel(lat=y, lon=x, method="nearest")
@@ -91,23 +91,24 @@ def get_timeseries(
             else:
                 raise ValueError("Either (x, y) or (xMin, xMax, yMin, yMax) must be provided")
 
-            # --- Year slicing ---
+            # Year slicing
             year_start_index = year_start - 2012
             year_end_index = year_end - 2012 + 1
             years = np.arange(year_start, year_end + 1).astype(float)
 
-            # --- Main variable values ---
+            # Main variable values
             variable_vals = data_series[year_start_index:year_end_index].compute()
             variable_vals = np.where(np.isnan(variable_vals), None, variable_vals.round(2))
 
-            # --- Standard deviation (if area) ---
+            # Standard deviation (if area)
             if data_series_std is not None:
                 variable_std = data_series_std[year_start_index:year_end_index].compute()
                 variable_std = np.where(np.isnan(variable_std), None, variable_std.round(2))
+                variable_std /= len(variable_vals) ** 0.5
             else:
                 variable_std = np.zeros_like(variable_vals)
 
-            # --- Trend line ---
+            # Trend line
             valid_data = np.array(variable_vals)
             if valid_data.tolist().count(None) == 0 and "biomes" not in variable_name:
                 trend = np.polyfit(years, valid_data.astype(float), 1)
@@ -115,7 +116,7 @@ def get_timeseries(
             else:
                 trend_line = [None]
 
-        # --- Environmental variable (optional) ---
+        # Environmental variable
         variable_env = variable_env_std = trend_line_env = None
         if file_path_env is not None:
             with xr.open_dataset(file_path_env) as ds_env:
@@ -139,18 +140,19 @@ def get_timeseries(
                         lat=lat_slice_env, lon=slice(x_min, x_max)
                     ).std(dim=["lat", "lon"])
 
-                # --- Extract values ---
+                # Extract values
                 variable_env = data_series_env[year_start_index:year_end_index].compute()
                 variable_env = np.where(np.isnan(variable_env), None, variable_env.round(2))
 
-                # --- Compute std if applicable ---
+                # Compute std if applicable
                 if data_series_env_std is not None:
                     variable_env_std = data_series_env_std[year_start_index:year_end_index].compute()
                     variable_env_std = np.where(np.isnan(variable_env_std), None, variable_env_std.round(2))
+                    variable_env_std /= len(variable_env) ** 0.5
                 else:
                     variable_env_std = np.zeros_like(variable_env)
 
-                # --- Compute trend line ---
+                # Compute trend line
                 valid_data_env = np.array(variable_env)
                 if valid_data_env.tolist().count(None) == 0:
                     trend_env = np.polyfit(years, valid_data_env.astype(float), 1)
@@ -158,7 +160,7 @@ def get_timeseries(
                 else:
                     trend_line_env = [None]
 
-        # --- Return structured numeric result ---
+        # Return structured numeric result
         return {
             "years": years.tolist(),
             "variable": {
