@@ -4,8 +4,16 @@ import InfoModal from "./InfoModal";
 import TutorialTooltip from "./TutorialTooltip";
 import { tooltips } from "../constants";
 
-const Tutorial = ({ start, onFinish, setTutorialStep }) => {
+const Tutorial = ({ start, onFinish, panel1Year, setTutorialStep }) => {
     const [step, setStep] = useState(0);
+
+    useEffect(() => {
+        if (step === 2 && panel1Year === 2050) {
+            setTimeout(() => setStep(3), 600);
+        }
+        setTutorialStep?.(step);
+    }, [panel1Year, step, setTutorialStep]);
+
     if (!start) return null;
 
     return (
@@ -14,8 +22,8 @@ const Tutorial = ({ start, onFinish, setTutorialStep }) => {
             <InfoModal
                 open={step === 0}
                 onClose={() => setStep(1)}
-                title="Welcome to the BLUEOVIEW Tutorial"
-                shortText="Learn how to explore different features."
+                title="Welcome to the MAPMAKER Tutorial"
+                shortText="Learn how to explore plankton diversity scenarios."
                 buttonText="Start Tutorial"
             />
 
@@ -47,7 +55,7 @@ const Tutorial = ({ start, onFinish, setTutorialStep }) => {
                 </>
             )}
 
-            {/* Last Step -- Completion */}
+            {/* Step 4 - Completion */}
             <InfoModal
                 open={step === 9}
                 onClose={() => {
