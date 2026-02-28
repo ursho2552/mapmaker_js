@@ -1,5 +1,3 @@
-import { differenceColors, temperatureColors, sequentialColors } from './constants';
-
 export const generateColorStops = (colors) => {
     const step = 1 / colors.length;
     return colors.flatMap((color, i) => {
@@ -7,19 +5,6 @@ export const generateColorStops = (colors) => {
         const end = (i + 1) * step;
         return [[start, color], [end, color]];
     });
-};
-
-export const getColorscaleForIndex = (index, scenario) => {
-    const colors = (index.includes("Change") || scenario.includes("-")) ? differenceColors : index.includes("Temperature") ? temperatureColors : sequentialColors;
-    return generateColorStops(colors);
-};
-
-export const getColorDomainForIndex = (minVal, maxVal, index, scenario) => {
-    if (index.includes("Change") || scenario.includes("-")) {
-        const absMax = Math.max(Math.abs(minVal), Math.abs(maxVal));
-        return [-absMax, absMax];
-    }
-    return [minVal, maxVal];
 };
 
 export const hexToRgb = (hex) => {
@@ -64,11 +49,13 @@ export const getInterpolatedColorFromValue = (value, min, max, colorStops) => {
 
 export const getLegendFromColorscale = (colorscale, minValue, maxValue) => {
     const numBins = colorscale.length / 2;
-    const { _, ticktext } = generateColorbarTicks(minValue, maxValue, numBins);
+    const { tickvals, ticktext } = generateColorbarTicks(minValue, maxValue, numBins);
+
     const binColors = colorscale
         .filter((_, i) => i % 2 === 0)
         .slice(0, numBins)
         .map(([_, color]) => color);
+
     return { colors: binColors, labels: ticktext };
 };
 
@@ -80,7 +67,7 @@ export const generateColorbarTicks = (min, max, numBins) => {
     const tickvals = [];
     const ticktext = [];
 
-    const precision = range >= 4 ? 0 :
+    const precision = range >= 10 ? 0 :
         range >= 1 ? 2 : 3;
 
     for (let i = 0; i <= numBins; i++) {

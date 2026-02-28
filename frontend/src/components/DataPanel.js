@@ -11,22 +11,30 @@ import {
 import { Lock, LockOpen } from '@mui/icons-material';
 import GlobeDisplay from './GlobeDisplay';
 import MapDisplay from './MapDisplay';
+import { monthNames, featureNames } from '../constants';
+import ControlPanel from './ControlPanel';
 
 const DataPanel = ({
     panel,
     setPanel,
-    tutorialStep,
-    debouncedUpdateYear,
-    setSelectedPoint,
+    debouncedMonth,
+    debouncedUpdateMonth,
     setArea,
-    selectedPoint,
     selectedArea,
-    lockYear,
-    onYearChange,
-    onLockToggle,
+    onMonthChange,
     sharedZoom,
-    onSharedZoomChange
+    onSharedZoomChange,
+    openInfoModal,
 }) => {
+
+    const [localMonth, setLocalMonth] = React.useState(panel.month);
+    const isAnnualMean = panel.month === 13;
+    const fullTitle = `${featureNames[panel.feature]} ${isAnnualMean ? (" (Annual Mean)") : "in " + monthNames[panel.month]}`;
+    const lockTitle = `${isAnnualMean ? "Annual Mean" : "Month: " + monthNames[panel.month]}`;
+
+    React.useEffect(() => {
+        setLocalMonth(panel.month);
+    }, [panel.month]);
 
     return (
         <Box
@@ -36,132 +44,112 @@ const DataPanel = ({
                 borderRadius: 1,
                 display: 'flex',
                 flexDirection: 'column',
-                border: [1, 2, 3, 7].includes(tutorialStep) ? '4px solid #4FC3F7' : 'none',
-                boxShadow: [1, 2, 3, 7].includes(tutorialStep)
-                    ? '0 0 30px 10px rgba(79,195,247,0.6)'
-                    : 'none',
-                animation: [1, 2, 3, 7].includes(tutorialStep) ? 'pulse 1.5s infinite' : 'none',
                 position: 'relative',
-                zIndex: [1, 2, 3, 7].includes(tutorialStep) ? 3000 : 'auto',
+                zIndex: 'auto',
             }}
         >
-            {/* View Switch */}
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
-                <FormControl component="fieldset">
-                    <RadioGroup
-                        row
-                        value={panel.view}
-                        onChange={(e) => setPanel({ ...panel, view: e.target.value })}
-                    >
-                        <FormControlLabel
-                            value="map"
-                            control={<Radio sx={{ color: 'white', '&.Mui-checked': { color: 'white' } }} />}
-                            label={<Typography color="white">Map</Typography>}
-                        />
-                        <FormControlLabel
-                            value="globe"
-                            control={<Radio sx={{ color: 'white', '&.Mui-checked': { color: 'white' } }} />}
-                            label={<Typography color="white">Globe</Typography>}
-                        />
-                    </RadioGroup>
-                </FormControl>
+            <Box sx={{ flex: 1, minWidth: 200 }}>
+                <ControlPanel
+                    feature={panel.feature}
+                    onFeatureChange={(e) => setPanel(prev => ({ ...prev, feature: e.target.value }))}
+                    openInfoModal={openInfoModal}
+                />
             </Box>
 
-            {/* Year Slider */}
+            {/* Month Slider */}
             <Box sx={{ mb: 1, px: 1 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, gap: 1 }}>
-                    <Typography color="white" variant="subtitle">
-                        Year: {panel.year}
-                    </Typography>
-                    <Box
-                        sx={{
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            color: 'white',
-                            '&:hover': { color: '#1976d2' },
-                        }}
-                        onClick={() => onLockToggle && onLockToggle()}
-                    >
-                        {lockYear ? <Lock /> : <LockOpen />}
+                <Box
+                    sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        mb: 1,
+                        gap: 2,
+                    }}
+                >
+                    {/* Month */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Typography color="white" variant="subtitle"> {lockTitle} </Typography>
+                    </Box>
+
+                    {/* Map/Globe View Switch */}
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        <FormControl component="fieldset">
+                            <RadioGroup
+                                row
+                                value={panel.view}
+                                onChange={(e) => setPanel({ ...panel, view: e.target.value })}
+                            >
+                                <FormControlLabel
+                                    value="map"
+                                    control={
+                                        <Radio
+                                            sx={{
+                                                color: 'white',
+                                                '&.Mui-checked': { color: 'white' },
+                                            }}
+                                        />
+                                    }
+                                    label={<Typography color="white">Map</Typography>}
+                                />
+                                <FormControlLabel
+                                    value="globe"
+                                    control={
+                                        <Radio
+                                            sx={{
+                                                color: 'white',
+                                                '&.Mui-checked': { color: 'white' },
+                                            }}
+                                        />
+                                    }
+                                    label={<Typography color="white">Globe</Typography>}
+                                />
+                            </RadioGroup>
+                        </FormControl>
                     </Box>
                 </Box>
                 <MuiSlider
-                    min={2012}
-                    max={2100}
-                    value={panel.year}
+                    min={1}
+                    max={13}
+                    value={localMonth}
                     onChange={(e, v) => {
-                        setPanel(prev => ({ ...prev, year: v }));
-                        debouncedUpdateYear(v);
-                        if (onYearChange) onYearChange(v);
+                        setLocalMonth(v);
+                    }}
+                    onChangeCommitted={(e, v) => {
+                        setPanel(prev => ({ ...prev, month: v }));
+                        debouncedUpdateMonth(v);
+                        if (onMonthChange) onMonthChange(v);
                     }}
                     valueLabelDisplay="auto"
+                    valueLabelFormat={(v) => monthNames[v]}
                     sx={{ color: '#1976d2' }}
                 />
             </Box>
 
             {/* Display Map or Globe */}
-            <Box sx={{ width: '100%', height: 400, position: 'relative' }}>
-                {panel.source === 'plankton' && panel.view === 'map' && (
+            <Box sx={{ width: '100%', height: 'calc(100vh - 200px)', position: 'relative', backgroundColor: 'rgba(0, 0, 0, 0.25)' }}>
+                {panel.view === 'map' && (
                     <MapDisplay
-                        year={panel.year}
-                        index={panel.diversity}
-                        group={panel.group}
-                        scenario={panel.rcp}
-                        model={panel.model}
-                        sourceType="plankton"
-                        onPointClick={(x, y) => setSelectedPoint({ x, y })}
-                        selectedPoint={selectedPoint}
+                        month={panel.month}
+                        feature={panel.feature}
                         selectedArea={selectedArea}
                         onZoomedAreaChange={(area) => {
                             setArea(area);
                             onSharedZoomChange?.(area);
                         }}
                         zoomedArea={sharedZoom}
+                        fullTitle={fullTitle}
                     />
                 )}
-                {panel.source === 'plankton' && panel.view === 'globe' && (
+                {panel.view === 'globe' && (
                     <GlobeDisplay
-                        year={panel.year}
-                        index={panel.diversity}
-                        group={panel.group}
-                        scenario={panel.rcp}
-                        model={panel.model}
-                        sourceType="plankton"
-                        onPointClick={(x, y) => setSelectedPoint({ x, y })}
-                        selectedPoint={selectedPoint}
-                    />
-                )}
-                {panel.source === 'environmental' && panel.view === 'map' && (
-                    <MapDisplay
-                        year={panel.year}
-                        index={panel.envParam}
-                        scenario={panel.rcp}
-                        model={panel.model}
-                        sourceType="environmental"
-                        onPointClick={(x, y) => setSelectedPoint({ x, y })}
-                        selectedPoint={selectedPoint}
-                        selectedArea={selectedArea}
-                        onZoomedAreaChange={(area) => {
-                            setArea(area);
-                            onSharedZoomChange?.(area);
-                        }}
-                        zoomedArea={sharedZoom}
-                    />
-                )}
-                {panel.source === 'environmental' && panel.view === 'globe' && (
-                    <GlobeDisplay
-                        year={panel.year}
-                        index={panel.envParam}
-                        scenario={panel.rcp}
-                        model={panel.model}
-                        sourceType="environmental"
-                        onPointClick={(x, y) => setSelectedPoint({ x, y })}
-                        selectedPoint={selectedPoint}
+                        month={panel.month}
+                        feature={panel.feature}
+                        fullTitle={fullTitle}
                     />
                 )}
             </Box>
-        </Box>
+        </Box >
     );
 };
 
