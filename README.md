@@ -6,6 +6,7 @@ This web application provides interactive visualizations of marine plankton dive
 
 - [Features](#features)
 - [Components](#components)
+- [Project Structure](#project-structure)
 - [Installation](#installation)
 - [Server Configuration](#server-configuration)
 - [Deployment](#deployment)
@@ -47,6 +48,20 @@ This web application provides interactive visualizations of marine plankton dive
 - Displays a time-series trend of selected points or regions.
 - Can handle dual Y-axes to show trends of two variables.
 - The user can choose an environmental parameter to compare with the main data.
+
+## Project Structure
+
+```
+backend/
+  app.py                    Flask app: logging, CORS, response headers
+  api.py                    HTTP handlers for /api/*, parameter validation, errors
+  datasets.py               NetCDF reading: map slices and time series
+  data_lookup_variables.py  Maps frontend choices to NetCDF files and variables
+  config.py                 Environment-derived settings (DATA_DIR, API_HOST, API_PORT)
+  difference_env.py         One-off script computing scenario differences
+```
+
+The NetCDF files are read from `backend/data/` unless `DATA_DIR` is set.
 
 ## Installation
 
