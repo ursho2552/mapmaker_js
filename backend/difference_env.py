@@ -1,8 +1,14 @@
+"""Generate the scenario differences (e.g. RCP85-RCP26) of the environmental files.
+
+Writes them into DATA_DIR next to the inputs, where the backend looks for them.
+"""
 import xarray as xr
 import os
 
-DATA_FOLDER = './data/'
-OUTPUT_FOLDER = './data/env_diff/'
+from config import DATA_DIR
+
+DATA_FOLDER = DATA_DIR
+OUTPUT_FOLDER = DATA_DIR
 
 os.makedirs(OUTPUT_FOLDER, exist_ok=True)
 

@@ -57,11 +57,48 @@ backend/
   api.py                    HTTP handlers for /api/*, parameter validation, errors
   datasets.py               NetCDF reading: map slices and time series
   data_lookup_variables.py  Maps frontend choices to NetCDF files and variables
-  config.py                 Environment-derived settings (DATA_DIR, API_HOST, API_PORT)
-  difference_env.py         One-off script computing scenario differences
+  config.py                 Environment-derived settings (DATA_DIR, DATA_URL, API_HOST, API_PORT)
+  data_files.py             Checking for missing data files and syncing them from DATA_URL
+  difference_env.py         Generates the environmental scenario-difference files
+  gunicorn_config.py        Production server settings
+  entrypoint.sh, Dockerfile Container image
+frontend/
+  Dockerfile, nginx.conf    Container image: static build served by nginx, /api proxied
+docker-compose.yml          Runs both containers
 ```
 
 The NetCDF files are read from `backend/data/` unless `DATA_DIR` is set.
+
+## Running with Docker
+
+```sh
+docker compose up --build
+```
+
+The app is then served on <http://localhost:8080>: nginx serves the React build
+and proxies `/api` to the backend (gunicorn). `backend/data/` is mounted into the
+backend container as its data directory, so put the NetCDF files there first.
+
+On start the backend logs any data file the app can request that is missing.
+Check this at any time with:
+
+```sh
+cd backend && flask --app app check-data
+```
+
+The environmental scenario differences (`Env_var_annual_mean_*_RCP85-RCP26.nc`
+etc.) are derived from the per-scenario files with `python difference_env.py`.
+
+### Syncing the data from a remote directory
+
+Setting `DATA_URL` (commented out in `docker-compose.yml`) to a directory listing
+of `.nc` files makes the backend download new or changed files into the data
+directory on every start. A failed sync only logs an error; the files already
+present are served. The same sync can be run by hand:
+
+```sh
+cd backend && flask --app app sync-data --url <directory listing URL>
+```
 
 ## Installation
 
