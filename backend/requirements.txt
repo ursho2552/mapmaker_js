@@ -8,7 +8,6 @@ cycler==0.12.1
 dask==2024.8.0
 Flask==3.0.3
 Flask-Cors==4.0.1
-Flask-Executor==1.0.0
 fonttools==4.53.1
 fsspec==2024.9.0
 importlib_metadata==8.4.0

@@ -1,59 +1,74 @@
+from contextlib import contextmanager
 from flask import Flask, jsonify, request, make_response
 from flask_cors import CORS  # Ensure this import is correct
 import xarray as xr
 import numpy as np
 from threading import Lock
-from flask_executor import Executor  # Import Flask-Executor
 
 from data_lookup_variables import *
 
 app = Flask(__name__)
 # Apply CORS to the entire application
 CORS(app)
-file_lock = Lock()
-executor = Executor(app)  # Initialize Flask-Executor
+
+# Datasets are opened once per file and kept open. Opening is lazy, so this holds
+# file handles and metadata, not the data itself.
+_datasets = {}
+
+# The netCDF/HDF5 C library is not thread-safe: two threads touching any netCDF
+# files at the same time (even different ones) can crash the process. All
+# dataset access therefore goes through this one lock.
+netcdf_lock = Lock()
+
+# Min/max of a variable across all years, keyed by (file_path, variable_name).
+# Computing them reads the whole variable, so each one is computed only once.
+_value_ranges = {}
 
 @app.after_request
 def add_header(response):
     response.cache_control.no_store = True  # Disable caching for all responses
     return response
 
+@contextmanager
+def open_dataset(file_path: str):
+    """The cached dataset for `file_path`, used while holding `netcdf_lock`."""
+    with netcdf_lock:
+        if file_path not in _datasets:
+            _datasets[file_path] = xr.open_dataset(file_path)
+        yield _datasets[file_path]
+
+def get_value_range(ds, file_path: str, variable_name: str):
+    """Min/max of a variable across all years. Call while holding `netcdf_lock`."""
+    key = (file_path, variable_name)
+    if key not in _value_ranges:
+        variable = ds[variable_name]
+        _value_ranges[key] = (variable.min().item(), variable.max().item())
+    return _value_ranges[key]
+
 def read_netcdf(file_path: str, variable_name: str, year: int = None):
     if year is None:
         year = 2012
 
-    file_lock.acquire()  # Acquire the lock to handle file concurrency
-    try:
-        # Open the dataset with Dask chunking
-        with xr.open_dataset(file_path, chunks={'time': 10}) as ds:
-            lats = ds['lat']
-            lons = ds['lon']
+    with open_dataset(file_path) as ds:
+        min_value, max_value = get_value_range(ds, file_path, variable_name)
+        if 'div' in variable_name:
+            abs_value = max(abs(min_value), abs(max_value))
+            min_value = -abs_value
+            max_value = abs_value
 
-            # Calculate min and max values across all years, lazily, and compute them
-            min_value = ds[variable_name].min().compute()
-            max_value = ds[variable_name].max().compute()
-            if 'div' in variable_name:
-                abs_value = max(abs(min_value), abs(max_value))
-                min_value = -abs_value
-                max_value = abs_value
+        # Load only the requested year
+        variable = ds[variable_name][year - 2012, :, :].values
+        variable = np.where(np.isnan(variable), None, variable.round(2))
+        colorscale = 'Picnic' if 'div' in variable_name else 'Viridis'
 
-            # Load the data for the specified year and compute the variable array
-            variable = ds[variable_name][year - 2012, :, :].compute().values
-            variable = np.where(np.isnan(variable), None, variable.round(2))
-            colorscale = 'Picnic' if 'div' in variable_name else 'Viridis'
-
-            data = {
-                'lats': lats.values.tolist(),
-                'lons': lons.values.tolist(),
-                'variable': variable.tolist(),
-                'colorscale': colorscale,
-                'minValue': min_value.round(2).item(),
-                'maxValue': max_value.round(2).item()
-            }
-    finally:
-        file_lock.release()  # Always release the lock after the operation is done
-
-    return data
+        return {
+            'lats': ds['lat'].values.tolist(),
+            'lons': ds['lon'].values.tolist(),
+            'variable': variable.tolist(),
+            'colorscale': colorscale,
+            'minValue': round(min_value, 2),
+            'maxValue': round(max_value, 2)
+        }
 
 
 def get_timeseries(
@@ -65,120 +80,115 @@ def get_timeseries(
     year_start: int = 2012, year_end: int = 2100,
     file_path_env: str = None, variable_name_env: str = None
 ):
-    file_lock.acquire()
-    try:
-        with xr.open_dataset(file_path) as ds:
-            variable = ds[variable_name]
+    with open_dataset(file_path) as ds:
+        variable = ds[variable_name]
 
-            # Select data: single point or area mean
+        # Select data: single point or area mean
+        if x is not None and y is not None:
+            # Single point selection
+            data_series = variable.sel(lat=y, lon=x, method="nearest")
+            data_series_std = None
+        elif None not in (x_min, x_max, y_min, y_max):
+            # Area selection (mean and std)
+            if ds.lat.values[0] > ds.lat.values[-1]:
+                lat_slice = slice(y_max, y_min)
+            else:
+                lat_slice = slice(y_min, y_max)
+
+            data_series = variable.sel(
+                lat=lat_slice, lon=slice(x_min, x_max)
+            ).mean(dim=["lat", "lon"])
+            data_series_std = variable.sel(
+                lat=lat_slice, lon=slice(x_min, x_max)
+            ).std(dim=["lat", "lon"])
+        else:
+            raise ValueError("Either (x, y) or (xMin, xMax, yMin, yMax) must be provided")
+
+        # Year slicing
+        year_start_index = year_start - 2012
+        year_end_index = year_end - 2012 + 1
+        years = np.arange(year_start, year_end + 1).astype(float)
+
+        # Main variable values
+        variable_vals = data_series[year_start_index:year_end_index].compute()
+        variable_vals = np.where(np.isnan(variable_vals), None, variable_vals.round(2))
+
+        # Standard deviation (if area)
+        if data_series_std is not None:
+            variable_std = data_series_std[year_start_index:year_end_index].compute()
+            variable_std = np.where(np.isnan(variable_std), None, variable_std.round(2))
+            variable_std /= len(variable_vals) ** 0.5
+        else:
+            variable_std = np.zeros_like(variable_vals)
+
+        # Trend line
+        valid_data = np.array(variable_vals)
+        if valid_data.tolist().count(None) == 0 and "biomes" not in variable_name:
+            trend = np.polyfit(years, valid_data.astype(float), 1)
+            trend_line = np.polyval(trend, years).tolist()
+        else:
+            trend_line = [None]
+
+    # Environmental variable
+    variable_env = variable_env_std = trend_line_env = None
+    if file_path_env is not None:
+        with open_dataset(file_path_env) as ds_env:
+            variable_env_data = ds_env[variable_name_env]
+
             if x is not None and y is not None:
-                # Single point selection
-                data_series = variable.sel(lat=y, lon=x, method="nearest")
-                data_series_std = None
-            elif None not in (x_min, x_max, y_min, y_max):
-                # Area selection (mean and std)
-                if ds.lat.values[0] > ds.lat.values[-1]:
-                    lat_slice = slice(y_max, y_min)
+                # Single point
+                data_series_env = variable_env_data.sel(lat=y, lon=x, method="nearest")
+                data_series_env_std = None
+            else:
+                # Area selection
+                if ds_env.lat.values[0] > ds_env.lat.values[-1]:
+                    lat_slice_env = slice(y_max, y_min)
                 else:
-                    lat_slice = slice(y_min, y_max)
+                    lat_slice_env = slice(y_min, y_max)
 
-                data_series = variable.sel(
-                    lat=lat_slice, lon=slice(x_min, x_max)
+                data_series_env = variable_env_data.sel(
+                    lat=lat_slice_env, lon=slice(x_min, x_max)
                 ).mean(dim=["lat", "lon"])
-                data_series_std = variable.sel(
-                    lat=lat_slice, lon=slice(x_min, x_max)
+                data_series_env_std = variable_env_data.sel(
+                    lat=lat_slice_env, lon=slice(x_min, x_max)
                 ).std(dim=["lat", "lon"])
+
+            # Extract values
+            variable_env = data_series_env[year_start_index:year_end_index].compute()
+            variable_env = np.where(np.isnan(variable_env), None, variable_env.round(2))
+
+            # Compute std if applicable
+            if data_series_env_std is not None:
+                variable_env_std = data_series_env_std[year_start_index:year_end_index].compute()
+                variable_env_std = np.where(np.isnan(variable_env_std), None, variable_env_std.round(2))
+                variable_env_std /= len(variable_env) ** 0.5
             else:
-                raise ValueError("Either (x, y) or (xMin, xMax, yMin, yMax) must be provided")
+                variable_env_std = np.zeros_like(variable_env)
 
-            # Year slicing
-            year_start_index = year_start - 2012
-            year_end_index = year_end - 2012 + 1
-            years = np.arange(year_start, year_end + 1).astype(float)
-
-            # Main variable values
-            variable_vals = data_series[year_start_index:year_end_index].compute()
-            variable_vals = np.where(np.isnan(variable_vals), None, variable_vals.round(2))
-
-            # Standard deviation (if area)
-            if data_series_std is not None:
-                variable_std = data_series_std[year_start_index:year_end_index].compute()
-                variable_std = np.where(np.isnan(variable_std), None, variable_std.round(2))
-                variable_std /= len(variable_vals) ** 0.5
+            # Compute trend line
+            valid_data_env = np.array(variable_env)
+            if valid_data_env.tolist().count(None) == 0:
+                trend_env = np.polyfit(years, valid_data_env.astype(float), 1)
+                trend_line_env = np.polyval(trend_env, years).tolist()
             else:
-                variable_std = np.zeros_like(variable_vals)
+                trend_line_env = [None]
 
-            # Trend line
-            valid_data = np.array(variable_vals)
-            if valid_data.tolist().count(None) == 0 and "biomes" not in variable_name:
-                trend = np.polyfit(years, valid_data.astype(float), 1)
-                trend_line = np.polyval(trend, years).tolist()
-            else:
-                trend_line = [None]
-
-        # Environmental variable
-        variable_env = variable_env_std = trend_line_env = None
-        if file_path_env is not None:
-            with xr.open_dataset(file_path_env) as ds_env:
-                variable_env_data = ds_env[variable_name_env]
-
-                if x is not None and y is not None:
-                    # Single point
-                    data_series_env = variable_env_data.sel(lat=y, lon=x, method="nearest")
-                    data_series_env_std = None
-                else:
-                    # Area selection
-                    if ds_env.lat.values[0] > ds_env.lat.values[-1]:
-                        lat_slice_env = slice(y_max, y_min)
-                    else:
-                        lat_slice_env = slice(y_min, y_max)
-
-                    data_series_env = variable_env_data.sel(
-                        lat=lat_slice_env, lon=slice(x_min, x_max)
-                    ).mean(dim=["lat", "lon"])
-                    data_series_env_std = variable_env_data.sel(
-                        lat=lat_slice_env, lon=slice(x_min, x_max)
-                    ).std(dim=["lat", "lon"])
-
-                # Extract values
-                variable_env = data_series_env[year_start_index:year_end_index].compute()
-                variable_env = np.where(np.isnan(variable_env), None, variable_env.round(2))
-
-                # Compute std if applicable
-                if data_series_env_std is not None:
-                    variable_env_std = data_series_env_std[year_start_index:year_end_index].compute()
-                    variable_env_std = np.where(np.isnan(variable_env_std), None, variable_env_std.round(2))
-                    variable_env_std /= len(variable_env) ** 0.5
-                else:
-                    variable_env_std = np.zeros_like(variable_env)
-
-                # Compute trend line
-                valid_data_env = np.array(variable_env)
-                if valid_data_env.tolist().count(None) == 0:
-                    trend_env = np.polyfit(years, valid_data_env.astype(float), 1)
-                    trend_line_env = np.polyval(trend_env, years).tolist()
-                else:
-                    trend_line_env = [None]
-
-        # Return structured numeric result
-        return {
-            "years": years.tolist(),
-            "variable": {
-                "name": variable_name,
-                "values": valid_data.tolist(),
-                "std": variable_std.tolist(),
-                "trend": trend_line,
-            },
-            "environmental_variable": {
-                "name": variable_name_env,
-                "values": variable_env.tolist() if variable_env is not None else None,
-                "std": variable_env_std.tolist() if variable_env_std is not None else None,
-                "trend": trend_line_env,
-            },
-        }
-
-    finally:
-        file_lock.release()
+    # Return structured numeric result
+    return {
+        "years": years.tolist(),
+        "variable": {
+            "name": variable_name,
+            "values": valid_data.tolist(),
+            "std": variable_std.tolist(),
+            "trend": trend_line,
+        },
+        "environmental_variable": {
+            "name": variable_name_env,
+            "values": variable_env.tolist() if variable_env is not None else None,
+            "std": variable_env_std.tolist() if variable_env_std is not None else None,
+            "trend": trend_line_env,
+        },
+    }
 
 def get_environmental_data(env_parameter:str, scenario:str, model:str):
 
@@ -239,9 +249,7 @@ def get_globe_data():
         index = request.args.get('index', type=str)
         file_path, variable = get_environmental_data(index, scenario, model)
 
-    # Run the data processing asynchronously
-    future = executor.submit(read_netcdf, file_path, variable, year)
-    data = future.result()
+    data = read_netcdf(file_path, variable, year)
 
     response = jsonify(data)
     response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
@@ -260,9 +268,7 @@ def get_map_data():
 
     file_path, variable = get_file_and_variable(index, group, scenario, model)
 
-    # Run the data processing asynchronously
-    future = executor.submit(read_netcdf, file_path, variable, year)
-    data = future.result()  # Wait for the result
+    data = read_netcdf(file_path, variable, year)
 
     response = jsonify(data)
     response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
@@ -301,8 +307,7 @@ def get_line_data():
     file_path_env, variable_env = get_environmental_data(env_parameter, scenario, model)
 
     # Run timeseries (handles point OR area)
-    future = executor.submit(
-        get_timeseries,
+    data = get_timeseries(
         file_path, variable,
         x=x, y=y,
         x_min=x_min, x_max=x_max,
@@ -310,7 +315,6 @@ def get_line_data():
         year_start=year_start, year_end=year_end,
         file_path_env=file_path_env, variable_name_env=variable_env
     )
-    data = future.result()
 
     response = jsonify(data)
     response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
