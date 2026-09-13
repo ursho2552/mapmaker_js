@@ -11,12 +11,15 @@ import {
 import { Lock, LockOpen } from '@mui/icons-material';
 import GlobeDisplay from './GlobeDisplay';
 import MapDisplay from './MapDisplay';
+import { useDebouncedValue } from '../hooks/useDebouncedValue';
+
+// The slider updates the label at once, but data is only requested once it rests.
+const YEAR_DEBOUNCE_MS = 300;
 
 const DataPanel = ({
     panel,
     setPanel,
     tutorialStep,
-    debouncedUpdateYear,
     setSelectedPoint,
     setArea,
     selectedPoint,
@@ -27,6 +30,7 @@ const DataPanel = ({
     sharedZoom,
     onSharedZoomChange
 }) => {
+    const dataYear = useDebouncedValue(panel.year, YEAR_DEBOUNCE_MS);
 
     return (
         <Box
@@ -92,7 +96,6 @@ const DataPanel = ({
                     value={panel.year}
                     onChange={(e, v) => {
                         setPanel(prev => ({ ...prev, year: v }));
-                        debouncedUpdateYear(v);
                         if (onYearChange) onYearChange(v);
                     }}
                     valueLabelDisplay="auto"
@@ -104,7 +107,7 @@ const DataPanel = ({
             <Box sx={{ width: '100%', height: 400, position: 'relative' }}>
                 {panel.source === 'plankton' && panel.view === 'map' && (
                     <MapDisplay
-                        year={panel.year}
+                        year={dataYear}
                         index={panel.diversity}
                         group={panel.group}
                         scenario={panel.rcp}
@@ -122,7 +125,7 @@ const DataPanel = ({
                 )}
                 {panel.source === 'plankton' && panel.view === 'globe' && (
                     <GlobeDisplay
-                        year={panel.year}
+                        year={dataYear}
                         index={panel.diversity}
                         group={panel.group}
                         scenario={panel.rcp}
@@ -134,7 +137,7 @@ const DataPanel = ({
                 )}
                 {panel.source === 'environmental' && panel.view === 'map' && (
                     <MapDisplay
-                        year={panel.year}
+                        year={dataYear}
                         index={panel.envParam}
                         scenario={panel.rcp}
                         model={panel.model}
@@ -151,7 +154,7 @@ const DataPanel = ({
                 )}
                 {panel.source === 'environmental' && panel.view === 'globe' && (
                     <GlobeDisplay
-                        year={panel.year}
+                        year={dataYear}
                         index={panel.envParam}
                         scenario={panel.rcp}
                         model={panel.model}

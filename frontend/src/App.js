@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState } from 'react';
 import CombinedLinePlot from './components/CombinedLinePlot';
 import ReferencesButton from './components/ReferencesButton';
 import DataPanel from './components/DataPanel';
@@ -6,7 +6,6 @@ import Footer from './components/Footer';
 import ControlPanel from './components/ControlPanel';
 import InfoModal from './components/InfoModal';
 import Tutorial from './components/Tutorial';
-import debounce from 'lodash/debounce';
 import './App.css';
 import { Box, Typography, Divider, IconButton, Collapse, Button } from '@mui/material';
 import {
@@ -26,7 +25,6 @@ const App = () => {
   // Initial panel definition
   const initialPanel = {
     year: 2025,
-    debouncedYear: 2025,
     source: 'plankton',
     view: 'map',
     diversity: diversityIndices[1],
@@ -62,26 +60,6 @@ const App = () => {
   const [lockScenario, setLockScenario] = useState(true);
   const [lockModel, setLockModel] = useState(true);
   const [lockYear, setLockYear] = useState(true);
-
-  // Debounced years (keep initial in sync with initialPanel.year)
-  const [debouncedYear1, setDebouncedYear1] = useState(initialPanel.year);
-  const [debouncedYear2, setDebouncedYear2] = useState(initialPanel.year);
-
-  const debouncedUpdateYear1 = useMemo(
-    () => debounce((y) => setDebouncedYear1(y), 500),
-    []
-  );
-  const debouncedUpdateYear2 = useMemo(
-    () => debounce((y) => setDebouncedYear2(y), 500),
-    []
-  );
-
-  useEffect(() => {
-    return () => {
-      debouncedUpdateYear1.cancel();
-      debouncedUpdateYear2.cancel();
-    };
-  }, [debouncedUpdateYear1, debouncedUpdateYear2]);
 
   //  Collapsible state
   const [panelsCollapsed, setPanelsCollapsed] = useState(false);
@@ -202,8 +180,6 @@ const App = () => {
             panel={panel1}
             setPanel={setPanel1}
             tutorialStep={tutorialStep}
-            debouncedYear={debouncedYear1}
-            debouncedUpdateYear={debouncedUpdateYear1}
             setSelectedPoint={setSelectedPoint}
             setArea={setArea}
             selectedPoint={selectedPoint}
@@ -396,8 +372,6 @@ const App = () => {
             panel={panel2}
             setPanel={setPanel2}
             tutorialStep={tutorialStep === 1 ? 1 : null}
-            debouncedYear={debouncedYear2}
-            debouncedUpdateYear={debouncedUpdateYear2}
             setSelectedPoint={setSelectedPoint}
             setArea={setArea}
             selectedPoint={selectedPoint}

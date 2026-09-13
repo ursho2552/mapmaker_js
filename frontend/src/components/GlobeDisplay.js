@@ -1,5 +1,8 @@
 import React, { useEffect, useState, useRef, useMemo } from 'react';
 import Globe from 'react-globe.gl';
+import { fetchGrid } from '../api/client';
+import { useAsyncData } from '../hooks/useAsyncData';
+import { useElementSize } from '../hooks/useElementSize';
 import {
   getColorscaleForIndex,
   getInterpolatedColorFromValue,
@@ -11,6 +14,9 @@ import {
   mapGlobeTitleStyle,
 } from '../constants';
 
+// Shared empty array, so the globe does not see "new" points every render.
+const NO_POINTS = [];
+
 const GlobeDisplay = ({
   year,
   index,
@@ -21,15 +27,11 @@ const GlobeDisplay = ({
   onPointClick,
   selectedPoint,
 }) => {
-  const containerRef = useRef(null);
+  const [containerRef, dimensions] = useElementSize();
   const globeRef = useRef();
 
-  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
-  const [pointsData, setPointsData] = useState([]);
-  const [error, setError] = useState(null);
-  const [minValue, setMinValue] = useState(0);
-  const [maxValue, setMaxValue] = useState(1);
-  const [cachedData, setCachedData] = useState({});
+  // Globe points per selection, so revisiting a year does not refetch it.
+  const cacheRef = useRef(new Map());
   const [isHovered, setIsHovered] = useState(false);
 
   const readableIndex = nameToLabelMapping[index] || index;
@@ -57,88 +59,54 @@ const GlobeDisplay = ({
     return el;
   };
 
-  useEffect(() => {
-    const updateDimensions = () => {
-      if (containerRef.current) {
-        const { offsetWidth, offsetHeight } = containerRef.current;
-        setDimensions({ width: offsetWidth, height: offsetHeight });
-      }
-    };
-    updateDimensions();
-    window.addEventListener('resize', updateDimensions);
-    return () => window.removeEventListener('resize', updateDimensions);
-  }, []);
+  const loadPoints = async (signal) => {
+    const cacheKey = `${year}_${index}_${group}_${scenario}_${model}_${sourceType}`;
+    const cached = cacheRef.current.get(cacheKey);
+    if (cached) return cached;
 
-  const fetchData = async (yr) => {
-    const cacheKey = `${yr}_${index}_${group}_${scenario}_${model}_${sourceType}`;
+    const data = await fetchGrid({ sourceType, year, index, group, scenario, model }, signal);
 
-    if (cachedData[cacheKey]) {
-      setPointsData(cachedData[cacheKey].pointsData);
-      setMinValue(cachedData[cacheKey].minValue);
-      setMaxValue(cachedData[cacheKey].maxValue);
-      return;
-    }
+    const flatData = data.variable.flat();
+    let minVal = Math.min(...flatData.filter((v) => !isNaN(v) && v != null));
+    let maxVal = Math.max(...flatData.filter((v) => !isNaN(v) && v != null));
 
-    try {
-      const isPlankton = sourceType === 'plankton';
-      const params = new URLSearchParams({
-        source: isPlankton ? 'plankton' : 'env',
-        year: yr.toString(),
-        index,
-        scenario,
-        model,
-      });
-      if (isPlankton) params.append('group', group);
+    [minVal, maxVal] = getColorDomainForIndex(minVal, maxVal, index, scenario);
 
-      const url = `/api/globe-data?${params.toString()}`;
-      const response = await fetch(url);
-      if (!response.ok) throw new Error('Network response was not ok');
-      const data = await response.json();
+    // Every second grid cell, to keep the number of globe points manageable.
+    const pointsData = data.lats
+      .filter((_, latIdx) => latIdx % 2 === 0)
+      .map((lat, latIdx) => {
+        return data.lons
+          .filter((_, lonIdx) => lonIdx % 2 === 0)
+          .map((lon, lonIdx) => {
+            const realLatIdx = latIdx * 2;
+            const realLonIdx = lonIdx * 2;
+            const value = data.variable[realLatIdx][realLonIdx];
+            if (value == null || isNaN(value)) return null;
+            return {
+              lat,
+              lng: lon,
+              size: value !== 0 ? 0.01 : 0,
+              color: getInterpolatedColorFromValue(value, minVal, maxVal, colorscale),
+            };
+          });
+      })
+      .flat()
+      .filter((p) => p !== null);
 
-      const flatData = data.variable.flat();
-      let minVal = Math.min(...flatData.filter((v) => !isNaN(v) && v != null));
-      let maxVal = Math.max(...flatData.filter((v) => !isNaN(v) && v != null));
-
-      [minVal, maxVal] = getColorDomainForIndex(minVal, maxVal, index, scenario);
-
-      const transformed = data.lats
-        .filter((_, latIdx) => latIdx % 2 === 0)
-        .map((lat, latIdx) => {
-          return data.lons
-            .filter((_, lonIdx) => lonIdx % 2 === 0)
-            .map((lon, lonIdx) => {
-              const realLatIdx = latIdx * 2;
-              const realLonIdx = lonIdx * 2;
-              const value = data.variable[realLatIdx][realLonIdx];
-              if (value == null || isNaN(value)) return null;
-              return {
-                lat,
-                lng: lon,
-                size: value !== 0 ? 0.01 : 0,
-                color: getInterpolatedColorFromValue(value, minVal, maxVal, colorscale),
-              };
-            });
-        })
-        .flat()
-        .filter((p) => p !== null);
-
-      setCachedData((prev) => ({
-        ...prev,
-        [cacheKey]: { pointsData: transformed, minValue: minVal, maxValue: maxVal },
-      }));
-      setPointsData(transformed);
-      setMinValue(minVal);
-      setMaxValue(maxVal);
-      setError(null);
-    } catch (err) {
-      console.error('Error fetching globe data:', err);
-      setError('Failed to load data');
-    }
+    const result = { pointsData, minValue: minVal, maxValue: maxVal };
+    cacheRef.current.set(cacheKey, result);
+    return result;
   };
 
-  useEffect(() => {
-    fetchData(year);
-  }, [year, index, group, scenario, model, sourceType]);
+  const { data: points, error } = useAsyncData(
+    loadPoints,
+    [year, index, group, scenario, model, sourceType]
+  );
+
+  const pointsData = points?.pointsData ?? NO_POINTS;
+  const minValue = points?.minValue ?? 0;
+  const maxValue = points?.maxValue ?? 1;
 
   useEffect(() => {
     if (globeRef.current) {
@@ -198,7 +166,7 @@ const GlobeDisplay = ({
               zIndex: 11,
             }}
           >
-            {error}
+            Failed to load data: {error}
           </div>
         )}
         <div style={{ position: 'relative', width: '100%', height: '100%' }}>

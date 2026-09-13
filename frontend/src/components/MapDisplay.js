@@ -1,16 +1,19 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Plot from 'react-plotly.js';
+import { fetchGrid } from '../api/client';
+import { useAsyncData } from '../hooks/useAsyncData';
 import {
   nameToLabelMapping,
   mapGlobeTitleStyle,
-  sequentialColors,
 } from '../constants';
 import {
-  generateColorStops,
   generateColorbarTicks,
   getColorscaleForIndex,
   getColorDomainForIndex,
 } from '../utils';
+
+// Shared empty array, so the plot memo does not see a "new" array every render.
+const EMPTY = [];
 
 const containerStyle = {
   width: '100%',
@@ -40,15 +43,25 @@ const MapDisplay = ({
   selectedArea,
   zoomedArea,
 }) => {
-  const [lats, setLats] = useState([]);
-  const [lons, setLons] = useState([]);
-  const [data, setData] = useState([]);
-  const [minValue, setMinValue] = useState(null);
-  const [maxValue, setMaxValue] = useState(null);
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [colorscale, setColorscale] = useState(generateColorStops(sequentialColors));
   const [isZoomed, setIsZoomed] = useState(false);
+
+  const { data: grid, loading, error } = useAsyncData(
+    (signal) => fetchGrid({ sourceType, year, index, group, scenario, model }, signal),
+    [sourceType, year, index, group, scenario, model]
+  );
+
+  const lats = grid?.lats ?? EMPTY;
+  const lons = grid?.lons ?? EMPTY;
+  const data = grid?.variable ?? EMPTY;
+
+  const colorscale = useMemo(() => getColorscaleForIndex(index, scenario), [index, scenario]);
+
+  const [minValue, maxValue] = useMemo(
+    () => (grid ? getColorDomainForIndex(grid.minValue, grid.maxValue, index, scenario) : [null, null]),
+    // The domain belongs to the loaded grid, so it only changes when a new grid arrives.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [grid]
+  );
 
   const uiRevisionKey = useMemo(
     () => `${year}-${index}-${group ?? ''}-${scenario}-${model}`,
@@ -59,52 +72,6 @@ const MapDisplay = ({
   useEffect(() => {
     setIsZoomed(false);
   }, [uiRevisionKey]);
-
-  // Fetch data
-  useEffect(() => {
-    const controller = new AbortController();
-    const signal = controller.signal;
-
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const url =
-          sourceType === 'environmental'
-            ? `/api/globe-data?source=env&year=${year}&index=${index}&scenario=${scenario}&model=${model}`
-            : `/api/map-data?year=${year}&index=${index}&group=${group}&scenario=${scenario}&model=${model}`;
-
-        setColorscale(getColorscaleForIndex(index, scenario));
-
-        const response = await fetch(url, { signal });
-        if (!response.ok) throw new Error('Network response was not ok');
-
-        const json = await response.json();
-        setLats(json.lats || []);
-        setLons(json.lons || []);
-        setData(json.variable || []);
-
-        const [min, max] = getColorDomainForIndex(
-          json.minValue,
-          json.maxValue,
-          index,
-          scenario
-        );
-        setMinValue(min);
-        setMaxValue(max);
-        setError(null);
-      } catch (err) {
-        if (err.name !== 'AbortError') {
-          console.error('Error fetching map data:', err);
-          setError('Failed to load data');
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-    return () => controller.abort();
-  }, [year, index, group, scenario, model, sourceType]);
 
   // Colorbar ticks
   const { tickvals, ticktext } = useMemo(() => {
@@ -255,7 +222,7 @@ const MapDisplay = ({
   return (
     <div style={containerStyle}>
       <div style={mapGlobeTitleStyle}>{fullTitle}</div>
-      {error && <div style={{ color: 'red' }}>{error}</div>}
+      {error && <div style={{ color: 'red' }}>Failed to load data: {error}</div>}
       {!loading && !error && data.length === 0 && (
         <div style={{ color: 'gray' }}>
           No data available for this selection

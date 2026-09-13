@@ -1,24 +1,10 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import Plot from 'react-plotly.js';
 import { Box, IconButton, Tooltip } from '@mui/material';
 import DownloadIcon from '@mui/icons-material/Download';
+import { fetchTimeseries } from '../api/client';
+import { useAsyncData } from '../hooks/useAsyncData';
 import { nameToLabelMapping } from '../constants';
-
-// Utility helpers
-const buildUrl = (settings, point, startYear, endYear, zoomedArea = null) => {
-  const base = zoomedArea
-    ? `/api/line-data?xMin=${zoomedArea.x[0]}&xMax=${zoomedArea.x[1]}&yMin=${zoomedArea.y[0]}&yMax=${zoomedArea.y[1]}`
-    : `/api/line-data?x=${point.x}&y=${point.y}`;
-
-  return (
-    `${base}&startYear=${startYear}&endYear=${endYear}` +
-    `&index=${encodeURIComponent(settings.index)}` +
-    `&group=${encodeURIComponent(settings.group || '')}` +
-    `&scenario=${encodeURIComponent(settings.scenario)}` +
-    `&model=${encodeURIComponent(settings.model)}` +
-    `&envParam=${encodeURIComponent(settings.envParam)}`
-  );
-};
 
 // Extracts the correct trace from backend data
 const getTrace = (data, source) => {
@@ -50,48 +36,32 @@ const CombinedLinePlot = ({
   endYear,
   zoomedArea,
 }) => {
-  const [leftData, setLeftData] = useState(null);
-  const [rightData, setRightData] = useState(null);
-  const [leftAreaData, setLeftAreaData] = useState(null);
-  const [rightAreaData, setRightAreaData] = useState(null);
-  const [error, setError] = useState(null);
+  // The settings are new objects on every parent render; compare them by value,
+  // so the series are only refetched when a selection actually changes.
+  const selectionKey = JSON.stringify([point, zoomedArea, leftSettings, rightSettings, startYear, endYear]);
 
-  // Fetch data from backend
-  useEffect(() => {
-    if (point.x == null || point.y == null) return;
+  const { data: series, error } = useAsyncData(
+    async (signal) => {
+      const load = (settings, area = null) =>
+        fetchTimeseries({ settings, point, area, startYear, endYear }, signal)
+          .then((res) => getTrace(res, settings.source));
 
-    const fetchData = async () => {
-      try {
-        setError(null);
+      const [left, right, leftArea, rightArea] = await Promise.all([
+        load(leftSettings),
+        load(rightSettings),
+        zoomedArea ? load(leftSettings, zoomedArea) : null,
+        zoomedArea ? load(rightSettings, zoomedArea) : null,
+      ]);
+      return { left, right, leftArea, rightArea };
+    },
+    [selectionKey],
+    { enabled: point.x != null && point.y != null }
+  );
 
-        const [leftRes, rightRes, leftAreaRes, rightAreaRes] = await Promise.all([
-          fetch(buildUrl(leftSettings, point, startYear, endYear)).then((r) => r.json()),
-          fetch(buildUrl(rightSettings, point, startYear, endYear)).then((r) => r.json()),
-          zoomedArea
-            ? fetch(buildUrl(leftSettings, point, startYear, endYear, zoomedArea)).then((r) => r.json())
-            : null,
-          zoomedArea
-            ? fetch(buildUrl(rightSettings, point, startYear, endYear, zoomedArea)).then((r) => r.json())
-            : null,
-        ]);
-
-        setLeftData(getTrace(leftRes, leftSettings.source));
-        setRightData(getTrace(rightRes, rightSettings.source));
-
-        if (zoomedArea) {
-          setLeftAreaData(leftAreaRes ? getTrace(leftAreaRes, leftSettings.source) : null);
-          setRightAreaData(rightAreaRes ? getTrace(rightAreaRes, rightSettings.source) : null);
-        } else {
-          setLeftAreaData(null);
-          setRightAreaData(null);
-        }
-      } catch (err) {
-        setError(err.message || 'Error fetching data');
-      }
-    };
-
-    fetchData();
-  }, [point, zoomedArea, leftSettings, rightSettings, startYear, endYear]);
+  const leftData = series?.left ?? null;
+  const rightData = series?.right ?? null;
+  const leftAreaData = series?.leftArea ?? null;
+  const rightAreaData = series?.rightArea ?? null;
 
   // CSV download handler
   const handleDownload = () => {
