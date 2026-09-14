@@ -24,7 +24,7 @@ const Tutorial = ({ start, onFinish, panel1Year, setTutorialStep }) => {
 
     return (
         <Box>
-            {/* Step 0 - Welcome */}
+            {/* Step 0: welcome */}
             <InfoModal
                 open={step === 0}
                 onClose={() => setStep(1)}
@@ -35,7 +35,7 @@ const Tutorial = ({ start, onFinish, panel1Year, setTutorialStep }) => {
                 onSecondaryClick={skip}
             />
 
-            {/* Dark overlay for all tooltip steps */}
+            {/* Steps 1-8: tooltips over a dark overlay */}
             {step > 0 && step < 9 && (
                 <>
                     <Box
@@ -64,7 +64,7 @@ const Tutorial = ({ start, onFinish, panel1Year, setTutorialStep }) => {
                 </>
             )}
 
-            {/* Step 4 - Completion */}
+            {/* Step 9: completion */}
             <InfoModal
                 open={step === 9}
                 onClose={skip}

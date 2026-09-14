@@ -13,7 +13,7 @@ const LEFT_COLOR = 'cyan';
 const RIGHT_COLOR = 'orange';
 const GRID_COLOR = 'rgba(255,255,255,0.1)';
 
-// Extracts the correct trace from backend data
+// The series of `source`'s variable in a timeseries response, or null.
 const getTrace = (data, source) => {
   if (!data) return null;
 
@@ -68,7 +68,6 @@ const CombinedLinePlot = ({
   const leftAreaData = series?.leftArea ?? null;
   const rightAreaData = series?.rightArea ?? null;
 
-  // CSV download handler
   const handleDownload = () => {
     if (!leftData || !rightData) return;
 
@@ -91,7 +90,6 @@ const CombinedLinePlot = ({
     URL.revokeObjectURL(url);
   };
 
-  // Layout configuration
   const layout = useMemo(() => {
     const title = zoomedArea
       ? `Zoomed Area Mean (±1 SD) of ${getName(leftSettings)}<br> and ${getName(rightSettings)}`
@@ -133,7 +131,6 @@ const CombinedLinePlot = ({
     };
   }, [leftSettings, rightSettings, point, zoomedArea]);
 
-  // Render states
   if (error) {
     return (
       <Box sx={{ ...glassPanelSx, p: 2 }}>
@@ -143,19 +140,18 @@ const CombinedLinePlot = ({
   }
   if (!leftData || !rightData) return null;
 
-  // Build Plot traces
+  // With a zoomed area, plot its mean (±1 SD) instead of the selected point.
   const leftTraceData = zoomedArea && leftAreaData ? leftAreaData : leftData;
   const rightTraceData = zoomedArea && rightAreaData ? rightAreaData : rightData;
 
   const plotData = [];
 
-  // Left mean and std
   if (leftTraceData) {
     const yUpper = leftTraceData.y.map((v, i) => v + (leftTraceData.std?.[i] ?? 0));
     const yLower = leftTraceData.y.map((v, i) => v - (leftTraceData.std?.[i] ?? 0));
 
     if (zoomedArea) {
-      // SD shaded region
+      // ±1 SD band
       plotData.push({
         x: [...leftTraceData.x, ...leftTraceData.x.slice().reverse()],
         y: [...yUpper, ...yLower.slice().reverse()],
@@ -177,13 +173,12 @@ const CombinedLinePlot = ({
     });
   }
 
-  // Right mean and std
   if (rightTraceData) {
     const yUpper = rightTraceData.y.map((v, i) => v + (rightTraceData.std?.[i] ?? 0));
     const yLower = rightTraceData.y.map((v, i) => v - (rightTraceData.std?.[i] ?? 0));
 
     if (zoomedArea) {
-      // SD shaded region
+      // ±1 SD band
       plotData.push({
         x: [...rightTraceData.x, ...rightTraceData.x.slice().reverse()],
         y: [...yUpper, ...yLower.slice().reverse()],
@@ -218,7 +213,6 @@ const CombinedLinePlot = ({
           useResizeHandler={true}
         />
 
-        {/* Download button */}
         <Tooltip title="Download CSV" placement="left" arrow>
           <IconButton onClick={handleDownload} aria-label="Download CSV" sx={cornerButtonSx}>
             <DownloadIcon sx={{ fontSize: 18 }} />

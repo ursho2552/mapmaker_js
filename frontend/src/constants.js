@@ -11,7 +11,7 @@ export const LAST_YEAR = 2100;
 // Equirectangular Earth image drawn under the map and globe data
 export const EARTH_TEXTURE = '/assets/earth_texture.png';
 
-// Colorbar label mapping
+// Display label, with unit, of each index and parameter (see `readableLabel`).
 export const nameToLabelMapping = {
     'Biomes': 'Biomes',
     'Species Richness': 'Species Richness [% species]',
