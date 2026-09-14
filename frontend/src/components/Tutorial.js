@@ -8,11 +8,17 @@ const Tutorial = ({ start, onFinish, panel1Year, setTutorialStep }) => {
     const [step, setStep] = useState(0);
 
     useEffect(() => {
-        if (step === 2 && panel1Year === 2050) {
-            setTimeout(() => setStep(3), 600);
-        }
         setTutorialStep?.(step);
+        if (step === 2 && panel1Year === 2050) {
+            const timer = setTimeout(() => setStep(3), 600);
+            return () => clearTimeout(timer);
+        }
     }, [panel1Year, step, setTutorialStep]);
+
+    const skip = () => {
+        setStep(0);
+        onFinish();
+    };
 
     if (!start) return null;
 
@@ -25,6 +31,8 @@ const Tutorial = ({ start, onFinish, panel1Year, setTutorialStep }) => {
                 title="Welcome to the MAPMAKER Tutorial"
                 shortText="Learn how to explore plankton diversity scenarios."
                 buttonText="Start Tutorial"
+                secondaryButtonText="Skip"
+                onSecondaryClick={skip}
             />
 
             {/* Dark overlay for all tooltip steps */}
@@ -47,6 +55,7 @@ const Tutorial = ({ start, onFinish, panel1Year, setTutorialStep }) => {
                         <TutorialTooltip
                             text={tooltips[step].text}
                             onNext={() => setStep(step + 1)}
+                            onSkip={skip}
                             buttonText="Next"
                             top={tooltips[step].top}
                             left={tooltips[step].left}
@@ -58,10 +67,7 @@ const Tutorial = ({ start, onFinish, panel1Year, setTutorialStep }) => {
             {/* Step 4 - Completion */}
             <InfoModal
                 open={step === 9}
-                onClose={() => {
-                    setStep(0);
-                    onFinish();
-                }}
+                onClose={skip}
                 title="Congratulations, you’ve completed the tutorial!"
                 shortText="You can revisit it anytime by clicking the “Start Tutorial” button. Have fun exploring the website!"
             />

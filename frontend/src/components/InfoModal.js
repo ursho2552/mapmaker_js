@@ -20,6 +20,8 @@ function InfoModal({
     shortText,
     longText,
     buttonText = 'Close',
+    secondaryButtonText,
+    onSecondaryClick,
     onDontShowAgainChange,
     showDontShowAgain = false,
 }) {
@@ -44,10 +46,13 @@ function InfoModal({
     };
 
     const handleClose = () => {
-        if (dontShowAgain) {
-            localStorage.setItem('hideProjectExplanation', 'true');
-        } else {
-            localStorage.removeItem('hideProjectExplanation');
+        // Only a modal offering the checkbox owns the saved preference.
+        if (showDontShowAgain) {
+            if (dontShowAgain) {
+                localStorage.setItem('hideProjectExplanation', 'true');
+            } else {
+                localStorage.removeItem('hideProjectExplanation');
+            }
         }
         onClose();
     };
@@ -111,6 +116,11 @@ function InfoModal({
             </DialogContent>
 
             <DialogActions>
+                {onSecondaryClick && (
+                    <Button onClick={onSecondaryClick} color="inherit">
+                        {secondaryButtonText}
+                    </Button>
+                )}
                 <Button onClick={handleClose}>{buttonText}</Button>
             </DialogActions>
         </Dialog>

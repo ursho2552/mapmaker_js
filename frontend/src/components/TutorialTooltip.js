@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, Typography, Button } from "@mui/material";
 
-const TutorialTooltip = ({ text, onNext, buttonText = "Next", top = "50%", left = "50%" }) => {
+const TutorialTooltip = ({ text, onNext, onSkip, buttonText = "Next", top = "50%", left = "50%" }) => {
     return (
         <Box
             sx={{
@@ -23,22 +23,33 @@ const TutorialTooltip = ({ text, onNext, buttonText = "Next", top = "50%", left 
                 {text}
             </Typography>
 
-            {onNext && (
-                <Button
-                    variant="contained"
-                    onClick={onNext}
-                    sx={{
-                        backgroundColor: "#4FC3F7",
-                        color: "#000",
-                        fontWeight: "bold",
-                        "&:hover": {
-                            backgroundColor: "#29B6F6",
-                        },
-                    }}
-                >
-                    {buttonText}
-                </Button>
-            )}
+            <Box sx={{ display: "flex", justifyContent: "center", gap: 1 }}>
+                {onSkip && (
+                    <Button
+                        variant="text"
+                        onClick={onSkip}
+                        sx={{ color: "rgba(255,255,255,0.7)", "&:hover": { color: "#fff" } }}
+                    >
+                        Skip
+                    </Button>
+                )}
+                {onNext && (
+                    <Button
+                        variant="contained"
+                        onClick={onNext}
+                        sx={{
+                            backgroundColor: "#4FC3F7",
+                            color: "#000",
+                            fontWeight: "bold",
+                            "&:hover": {
+                                backgroundColor: "#29B6F6",
+                            },
+                        }}
+                    >
+                        {buttonText}
+                    </Button>
+                )}
+            </Box>
         </Box>
     );
 };
