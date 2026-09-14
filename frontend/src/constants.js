@@ -43,6 +43,9 @@ export const tooltips = [
     }
 ];
 
+// Equirectangular Earth image drawn under the map and globe data
+export const EARTH_TEXTURE = '/assets/earth_texture.png';
+
 // Colorbar label mapping
 export const nameToLabelMapping = {
     'Biomes': 'Biomes',

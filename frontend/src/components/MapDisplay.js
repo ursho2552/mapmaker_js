@@ -3,6 +3,7 @@ import Plot from 'react-plotly.js';
 import { fetchGrid } from '../api/client';
 import { useAsyncData } from '../hooks/useAsyncData';
 import {
+  EARTH_TEXTURE,
   nameToLabelMapping,
   mapGlobeTitleStyle,
 } from '../constants';
@@ -87,6 +88,8 @@ const MapDisplay = ({
       z: data,
       x: lons,
       y: lats,
+      // Let the Earth texture show through the data.
+      opacity: 0.7,
       colorscale,
       zsmooth: false,
       zmin: minValue,
@@ -140,6 +143,19 @@ const MapDisplay = ({
       autosize: true,
       uirevision: uiRevisionKey,
       dragmode: 'zoom',
+      images: [
+        {
+          source: EARTH_TEXTURE,
+          xref: 'x',
+          yref: 'y',
+          x: -180,
+          y: 90,
+          sizex: 360,
+          sizey: 180,
+          sizing: 'stretch',
+          layer: 'below',
+        },
+      ],
       xaxis: {
         showgrid: false,
         zeroline: false,

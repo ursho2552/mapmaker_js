@@ -10,6 +10,7 @@ import {
   getColorDomainForIndex,
 } from '../utils';
 import {
+  EARTH_TEXTURE,
   nameToLabelMapping,
   mapGlobeTitleStyle,
 } from '../constants';
@@ -175,7 +176,7 @@ const GlobeDisplay = ({
               ref={globeRef}
               width={dimensions.width}
               height={dimensions.height}
-              globeImageUrl="//unpkg.com/three-globe/example/img/earth-water.png"
+              globeImageUrl={EARTH_TEXTURE}
               showAtmosphere={false}
               backgroundColor="rgba(18, 18, 18, 0.6)"
               pointsData={pointsData}
