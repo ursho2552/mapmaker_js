@@ -1,3 +1,18 @@
+import { Lock } from '@mui/icons-material';
+
+// Tutorial step that explains the locks
+export const LOCK_TUTORIAL_STEP = 5;
+
+// Glow applied to lock icons while the tutorial talks about them
+export const lockHighlightSx = {
+    position: 'relative',
+    zIndex: 3000,
+    p: 0.5,
+    borderRadius: '50%',
+    border: '2px solid #4FC3F7',
+    animation: 'pulse 1.5s infinite',
+};
+
 // Tutorial steps
 export const tooltips = [
     null, // Step 0: Welcome modal
@@ -22,7 +37,13 @@ export const tooltips = [
         left: "50%",
     },
     { // Step 5
-        text: "Use locks to sync or separate panels. By default, the left and right data panels are synchronized, meaning the year, scenario, and model are linked. You can unlock these parameters individually if you want to compare different settings.",
+        text: (
+            <>
+                Use locks{' '}
+                <Lock fontSize="small" sx={{ verticalAlign: 'text-bottom' }} />{' '}
+                to sync or separate panels. By default, the left and right data panels are synchronized, meaning the year, scenario, and model are linked. You can unlock these parameters individually if you want to compare different settings.
+            </>
+        ),
         top: "65%",
         left: "50%",
     },

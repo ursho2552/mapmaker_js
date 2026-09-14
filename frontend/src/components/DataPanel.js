@@ -11,6 +11,7 @@ import {
 import { Lock, LockOpen } from '@mui/icons-material';
 import LoadingFallback from './LoadingFallback';
 import { useDebouncedValue } from '../hooks/useDebouncedValue';
+import { lockHighlightSx } from '../constants';
 
 // Loaded on demand so three.js (globe) and Plotly (map) get their own chunks.
 const GlobeDisplay = lazy(() => import('./GlobeDisplay'));
@@ -30,10 +31,12 @@ const DataPanel = ({
     lockYear,
     onYearChange,
     onLockToggle,
+    highlightLock,
     sharedZoom,
     onSharedZoomChange
 }) => {
     const dataYear = useDebouncedValue(panel.year, YEAR_DEBOUNCE_MS);
+    const highlighted = [1, 2, 3, 7].includes(tutorialStep) || highlightLock;
 
     return (
         <Box
@@ -43,13 +46,13 @@ const DataPanel = ({
                 borderRadius: 1,
                 display: 'flex',
                 flexDirection: 'column',
-                border: [1, 2, 3, 7].includes(tutorialStep) ? '4px solid #4FC3F7' : 'none',
-                boxShadow: [1, 2, 3, 7].includes(tutorialStep)
+                border: highlighted ? '4px solid #4FC3F7' : 'none',
+                boxShadow: highlighted
                     ? '0 0 30px 10px rgba(79,195,247,0.6)'
                     : 'none',
-                animation: [1, 2, 3, 7].includes(tutorialStep) ? 'pulse 1.5s infinite' : 'none',
+                animation: highlighted ? 'pulse 1.5s infinite' : 'none',
                 position: 'relative',
-                zIndex: [1, 2, 3, 7].includes(tutorialStep) ? 3000 : 'auto',
+                zIndex: highlighted ? 3000 : 'auto',
             }}
         >
             {/* View Switch */}
@@ -87,6 +90,7 @@ const DataPanel = ({
                             alignItems: 'center',
                             color: 'white',
                             '&:hover': { color: '#1976d2' },
+                            ...(highlightLock && lockHighlightSx),
                         }}
                         onClick={() => onLockToggle && onLockToggle()}
                     >

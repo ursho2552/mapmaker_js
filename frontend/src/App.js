@@ -18,6 +18,8 @@ import {
   infoMessagesShort,
   shortProjectDescription,
   projectDescription,
+  LOCK_TUTORIAL_STEP,
+  lockHighlightSx,
 } from './constants';
 import { Lock, LockOpen, ExpandLess, ExpandMore } from '@mui/icons-material';
 
@@ -190,6 +192,7 @@ const App = () => {
             lockYear={lockYear}
             onYearChange={(y) => handleYearChange(setPanel1, setPanel2, y)}
             onLockToggle={handleYearLockToggle}
+            highlightLock={tutorialStep === LOCK_TUTORIAL_STEP}
             sharedZoom={sharedZoom}
             onSharedZoomChange={setSharedZoom}
           />
@@ -239,10 +242,10 @@ const App = () => {
                   gap: 1,
                   justifyContent: 'space-between',
                   mb: 1,
-                  border: [4, 5].includes(tutorialStep) ? '4px solid #4FC3F7' : 'none',
-                  boxShadow: [4, 5].includes(tutorialStep) ? '0 0 30px 10px rgba(79,195,247,0.6)' : 'none',
-                  animation: [4, 5].includes(tutorialStep) ? 'pulse 1.5s infinite' : 'none',
-                  zIndex: [4, 5].includes(tutorialStep) ? 3000 : 'auto',
+                  border: [4, LOCK_TUTORIAL_STEP].includes(tutorialStep) ? '4px solid #4FC3F7' : 'none',
+                  boxShadow: [4, LOCK_TUTORIAL_STEP].includes(tutorialStep) ? '0 0 30px 10px rgba(79,195,247,0.6)' : 'none',
+                  animation: [4, LOCK_TUTORIAL_STEP].includes(tutorialStep) ? 'pulse 1.5s infinite' : 'none',
+                  zIndex: [4, LOCK_TUTORIAL_STEP].includes(tutorialStep) ? 3000 : 'auto',
                   position: 'relative',
                 }}
               >
@@ -283,7 +286,13 @@ const App = () => {
                 >
                   {/* Scenario lock */}
                   <Box
-                    sx={{ cursor: 'pointer', '&:hover': { color: '#1976d2' }, display: 'flex', alignItems: 'center' }}
+                    sx={{
+                      cursor: 'pointer',
+                      '&:hover': { color: '#1976d2' },
+                      display: 'flex',
+                      alignItems: 'center',
+                      ...(tutorialStep === LOCK_TUTORIAL_STEP && lockHighlightSx),
+                    }}
                     onClick={() => {
                       const newLock = !lockScenario;
                       setLockScenario(newLock);
@@ -295,7 +304,13 @@ const App = () => {
 
                   {/* Model lock */}
                   <Box
-                    sx={{ cursor: 'pointer', '&:hover': { color: '#1976d2' }, display: 'flex', alignItems: 'center' }}
+                    sx={{
+                      cursor: 'pointer',
+                      '&:hover': { color: '#1976d2' },
+                      display: 'flex',
+                      alignItems: 'center',
+                      ...(tutorialStep === LOCK_TUTORIAL_STEP && lockHighlightSx),
+                    }}
                     onClick={() => {
                       const newLock = !lockModel;
                       setLockModel(newLock);
@@ -384,6 +399,7 @@ const App = () => {
             lockYear={lockYear}
             onYearChange={(y) => handleYearChange(setPanel2, setPanel1, y)}
             onLockToggle={handleYearLockToggle}
+            highlightLock={tutorialStep === LOCK_TUTORIAL_STEP}
             sharedZoom={sharedZoom}
             onSharedZoomChange={setSharedZoom}
           />
