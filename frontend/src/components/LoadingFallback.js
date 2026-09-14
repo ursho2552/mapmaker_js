@@ -1,19 +1,21 @@
 import React from 'react';
-import { Box, CircularProgress } from '@mui/material';
+import { Box } from '@mui/material';
+import Spinner from './common/Spinner';
 
 // Placeholder shown while a lazily loaded view's code chunk is downloading.
-const LoadingFallback = ({ height = '100%' }) => (
-    <Box
-        sx={{
-            width: '100%',
-            height,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-        }}
-    >
-        <CircularProgress sx={{ color: 'white' }} />
-    </Box>
+const LoadingFallback = ({ height = '100%', sx = {} }) => (
+  <Box
+    sx={{
+      width: '100%',
+      height,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      ...sx,
+    }}
+  >
+    <Spinner />
+  </Box>
 );
 
 export default LoadingFallback;

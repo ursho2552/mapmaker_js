@@ -4,7 +4,14 @@ import { Box, IconButton, Tooltip } from '@mui/material';
 import DownloadIcon from '@mui/icons-material/Download';
 import { fetchTimeseries } from '../api/client';
 import { useAsyncData } from '../hooks/useAsyncData';
-import { nameToLabelMapping } from '../constants';
+import LoadingOverlay from './common/LoadingOverlay';
+import { readableLabel } from '../utils';
+import { cornerButtonSx, glassPanelSx } from '../styles/panels';
+import { errorTextStyle, hoverLabel } from '../styles/display';
+
+const LEFT_COLOR = 'cyan';
+const RIGHT_COLOR = 'orange';
+const GRID_COLOR = 'rgba(255,255,255,0.1)';
 
 // Extracts the correct trace from backend data
 const getTrace = (data, source) => {
@@ -24,9 +31,7 @@ const getTrace = (data, source) => {
 };
 
 const getName = (settings) =>
-  settings.source === 'plankton'
-    ? nameToLabelMapping[settings.index]
-    : nameToLabelMapping[settings.envParam];
+  readableLabel(settings.source === 'plankton' ? settings.index : settings.envParam);
 
 const CombinedLinePlot = ({
   point,
@@ -40,7 +45,7 @@ const CombinedLinePlot = ({
   // so the series are only refetched when a selection actually changes.
   const selectionKey = JSON.stringify([point, zoomedArea, leftSettings, rightSettings, startYear, endYear]);
 
-  const { data: series, error } = useAsyncData(
+  const { data: series, loading, error } = useAsyncData(
     async (signal) => {
       const load = (settings, area = null) =>
         fetchTimeseries({ settings, point, area, startYear, endYear }, signal)
@@ -94,37 +99,48 @@ const CombinedLinePlot = ({
 
     return {
       margin: { l: 70, r: 70, t: 70, b: 50, pad: 2 },
-      title: { text: title, font: { color: 'white' } },
-      paper_bgcolor: 'rgba(18, 18, 18, 0.6)',
-      plot_bgcolor: 'rgba(18, 18, 18, 0.6)',
+      title: { text: title, font: { color: 'white', size: 16 } },
+      paper_bgcolor: 'rgba(0,0,0,0)',
+      plot_bgcolor: 'rgba(0,0,0,0)',
+      hoverlabel: hoverLabel,
       xaxis: {
         title: { text: 'Year', font: { color: 'white' } },
         tickfont: { color: 'white' },
-        linecolor: 'white',
-        tickcolor: 'white',
-        gridcolor: '#444',
+        linecolor: 'rgba(255,255,255,0.4)',
+        tickcolor: 'rgba(255,255,255,0.4)',
+        gridcolor: GRID_COLOR,
         zeroline: false,
       },
       yaxis: {
         title: getName(leftSettings),
-        color: 'cyan',
-        linecolor: 'cyan',
-        tickcolor: 'cyan',
+        color: LEFT_COLOR,
+        linecolor: LEFT_COLOR,
+        tickcolor: LEFT_COLOR,
+        gridcolor: GRID_COLOR,
+        zeroline: false,
       },
       yaxis2: {
         title: getName(rightSettings),
-        color: 'orange',
+        color: RIGHT_COLOR,
         overlaying: 'y',
         side: 'right',
-        linecolor: 'orange',
-        tickcolor: 'orange',
+        linecolor: RIGHT_COLOR,
+        tickcolor: RIGHT_COLOR,
+        showgrid: false,
+        zeroline: false,
       },
       showlegend: false,
     };
   }, [leftSettings, rightSettings, point, zoomedArea]);
 
   // Render states
-  if (error) return <div style={{ color: 'red' }}>Error loading chart: {error}</div>;
+  if (error) {
+    return (
+      <Box sx={{ ...glassPanelSx, p: 2 }}>
+        <div style={errorTextStyle}>Error loading chart: {error}</div>
+      </Box>
+    );
+  }
   if (!leftData || !rightData) return null;
 
   // Build Plot traces
@@ -157,7 +173,7 @@ const CombinedLinePlot = ({
       y: leftTraceData.y,
       type: 'scatter',
       mode: 'lines+markers',
-      line: { color: 'cyan' },
+      line: { color: LEFT_COLOR },
     });
   }
 
@@ -186,22 +202,14 @@ const CombinedLinePlot = ({
       y: rightTraceData.y,
       type: 'scatter',
       mode: 'lines+markers',
-      line: { color: 'orange' },
+      line: { color: RIGHT_COLOR },
       yaxis: 'y2',
     });
   }
 
   return (
-    <Box
-      sx={{
-        p: 2,
-        backgroundColor: 'rgba(0, 0, 0, 0.25)',
-        borderRadius: 1,
-        flex: 1,
-        position: 'relative',
-      }}
-    >
-      <Box sx={{ position: 'relative' }}>
+    <Box sx={{ ...glassPanelSx, p: 2, flex: 1, position: 'relative' }}>
+      <Box sx={{ position: 'relative', borderRadius: 1, overflow: 'hidden' }}>
         <Plot
           data={plotData}
           layout={layout}
@@ -211,22 +219,13 @@ const CombinedLinePlot = ({
         />
 
         {/* Download button */}
-        <Tooltip title="Download CSV">
-          <IconButton
-            onClick={handleDownload}
-            sx={{
-              position: 'absolute',
-              top: 4,
-              right: 8,
-              color: 'white',
-              backgroundColor: 'rgba(0,0,0,0.4)',
-              '&:hover': { backgroundColor: 'rgba(0,0,0,0.6)' },
-              zIndex: 10,
-            }}
-          >
-            <DownloadIcon />
+        <Tooltip title="Download CSV" placement="left" arrow>
+          <IconButton onClick={handleDownload} aria-label="Download CSV" sx={cornerButtonSx}>
+            <DownloadIcon sx={{ fontSize: 18 }} />
           </IconButton>
         </Tooltip>
+
+        <LoadingOverlay visible={loading} />
       </Box>
     </Box>
   );

@@ -7,53 +7,46 @@ This web application provides interactive visualizations of marine plankton dive
 - [Features](#features)
 - [Components](#components)
 - [Project Structure](#project-structure)
+- [Running with Docker](#running-with-docker)
 - [Installation](#installation)
-- [Server Configuration](#server-configuration)
-- [Deployment](#deployment)
 - [Firewall Configuration](#firewall-configuration)
-- [Usage](#usage)
-- [License](#license)
 
 ## Features
 
-- **Filters and Modal Components**: Adjust data displayed by changing indices, plankton groups, climate scenarios, earth system models, and environmental parameters.
-- **Time Slider**: View data for any year from 2012 to 2100.
-- **Flat Map Visualization**: View geographical data on a flat 2D map.
-- **Interactive Globe Display**: Visualize marine plankton diversity on a 3D globe.
-- **Line Plot**: Display trends over time for a selected point or region.
-<!-- - **Region Selection**: Toggle between point or region selection for the line plot. -->
+- **Two linked data panels**: Compare scenarios, models and data sources side by side. Locks keep the year, scenario and model of the two panels in step, or let them differ.
+- **Control panels**: Choose between plankton diversity and environmental conditions, then the scenario, Earth System Model, metric and plankton group. Info buttons explain every option.
+- **Time slider**: View any year from 2012 to 2100.
+- **Flat map visualisation**: 2D map drawn with `react-plotly.js`. Zooming is shared between the panels; double-click resets it.
+- **Interactive globe display**: The same data on a 3D globe drawn with `react-globe.gl`. The two globes rotate together.
+- **Time series**: Click a point on a map or globe to plot both panels' variables over time, or zoom into an area to plot its mean. The series can be downloaded as CSV.
+- **Tutorial**: A guided tour of the interface, started from the header.
+- **References**: Publications behind the data and models.
 
 ## Components
 
-### 1. **Filters and Modal Components**
-- Displays explanatory text and information related to the selected index, plankton group, or model.
-- Controlled by various buttons on the interface.
+### `DataPanel`
+Year slider with its lock, the map/globe switch, and the map or globe it drives.
 
-### 2. **Slider Component**
-- Allows users to adjust the year of the displayed data dynamically.
-- The globe, map, and line plot update accordingly.
+### `ControlPanel`
+Source, scenario, model, metric and group of one data panel. Both sit in the collapsible "Control Panels" card, with the scenario and model locks between them.
 
-### 3. **MapDisplay Component**
-- Provides a 2D flat map view of the data using `react-plotly.js`.
-- Data is color-coded, and the color scale can be customized for positive and negative values.
-- Supports point or region selection for generating line plots.
+### `MapDisplay`
+2D map drawn with `react-plotly.js` over an Earth texture, with a banded colour scale that diverges around zero for changes and scenario differences.
 
-### 4. **GlobeDisplay Component**
-- Displays marine plankton data on a 3D globe.
-- Data is fetched for the selected year and displayed with color-coded markers.
-- Uses `react-globe.gl` and `d3-scale` for the color scale.
-- Supports interaction like zooming, rotating, and clicking on points.
+### `GlobeDisplay`
+The same data on a 3D globe drawn with `react-globe.gl`, sampling every second grid cell, with a hand-drawn colour legend. Cameras of the two globes are kept in step by `useSyncedGlobes`.
 
-### 5. **LinePlot Component**
-- Displays a time-series trend of selected points or regions.
-- Can handle dual Y-axes to show trends of two variables.
-- The user can choose an environmental parameter to compare with the main data.
+### `CombinedLinePlot`
+Time series of both panels' variables on two y-axes, at the selected point or averaged over the zoomed area (±1 SD).
+
+### `InfoModal` / `ReferencesModal` / `Tutorial`
+Explanatory text, references, and the step-by-step tutorial.
 
 ## Project Structure
 
 ```
 backend/
-  app.py                    Flask app: logging, CORS, response headers
+  app.py                    Flask app: logging, CORS, response headers, CLI commands
   api.py                    HTTP handlers for /api/*, parameter validation, errors
   datasets.py               NetCDF reading: map slices and time series
   data_lookup_variables.py  Maps frontend choices to NetCDF files and variables
@@ -64,6 +57,14 @@ backend/
   entrypoint.sh, Dockerfile Container image
 frontend/
   Dockerfile, nginx.conf    Container image: static build served by nginx, /api proxied
+  src/
+    api/                    Calls to the backend
+    hooks/                  Data fetching, debouncing, element size and globe camera sync
+    components/             Components; common/ holds the shared building blocks
+    styles/                 Style objects shared between components
+    constants.js            Option lists, colour palettes, logos and other fixed data
+    content.js              User-facing copy: descriptions, tutorial text, references
+    utils.js                Pure helpers for colour scales, legends and labels
 docker-compose.yml          Runs both containers
 ```
 

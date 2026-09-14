@@ -1,70 +1,49 @@
-# Getting Started with Create React App
+# MAPMAKER frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+React single-page app that renders the plankton diversity and environmental
+projections served by the Flask backend in [`../backend`](../backend). See the
+[project README](../README.md) for the architecture and deployment instructions.
 
-## Available Scripts
+## Development
 
-In the project directory, you can run:
+```sh
+npm install
+npm start            # dev server on http://localhost:3000
+```
 
-### `npm start`
+`package.json` sets `"proxy": "http://127.0.0.1:5000"`, so `/api/*` requests from
+the dev server reach a backend running locally on port 5000 (`python app.py` in
+`backend/`).
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Scripts
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+| Command | Purpose |
+| --- | --- |
+| `npm start` | Development server with hot reload. |
+| `npm test` | Jest test suite (`src/**/*.test.js`). |
+| `npm run build` | Production bundle in `build/`, as served by nginx in the image. |
 
-### `npm test`
+## Layout
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```
+src/
+  App.js            Page layout, the two panels' state and the locks between them
+  api/client.js     Calls to the Flask API; components never call fetch directly
+  hooks/            useAsyncData, useDebouncedValue, useElementSize, useSyncedGlobes
+  components/       DataPanel, ControlPanel, MapDisplay, GlobeDisplay, CombinedLinePlot,
+                    modals and the tutorial
+  components/common/  Shared building blocks: CollapsiblePanel, ColorLegend,
+                    LoadingOverlay, LogoTile, PanelTitle, Spinner, ZoomHint
+  styles/panels.js  MUI `sx` fragments: glass panels, selects, menus, dialogs, tutorial highlight
+  styles/display.js Inline styles of the figures: surfaces, titles, legends, colour bars
+  constants.js      Option lists, colour palettes, logos
+  content.js        User-facing copy: descriptions, info texts, tutorial steps, references
+  utils.js          Colour scales, legends and labels
+```
 
-### `npm run build`
+Map, globe and line plot are loaded lazily, so Plotly and three.js land in their
+own chunks. Plotly comes from its cartesian bundle (`components/Plot.js`), which
+covers the heatmap and scatter traces used.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+`three` is pinned to one exact version, with an `overrides` entry so that
+`react-globe.gl` cannot pull in a second copy.

@@ -1,34 +1,74 @@
 import React, { useCallback, useMemo } from 'react';
 import Plot from './Plot';
+import LoadingOverlay from './common/LoadingOverlay';
+import PanelTitle from './common/PanelTitle';
+import ZoomHint from './common/ZoomHint';
 import { fetchGrid } from '../api/client';
 import { useAsyncData } from '../hooks/useAsyncData';
+import { useElementSize } from '../hooks/useElementSize';
+import { EARTH_TEXTURE } from '../constants';
 import {
-  EARTH_TEXTURE,
-  nameToLabelMapping,
-  mapGlobeTitleStyle,
-} from '../constants';
-import {
+  figureTitle,
   generateColorbarTicks,
-  getColorscaleForIndex,
   getColorDomainForIndex,
+  getColorscaleForIndex,
+  unitOf,
 } from '../utils';
+import {
+  aspectBoxStyle,
+  centerMessageStyle,
+  colorbarBase,
+  colorbarUnitTitle,
+  hoverLabel,
+  PLOT_MARGIN,
+  surfaceStyle,
+  titleStyle,
+} from '../styles/display';
 
 // Shared empty array, so the plot memo does not see a "new" array every render.
 const EMPTY = [];
 
-const containerStyle = {
-  width: '100%',
-  height: '100%',
-  position: 'relative',
-  backgroundColor: 'rgba(18, 18, 18, 0.6)',
+const HIDDEN_AXIS = {
+  showgrid: false,
+  zeroline: false,
+  showline: false,
+  ticks: '',
+  showticklabels: false,
 };
 
-const plotWrapperStyle = {
-  position: 'absolute',
-  top: 5,
-  left: 0,
-  width: '100%',
-  height: '100%',
+// Double-click resets the shared zoom through `onDoubleClick` instead of Plotly's own reset.
+const PLOT_CONFIG = {
+  responsive: true,
+  displayModeBar: false,
+  displaylogo: false,
+  doubleClick: false,
+  showTips: false,
+};
+
+const plotStyle = { width: '100%', height: '100%' };
+
+/**
+ * Equirectangular map: one degree of latitude is as long as one of longitude, so
+ * the world is always 2:1, however the panel is sized or zoomed. The plot area
+ * shrinks to fit, centred in the figure.
+ */
+const EQUAL_SCALE_X = { constrain: 'domain' };
+const EQUAL_SCALE_Y = { scaleanchor: 'x', scaleratio: 1, constrain: 'domain' };
+
+/** Height of the map in pixels within a figure of the given size, at the full 360° × 180° extent. */
+const mapHeight = (width, height) => {
+  const plotWidth = width - PLOT_MARGIN.l - PLOT_MARGIN.r;
+  const plotHeight = height - PLOT_MARGIN.t - PLOT_MARGIN.b;
+  return Math.max(0, Math.min(plotHeight, plotWidth / 2));
+};
+
+const parseRelayoutRanges = (eventData) => {
+  const x = eventData['xaxis.range'] || [eventData['xaxis.range[0]'], eventData['xaxis.range[1]']];
+  const y = eventData['yaxis.range'] || [eventData['yaxis.range[0]'], eventData['yaxis.range[1]']];
+  if (x?.[0] != null && x?.[1] != null && y?.[0] != null && y?.[1] != null) {
+    return { x, y };
+  }
+  return null;
 };
 
 const MapDisplay = ({
@@ -43,6 +83,8 @@ const MapDisplay = ({
   selectedPoint,
   zoomedArea,
 }) => {
+  const [surfaceRef, { width, height }] = useElementSize();
+
   const { data: grid, loading, error } = useAsyncData(
     (signal) => fetchGrid({ sourceType, year, index, group, scenario, model }, signal),
     [sourceType, year, index, group, scenario, model]
@@ -61,19 +103,18 @@ const MapDisplay = ({
     [grid]
   );
 
-  const uiRevisionKey = useMemo(
-    () => `${year}-${index}-${group ?? ''}-${scenario}-${model}`,
-    [year, index, group, scenario, model]
-  );
+  const uiRevisionKey = `${year}-${index}-${group ?? ''}-${scenario}-${model}`;
 
-  // Colorbar ticks
   const { tickvals, ticktext } = useMemo(() => {
-    if (minValue == null || maxValue == null || !colorscale.length)
+    if (minValue == null || maxValue == null || !colorscale.length) {
       return { tickvals: [], ticktext: [] };
+    }
     return generateColorbarTicks(minValue, maxValue, colorscale.length / 2);
   }, [minValue, maxValue, colorscale]);
 
-  // Plot data
+  // The colour bar matches the map's height rather than the whole plot area's.
+  const colorbarLength = mapHeight(width, height);
+
   const plotData = useMemo(() => {
     const heatmap = {
       type: 'heatmap',
@@ -87,49 +128,39 @@ const MapDisplay = ({
       zmin: minValue,
       zmax: maxValue,
       hovertemplate: `Longitude: %{x}<br>Latitude: %{y}<br>${index}: %{z}<extra></extra>`,
+      hoverlabel: hoverLabel,
       colorbar: {
-        tickcolor: 'white',
-        tickfont: { color: 'white' },
+        ...colorbarBase,
+        ...(colorbarLength > 0 && { lenmode: 'pixels', len: colorbarLength }),
         tickvals,
         ticktext,
+        ...colorbarUnitTitle(unitOf(index)),
       },
     };
 
-    if (selectedPoint) {
-      return [
-        heatmap,
-        {
-          type: 'scatter',
-          mode: 'text',
-          x: [selectedPoint.x],
-          y: [selectedPoint.y],
-          text: ['📍'],
-          textposition: 'middle center',
-          textfont: { size: 18 },
-          hoverinfo: 'skip',
-        },
-      ];
-    }
-    return [heatmap];
-  }, [
-    data,
-    lons,
-    lats,
-    colorscale,
-    minValue,
-    maxValue,
-    tickvals,
-    ticktext,
-    selectedPoint,
-    index,
-  ]);
+    if (!selectedPoint) return [heatmap];
 
-  // Layout
+    return [
+      heatmap,
+      {
+        type: 'scatter',
+        mode: 'text',
+        x: [selectedPoint.x],
+        y: [selectedPoint.y],
+        text: ['📍'],
+        textposition: 'middle center',
+        textfont: { size: 18 },
+        hoverinfo: 'skip',
+      },
+    ];
+  }, [data, lons, lats, colorscale, minValue, maxValue, tickvals, ticktext, selectedPoint, index, colorbarLength]);
+
   const layout = useMemo(() => {
-    const baseLayout = {
-      margin: { l: 10, r: 0, t: 60, b: 10 },
-      paper_bgcolor: 'rgba(18, 18, 18, 0.6)',
-      plot_bgcolor: 'rgba(18, 18, 18, 0.6)',
+    const zoomed = Boolean(zoomedArea?.x && zoomedArea?.y);
+    return {
+      margin: PLOT_MARGIN,
+      paper_bgcolor: 'rgba(0,0,0,0)',
+      plot_bgcolor: 'rgba(0,0,0,0)',
       autosize: true,
       uirevision: uiRevisionKey,
       dragmode: 'zoom',
@@ -146,50 +177,13 @@ const MapDisplay = ({
           layer: 'below',
         },
       ],
-      xaxis: {
-        showgrid: false,
-        zeroline: false,
-        showticklabels: false,
-        tickfont: { color: 'white' },
-      },
-      yaxis: {
-        showgrid: false,
-        zeroline: false,
-        showticklabels: false,
-        tickfont: { color: 'white' },
-      },
+      xaxis: { ...HIDDEN_AXIS, ...EQUAL_SCALE_X, autorange: !zoomed, range: zoomed ? zoomedArea.x : undefined },
+      yaxis: { ...HIDDEN_AXIS, ...EQUAL_SCALE_Y, autorange: !zoomed, range: zoomed ? zoomedArea.y : undefined },
     };
-
-    if (zoomedArea?.x && zoomedArea?.y) {
-      baseLayout.xaxis.range = zoomedArea.x;
-      baseLayout.yaxis.range = zoomedArea.y;
-      baseLayout.xaxis.autorange = false;
-      baseLayout.yaxis.autorange = false;
-    } else {
-      baseLayout.xaxis.autorange = true;
-      baseLayout.yaxis.autorange = true;
-    }
-
-    return baseLayout;
   }, [uiRevisionKey, zoomedArea]);
 
-  // Parse relayout ranges
-  const parseRelayoutRanges = (eventData) => {
-    const xr = eventData['xaxis.range'] || [
-      eventData['xaxis.range[0]'],
-      eventData['xaxis.range[1]'],
-    ];
-    const yr = eventData['yaxis.range'] || [
-      eventData['yaxis.range[0]'],
-      eventData['yaxis.range[1]'],
-    ];
-    if (xr?.[0] != null && xr?.[1] != null && yr?.[0] != null && yr?.[1] != null) {
-      return { x: xr, y: yr };
-    }
-    return null;
-  };
+  const resetZoom = useCallback(() => onZoomedAreaChange?.(null), [onZoomedAreaChange]);
 
-  // Handle zoom/relayout
   const handleRelayout = (eventData) => {
     if (eventData['xaxis.autorange'] || eventData['yaxis.autorange']) {
       onZoomedAreaChange?.(null);
@@ -198,16 +192,12 @@ const MapDisplay = ({
 
     const ranges = parseRelayoutRanges(eventData);
     if (ranges) {
-      onZoomedAreaChange?.(prev => {
-        if (JSON.stringify(prev) !== JSON.stringify(ranges)) {
-          return ranges;
-        }
-        return prev;
-      });
+      onZoomedAreaChange?.((prev) =>
+        JSON.stringify(prev) !== JSON.stringify(ranges) ? ranges : prev
+      );
     }
   };
 
-  // Handle point click
   const handlePointClick = useCallback(
     (evt) => {
       if (!evt.points?.length) return;
@@ -217,36 +207,32 @@ const MapDisplay = ({
     [onPointClick]
   );
 
-  const fullTitle = useMemo(() => {
-    const readableIndex = nameToLabelMapping[index] || index;
-    const readableGroup = group ? ` and ${group}` : '';
-    return `${readableIndex}${readableGroup} predicted by ${scenario} on ${model} in ${year}`;
-  }, [index, group, scenario, model, year]);
-
   return (
-    <div style={containerStyle}>
-      <div style={mapGlobeTitleStyle}>{fullTitle}</div>
-      {error && <div style={{ color: 'red' }}>Failed to load data: {error}</div>}
-      {!loading && !error && data.length === 0 && (
-        <div style={{ color: 'gray' }}>
-          No data available for this selection
-        </div>
-      )}
-      <div style={plotWrapperStyle}>
+    <div style={aspectBoxStyle}>
+      <div ref={surfaceRef} style={surfaceStyle(loading)}>
+        <PanelTitle
+          title={figureTitle({ index, group, scenario, model, year })}
+          loading={loading}
+          style={titleStyle}
+        />
         <Plot
           data={plotData}
           layout={layout}
           useResizeHandler
-          style={{ width: '100%', height: '100%' }}
+          style={plotStyle}
           onRelayout={handleRelayout}
+          onDoubleClick={resetZoom}
           onClick={handlePointClick}
-          config={{
-            displayModeBar: false,
-            responsive: true,
-            displaylogo: false,
-            showTips: false,
-          }}
+          config={PLOT_CONFIG}
         />
+        {error && <div style={centerMessageStyle('#ff6b6b')}>Failed to load data: {error}</div>}
+        {!loading && !error && data.length === 0 && (
+          <div style={centerMessageStyle('rgba(255,255,255,0.7)')}>
+            No data available for this selection
+          </div>
+        )}
+        <LoadingOverlay visible={loading} />
+        <ZoomHint visible={zoomedArea != null && !loading} />
       </div>
     </div>
   );

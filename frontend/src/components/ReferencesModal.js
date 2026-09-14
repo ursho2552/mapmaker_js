@@ -1,302 +1,86 @@
 import React from 'react';
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Typography,
-  Link,
+  Box,
   Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Divider,
+  Link,
+  Typography,
 } from '@mui/material';
+import { acknowledgements, references } from '../content';
+import { frostedDialogSx } from '../styles/panels';
+
+const ExternalLink = ({ href, children }) => (
+  <Link href={href} target="_blank" rel="noopener noreferrer" underline="hover" sx={{ wordBreak: 'break-word' }}>
+    {children}
+  </Link>
+);
+
+const SectionTitle = ({ children }) => (
+  <Typography
+    variant="caption"
+    color="text.secondary"
+    component="h3"
+    sx={{ fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5, m: 0 }}
+  >
+    {children}
+  </Typography>
+);
+
+/** One citation: authors, title, journal (date), pages, DOI and further links. */
+const Citation = ({ authors, title, journal, date, pages, doi, links = [] }) => (
+  <Typography variant="body2" sx={{ mb: 1 }}>
+    {authors} <em>{title}</em>, in <em>{journal}</em> ({date})
+    {pages && `, ${pages}`}, doi:{' '}
+    <ExternalLink href={`https://doi.org/${doi}`}>{doi}</ExternalLink>
+    {links.map(({ label, href }) => (
+      <React.Fragment key={href}>
+        , <ExternalLink href={href}>{label}</ExternalLink>
+      </React.Fragment>
+    ))}
+  </Typography>
+);
+
+const Entries = ({ entries }) =>
+  entries.map((entry) => <Citation key={`${entry.doi}-${entry.title}`} {...entry} />);
 
 const ReferencesModal = ({ open, onClose }) => (
-  <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+  <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth sx={frostedDialogSx}>
     <DialogTitle>References &amp; Data Courtesy</DialogTitle>
 
     <DialogContent dividers>
-      {/* Data */}
-      <Typography variant="h6" sx={{ fontWeight: 'bold', mt: 1 }}>
-        Data
-      </Typography>
+      {references.map((section, i) => (
+        <Box key={section.title} component="section">
+          {i > 0 && <Divider sx={{ my: 2 }} />}
+          <SectionTitle>{section.title}</SectionTitle>
 
-      {/* Phytoplankton */}
-      <Typography variant="body2" sx={{ fontStyle: 'italic', mt: 1 }}>
-        Phytoplankton
-      </Typography>
-      <Typography variant="body2" paragraph>
-        Damiano&nbsp;Righetti&nbsp;et&nbsp;al.&nbsp;
-        <em>PhytoBase: A global synthesis of open-ocean phytoplankton
-          occurrences</em>,&nbsp;in <em>Earth System Science Data</em> (2020),
-        pp.&nbsp;907–933,&nbsp;doi:&nbsp;
-        <Link
-          href="https://doi.org/10.5194/essd-12-907-2020"
-          target="_blank"
-          rel="noopener noreferrer"
-          underline="hover"
-          sx={{ color: 'primary.main' }}
-        >
-          10.5194/essd-12-907-2020
-        </Link>
-        ,&nbsp;url:&nbsp;
-        <Link
-          href="https://essd.copernicus.org/articles/12/907/2020/"
-          target="_blank"
-          rel="noopener noreferrer"
-          underline="hover"
-          sx={{ color: 'primary.main' }}
-        >
-          essd.copernicus.org/articles/12/907/2020/
-        </Link>
-      </Typography>
+          {section.entries && <Box sx={{ mt: 0.5 }}><Entries entries={section.entries} /></Box>}
 
-      {/* Zooplankton */}
-      <Typography variant="body2" sx={{ fontStyle: 'italic', mt: 1 }}>
-        Zooplankton
-      </Typography>
-      <Typography variant="body2" paragraph>
-        Benedetti&nbsp;et&nbsp;al.&nbsp;
-        <em>Major restructuring of marine plankton assemblages under global warming</em>, in <em>Nature Communications</em> (2021), doi:&nbsp;
-        <Link
-          href="https://doi.org/10.1038/s41467-021-25385-x"
-          target="_blank"
-          rel="noopener noreferrer"
-          underline="hover"
-          sx={{ color: 'primary.main' }}
-        >
-          10.1038/s41558-021-25385-x
-        </Link>
-      </Typography>
-      <Typography variant="body2" paragraph>
-        E.&nbsp;T.&nbsp;Buitenhuis&nbsp;et&nbsp;al.&nbsp;
-        <em>MAREDAT: towards a world atlas of MARine Ecosystem&nbsp;DATa</em>,
-        in <em>Earth System Science Data</em> (July&nbsp;2013), pp.&nbsp;227–239,
-        doi:&nbsp;
-        <Link
-          href="https://doi.org/10.5194/essd-5-227-2013"
-          target="_blank"
-          rel="noopener noreferrer"
-          underline="hover"
-          sx={{ color: 'primary.main' }}
-        >
-          10.5194/essd-5-227-2013
-        </Link>
-      </Typography>
+          {section.subsections?.map((sub) => (
+            <Box key={sub.title} sx={{ mt: 1 }}>
+              <Typography variant="body2" sx={{ fontStyle: 'italic', mb: 0.5 }}>
+                {sub.title}
+              </Typography>
+              <Entries entries={sub.entries} />
+            </Box>
+          ))}
+        </Box>
+      ))}
 
-      {/* Species Distribution Models */}
-      <Typography variant="h6" sx={{ fontWeight: 'bold', mt: 2 }}>
-        Species Distribution Models
-      </Typography>
-
-      <Typography variant="body2" paragraph sx={{ mt: 1 }}>
-        Damiano&nbsp;Righetti&nbsp;et&nbsp;al.&nbsp;
-        <em>Global pattern of phytoplankton diversity driven by temperature and
-          environmental variability</em>, in <em>Science&nbsp;Advances</em>
-        (2019), doi:&nbsp;
-        <Link
-          href="https://doi.org/10.1126/sciadv.aau6253"
-          target="_blank"
-          rel="noopener noreferrer"
-          underline="hover"
-          sx={{ color: 'primary.main' }}
-        >
-          10.1126/sciadv.aau6253
-        </Link>
-        , e-print:&nbsp;
-        <Link
-          href="https://advances.sciencemag.org/content/5/5/eaau6253.full.pdf"
-          target="_blank"
-          rel="noopener noreferrer"
-          underline="hover"
-          sx={{ color: 'primary.main' }}
-        >
-          Full PDF
-        </Link>
-        , url:&nbsp;
-        <Link
-          href="https://advances.sciencemag.org/content/5/5/eaau6253"
-          target="_blank"
-          rel="noopener noreferrer"
-          underline="hover"
-          sx={{ color: 'primary.main' }}
-        >
-          Article Link
-        </Link>
-      </Typography>
-
-      <Typography variant="body2" paragraph>
-        <Typography variant="body2" paragraph>
-          Benedetti&nbsp;et&nbsp;al.&nbsp;
-          <em>Major restructuring of marine plankton assemblages under global warming</em>, in <em>Nature Communications</em> (2021), doi:&nbsp;
-          <Link
-            href="https://doi.org/10.1038/s41467-021-25385-x"
-            target="_blank"
-            rel="noopener noreferrer"
-            underline="hover"
-            sx={{ color: 'primary.main' }}
-          >
-            10.1038/s41558-021-25385-x
-          </Link>
+      <Divider sx={{ my: 2 }} />
+      <Box component="section">
+        <SectionTitle>Acknowledgements</SectionTitle>
+        <Typography variant="body2" sx={{ mt: 0.5 }}>
+          {acknowledgements}
         </Typography>
-        Urs&nbsp;Hofmann&nbsp;Elizondo&nbsp;et&nbsp;al.&nbsp;
-        <em>Biome partitioning of the global ocean based on phytoplankton
-          biogeography</em>, in <em>Progress in Oceanography</em> (2021),
-        p.&nbsp;102530,&nbsp;doi:&nbsp;
-        <Link
-          href="https://doi.org/10.1016/j.pocean.2021.102530"
-          target="_blank"
-          rel="noopener noreferrer"
-          underline="hover"
-          sx={{ color: 'primary.main' }}
-        >
-          10.1016/j.pocean.2021.102530
-        </Link>
-        , url:&nbsp;
-        <Link
-          href="https://www.sciencedirect.com/science/article/pii/S0079661121000203"
-          target="_blank"
-          rel="noopener noreferrer"
-          underline="hover"
-          sx={{ color: 'primary.main' }}
-        >
-          sciencedirect.com/science/article/pii/S0079661121000203
-        </Link>
-      </Typography>
-
-      {/* CMIP5 */}
-      <Typography variant="h6" sx={{ fontWeight: 'bold', mt: 2 }}>
-        CMIP5
-      </Typography>
-
-      <Typography variant="body2" paragraph sx={{ mt: 1 }}>
-        Karl&nbsp;E.&nbsp;Taylor,&nbsp;Ronald&nbsp;J.&nbsp;Stouffer&nbsp;and
-        Gerald&nbsp;A.&nbsp;Meehl.&nbsp;
-        <em>An Overview of CMIP5 and the Experiment Design</em>, in
-        <em>Bulletin of the American Meteorological Society</em> (2012),
-        pp.&nbsp;485–498,&nbsp;doi:&nbsp;
-        <Link
-          href="https://doi.org/10.1175/BAMS-D-11-00094.1"
-          target="_blank"
-          rel="noopener noreferrer"
-          underline="hover"
-          sx={{ color: 'primary.main' }}
-        >
-          10.1175/BAMS-D-11-00094.1
-        </Link>
-        , url:&nbsp;
-        <Link
-          href="https://journals.ametsoc.org/view/journals/bams/93/4/bams-d-11-00094.1.xml"
-          target="_blank"
-          rel="noopener noreferrer"
-          underline="hover"
-          sx={{ color: 'primary.main' }}
-        >
-          journals.ametsoc.org/view/journals/bams/93/4/bams-d-11-00094.1.xml
-        </Link>
-      </Typography>
-
-      {/* Earth System Models */}
-      <Typography variant="h6" sx={{ fontWeight: 'bold', mt: 2 }}>
-        Earth System Models
-      </Typography>
-
-      <Typography variant="body2" paragraph sx={{ mt: 1 }}>
-        Aurore&nbsp;Voldoire&nbsp;et&nbsp;al.&nbsp;
-        <em>The CNRM-CM5.1 global climate model: description and basic
-          evaluation</em>, in <em>Climate Dynamics</em> (May&nbsp;2013),
-        pp.&nbsp;2091–2121, doi:&nbsp;
-        <Link
-          href="https://doi.org/10.1007/S00382-011-1259-Y"
-          target="_blank"
-          rel="noopener noreferrer"
-          underline="hover"
-          sx={{ color: 'primary.main' }}
-        >
-          10.1007/S00382-011-1259-Y
-        </Link>
-        , url:&nbsp;
-        <Link
-          href="https://hal.archives-ouvertes.fr/hal-008330"
-          target="_blank"
-          rel="noopener noreferrer"
-          underline="hover"
-          sx={{ color: 'primary.main' }}
-        >
-          hal.archives-ouvertes.fr/hal-008330
-        </Link>
-      </Typography>
-
-      <Typography variant="body2" paragraph>
-        Jean-Louis&nbsp;Dufresne&nbsp;et&nbsp;al.&nbsp;
-        <em>Climate change projections using the IPSL-CM5 Earth System Model:
-          from CMIP3 to CMIP5</em>, in <em>Climate Dynamics</em> (2013),
-        pp.&nbsp;2123–2165,&nbsp;doi:&nbsp;
-        <Link
-          href="https://doi.org/10.1007/S00382-012-1636-1"
-          target="_blank"
-          rel="noopener noreferrer"
-          underline="hover"
-          sx={{ color: 'primary.main' }}
-        >
-          10.1007/S00382-012-1636-1
-        </Link>
-        , url:&nbsp;
-        <Link
-          href="https://hal.archives-ouvertes.fr/hal-0079"
-          target="_blank"
-          rel="noopener noreferrer"
-          underline="hover"
-          sx={{ color: 'primary.main' }}
-        >
-          hal.archives-ouvertes.fr/hal-0079
-        </Link>
-      </Typography>
-
-      <Typography variant="body2" paragraph>
-        Thomas&nbsp;L.&nbsp;Delworth&nbsp;et&nbsp;al.&nbsp;
-        <em>GFDL’s CM2 Global Coupled Climate Models. Part&nbsp;I: Formulation
-          and Simulation Characteristics</em>, in <em>Journal of Climate</em>
-        (2006), pp.&nbsp;643–674,&nbsp;doi:&nbsp;
-        <Link
-          href="https://doi.org/10.1175/JCLI3629.1"
-          target="_blank"
-          rel="noopener noreferrer"
-          underline="hover"
-          sx={{ color: 'primary.main' }}
-        >
-          10.1175/JCLI3629.1
-        </Link>
-        , url:&nbsp;
-        <Link
-          href="https://journals.ametsoc.org/view/journals/clim/19/5/jcli3629"
-          target="_blank"
-          rel="noopener noreferrer"
-          underline="hover"
-          sx={{ color: 'primary.main' }}
-        >
-          journals.ametsoc.org/view/journals/clim/19/5/jcli3629
-        </Link>
-      </Typography>
-
-      {/* Acknowledgements */}
-      <Typography variant="h6" sx={{ fontWeight: 'bold', mt: 2 }}>
-        Acknowledgements
-      </Typography>
-      <Typography variant="body2" paragraph sx={{ mt: 1 }}>
-        We acknowledge the World Climate Research Programme’s Working Group on
-        Coupled Modelling, which is responsible for CMIP, and we thank the
-        climate-modeling groups for producing and making available their model
-        output. For CMIP the U.S. Department of Energy’s Program for Climate
-        Model Diagnosis and Intercomparison provides coordinating support and
-        led development of software infrastructure in partnership with the
-        Global Organization for Earth System Science Portals.
-      </Typography>
-
+      </Box>
     </DialogContent>
 
     <DialogActions>
-      <Button onClick={onClose} color="primary">
-        Close
-      </Button>
+      <Button onClick={onClose}>Close</Button>
     </DialogActions>
   </Dialog>
 );

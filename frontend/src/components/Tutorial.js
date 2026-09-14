@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Box } from "@mui/material";
 import InfoModal from "./InfoModal";
 import TutorialTooltip from "./TutorialTooltip";
-import { tooltips } from "../constants";
+import { tooltips } from "../content";
 
 const Tutorial = ({ start, onFinish, panel1Year, setTutorialStep }) => {
     const [step, setStep] = useState(0);

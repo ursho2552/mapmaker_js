@@ -1,22 +1,49 @@
-import React, { useEffect, useRef, useMemo } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import Globe from 'react-globe.gl';
+import ColorLegend from './common/ColorLegend';
+import LoadingOverlay from './common/LoadingOverlay';
+import PanelTitle from './common/PanelTitle';
 import { fetchGrid } from '../api/client';
 import { useAsyncData } from '../hooks/useAsyncData';
 import { useElementSize } from '../hooks/useElementSize';
+import { EARTH_TEXTURE } from '../constants';
 import {
+  figureTitle,
+  getColorDomainForIndex,
   getColorscaleForIndex,
   getInterpolatedColorFromValue,
   getLegendFromColorscale,
-  getColorDomainForIndex,
+  unitOf,
 } from '../utils';
 import {
-  EARTH_TEXTURE,
-  nameToLabelMapping,
-  mapGlobeTitleStyle,
-} from '../constants';
+  aspectBoxStyle,
+  centerMessageStyle,
+  surfaceStyle,
+  titleStyle,
+} from '../styles/display';
 
 // Shared empty array, so the globe does not see "new" points every render.
 const NO_POINTS = [];
+
+/** Plot every nth grid cell, to keep the number of globe points manageable. */
+const GRID_STEP = 2;
+
+/** Closest and farthest the camera may zoom, in globe radii × 100. */
+const MIN_DISTANCE = 250;
+const MAX_DISTANCE = 400;
+
+const createPinElement = () => {
+  const el = document.createElement('div');
+  el.style.fontSize = '24px';
+  el.style.pointerEvents = 'none';
+  el.style.userSelect = 'none';
+  el.style.transform = 'translate(-50%, -100%)';
+  el.style.whiteSpace = 'nowrap';
+  el.setAttribute('aria-label', 'Selected Point Pin');
+  el.setAttribute('title', 'Selected Point');
+  el.textContent = '📍';
+  return el;
+};
 
 const GlobeDisplay = ({
   year,
@@ -27,37 +54,15 @@ const GlobeDisplay = ({
   sourceType = 'environmental',
   onPointClick,
   selectedPoint,
+  registerGlobe,
 }) => {
-  const [containerRef, dimensions] = useElementSize();
+  const [containerRef, { width, height }] = useElementSize();
   const globeRef = useRef();
 
   // Globe points per selection, so revisiting a year does not refetch it.
   const cacheRef = useRef(new Map());
 
-  const readableIndex = nameToLabelMapping[index] || index;
-  const readableGroup = group ? ` and ${group}` : '';
-  const fullTitle = `${readableIndex}${readableGroup} predicted by ${scenario} on ${model} in ${year}`;
-  const normalizedSelectedPoint = selectedPoint
-    ? { lat: selectedPoint.y, lng: selectedPoint.x }
-    : null;
-
-  const colorscale = useMemo(() => {
-    return getColorscaleForIndex(index, scenario);
-  }, [index, scenario]);
-
-  const createHtmlElement = (d) => {
-    const el = document.createElement('div');
-    el.style.color = 'red';
-    el.style.fontSize = '24px';
-    el.style.pointerEvents = 'none';
-    el.style.userSelect = 'none';
-    el.style.transform = 'translate(-50%, -100%)';
-    el.style.whiteSpace = 'nowrap';
-    el.setAttribute('aria-label', 'Selected Point Pin');
-    el.setAttribute('title', 'Selected Point');
-    el.textContent = '📍';
-    return el;
-  };
+  const colorscale = useMemo(() => getColorscaleForIndex(index, scenario), [index, scenario]);
 
   const loadPoints = async (signal) => {
     const cacheKey = `${year}_${index}_${group}_${scenario}_${model}_${sourceType}`;
@@ -66,189 +71,88 @@ const GlobeDisplay = ({
 
     const data = await fetchGrid({ sourceType, year, index, group, scenario, model }, signal);
 
-    const flatData = data.variable.flat();
-    let minVal = Math.min(...flatData.filter((v) => !isNaN(v) && v != null));
-    let maxVal = Math.max(...flatData.filter((v) => !isNaN(v) && v != null));
+    const finite = data.variable.flat().filter((v) => v != null && Number.isFinite(v));
+    const [minValue, maxValue] = getColorDomainForIndex(
+      Math.min(...finite),
+      Math.max(...finite),
+      index,
+      scenario
+    );
 
-    [minVal, maxVal] = getColorDomainForIndex(minVal, maxVal, index, scenario);
+    const pointsData = [];
+    for (let latIdx = 0; latIdx < data.lats.length; latIdx += GRID_STEP) {
+      for (let lonIdx = 0; lonIdx < data.lons.length; lonIdx += GRID_STEP) {
+        const value = data.variable[latIdx][lonIdx];
+        if (value == null || Number.isNaN(value)) continue;
+        pointsData.push({
+          lat: data.lats[latIdx],
+          lng: data.lons[lonIdx],
+          size: value !== 0 ? 0.01 : 0,
+          color: getInterpolatedColorFromValue(value, minValue, maxValue, colorscale),
+        });
+      }
+    }
 
-    // Every second grid cell, to keep the number of globe points manageable.
-    const pointsData = data.lats
-      .filter((_, latIdx) => latIdx % 2 === 0)
-      .map((lat, latIdx) => {
-        return data.lons
-          .filter((_, lonIdx) => lonIdx % 2 === 0)
-          .map((lon, lonIdx) => {
-            const realLatIdx = latIdx * 2;
-            const realLonIdx = lonIdx * 2;
-            const value = data.variable[realLatIdx][realLonIdx];
-            if (value == null || isNaN(value)) return null;
-            return {
-              lat,
-              lng: lon,
-              size: value !== 0 ? 0.01 : 0,
-              color: getInterpolatedColorFromValue(value, minVal, maxVal, colorscale),
-            };
-          });
-      })
-      .flat()
-      .filter((p) => p !== null);
-
-    const result = { pointsData, minValue: minVal, maxValue: maxVal };
+    const result = { pointsData, minValue, maxValue };
     cacheRef.current.set(cacheKey, result);
     return result;
   };
 
-  const { data: points, error } = useAsyncData(
+  const { data: points, loading, error } = useAsyncData(
     loadPoints,
     [year, index, group, scenario, model, sourceType]
   );
 
+  // Limits first, so a camera copied from another globe on registration is kept within them.
+  useEffect(() => {
+    const controls = globeRef.current?.controls();
+    if (!controls) return;
+    controls.minDistance = MIN_DISTANCE;
+    controls.maxDistance = MAX_DISTANCE;
+    controls.autoRotate = false;
+  }, []);
+
+  useEffect(() => registerGlobe?.(globeRef.current), [registerGlobe]);
+
   const pointsData = points?.pointsData ?? NO_POINTS;
-  const minValue = points?.minValue ?? 0;
-  const maxValue = points?.maxValue ?? 1;
 
-  useEffect(() => {
-    if (globeRef.current) {
-      globeRef.current.controls().minDistance = 250;
-      globeRef.current.controls().maxDistance = 400;
-    }
-  }, []);
+  const legend = useMemo(
+    () => (points ? getLegendFromColorscale(colorscale, points.minValue, points.maxValue) : null),
+    [points, colorscale]
+  );
 
-  useEffect(() => {
-    if (globeRef.current) {
-      globeRef.current.controls().autoRotate = false;
-    }
-  }, []);
-
-  const legendData = useMemo(() => {
-    if (minValue == null || maxValue == null || colorscale.length === 0) {
-      return { colors: [], labels: [] };
-    }
-    return getLegendFromColorscale(colorscale, minValue, maxValue);
-  }, [minValue, maxValue, colorscale]);
-
-  const handlePointClick = (lng, lat) => {
-    if (onPointClick) onPointClick(lng, lat);
-  };
+  const pinData = useMemo(
+    () => (selectedPoint ? [{ lat: selectedPoint.y, lng: selectedPoint.x }] : NO_POINTS),
+    [selectedPoint]
+  );
 
   return (
-    <div
-      ref={containerRef}
-      style={{
-        width: '100%',
-        height: '100%',
-        position: 'relative',
-        backgroundColor: 'rgba(18, 18, 18, 0.6)',
-        overflow: 'hidden',
-      }}
-    >
-      <div
-        style={{
-          width: '100%',
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          backgroundColor: 'rgba(18, 18, 18, 0.6)',
-        }}
-      >
-        <div style={mapGlobeTitleStyle} dangerouslySetInnerHTML={{ __html: fullTitle }} />
-
-        {error && (
-          <div
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              color: 'red',
-              zIndex: 11,
-            }}
-          >
-            Failed to load data: {error}
-          </div>
-        )}
-        <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-          <div style={{ width: '100%', height: '100%' }}>
-            <Globe
-              ref={globeRef}
-              width={dimensions.width}
-              height={dimensions.height}
-              globeImageUrl={EARTH_TEXTURE}
-              showAtmosphere={false}
-              backgroundColor="rgba(18, 18, 18, 0.6)"
-              pointsData={pointsData}
-              pointAltitude="size"
-              pointColor="color"
-              pointRadius={0.9}
-              onPointClick={(pt) => handlePointClick(pt.lng, pt.lat)}
-              htmlElementsData={normalizedSelectedPoint ? [normalizedSelectedPoint] : []}
-              htmlElement={createHtmlElement}
-            />
-          </div>
-        </div>
-        <div
-          style={{
-            position: 'absolute',
-            top: 60,
-            right: 10,
-            width: 90,
-            height: 'calc(100% - 80px)',
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
-            pointerEvents: 'none',
-            zIndex: 10,
-          }}
-        >
-          {/* Color bins */}
-          <div
-            style={{
-              flex: 1,
-              display: 'flex',
-              flexDirection: 'column-reverse',
-              height: '90%',
-              borderRadius: 4,
-              background: 'none',
-            }}
-          >
-            {legendData.colors.map((color, i) => (
-              <div
-                key={i}
-                style={{
-                  flex: 2 / colorscale.length,
-                  backgroundColor: color,
-                }}
-              />
-            ))}
-          </div>
-
-          {/* Labels */}
-          <div
-            style={{
-              flex: 1,
-              display: 'flex',
-              flexDirection: 'column-reverse',
-              height: '96%',
-              borderRadius: 4,
-              background: 'none',
-              marginTop: 4,
-            }}
-          >
-            {legendData.labels.map((lbl, i) => (
-              <div
-                key={i}
-                style={{
-                  flex: 2 / colorscale.length,
-                  color: 'white',
-                  fontSize: 13,
-                }}
-              >
-                {`- ${lbl}`}
-              </div>
-            ))}
-
-          </div>
-        </div>
+    <div style={aspectBoxStyle}>
+      <div ref={containerRef} style={surfaceStyle(loading)}>
+        <PanelTitle
+          title={figureTitle({ index, group, scenario, model, year })}
+          loading={loading}
+          style={titleStyle}
+        />
+        <Globe
+          ref={globeRef}
+          width={width}
+          height={height}
+          globeImageUrl={EARTH_TEXTURE}
+          showAtmosphere={false}
+          backgroundColor="rgba(0,0,0,0)"
+          pointsData={pointsData}
+          pointAltitude="size"
+          pointColor="color"
+          pointRadius={0.9}
+          pointTransitionDuration={0}
+          onPointClick={(pt) => onPointClick?.(pt.lng, pt.lat)}
+          htmlElementsData={pinData}
+          htmlElement={createPinElement}
+        />
+        <ColorLegend legend={legend} unit={unitOf(index)} />
+        {error && <div style={centerMessageStyle('#ff6b6b')}>Failed to load data: {error}</div>}
+        <LoadingOverlay visible={loading} />
       </div>
     </div>
   );

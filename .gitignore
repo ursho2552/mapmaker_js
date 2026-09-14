@@ -30,8 +30,7 @@ yarn-error.log*
 backend/data/*
 !backend/data/.gitkeep
 backend/__pycache__
-backend/mapmaker_env/*
-!backend/mapmaker_env/.gitkeep
+backend/*_env/
 
 # others
 .prettierrc
