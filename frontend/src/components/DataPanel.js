@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import {
     Box,
     Typography,
@@ -9,9 +9,12 @@ import {
     Slider as MuiSlider,
 } from '@mui/material';
 import { Lock, LockOpen } from '@mui/icons-material';
-import GlobeDisplay from './GlobeDisplay';
-import MapDisplay from './MapDisplay';
+import LoadingFallback from './LoadingFallback';
 import { useDebouncedValue } from '../hooks/useDebouncedValue';
+
+// Loaded on demand so three.js (globe) and Plotly (map) get their own chunks.
+const GlobeDisplay = lazy(() => import('./GlobeDisplay'));
+const MapDisplay = lazy(() => import('./MapDisplay'));
 
 // The slider updates the label at once, but data is only requested once it rests.
 const YEAR_DEBOUNCE_MS = 300;
@@ -105,6 +108,7 @@ const DataPanel = ({
 
             {/* Display Map or Globe */}
             <Box sx={{ width: '100%', height: 400, position: 'relative' }}>
+                <Suspense fallback={<LoadingFallback />}>
                 {panel.source === 'plankton' && panel.view === 'map' && (
                     <MapDisplay
                         year={dataYear}
@@ -163,6 +167,7 @@ const DataPanel = ({
                         selectedPoint={selectedPoint}
                     />
                 )}
+                </Suspense>
             </Box>
         </Box>
     );

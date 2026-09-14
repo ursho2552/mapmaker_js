@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import Plot from 'react-plotly.js';
+import React, { useCallback, useMemo } from 'react';
+import Plot from './Plot';
 import { fetchGrid } from '../api/client';
 import { useAsyncData } from '../hooks/useAsyncData';
 import {
@@ -41,11 +41,8 @@ const MapDisplay = ({
   onPointClick,
   onZoomedAreaChange,
   selectedPoint,
-  selectedArea,
   zoomedArea,
 }) => {
-  const [isZoomed, setIsZoomed] = useState(false);
-
   const { data: grid, loading, error } = useAsyncData(
     (signal) => fetchGrid({ sourceType, year, index, group, scenario, model }, signal),
     [sourceType, year, index, group, scenario, model]
@@ -68,11 +65,6 @@ const MapDisplay = ({
     () => `${year}-${index}-${group ?? ''}-${scenario}-${model}`,
     [year, index, group, scenario, model]
   );
-
-  // Reset zoom when dataset changes
-  useEffect(() => {
-    setIsZoomed(false);
-  }, [uiRevisionKey]);
 
   // Colorbar ticks
   const { tickvals, ticktext } = useMemo(() => {
@@ -129,9 +121,7 @@ const MapDisplay = ({
     tickvals,
     ticktext,
     selectedPoint,
-    selectedArea,
     index,
-    isZoomed,
   ]);
 
   // Layout
@@ -202,14 +192,12 @@ const MapDisplay = ({
   // Handle zoom/relayout
   const handleRelayout = (eventData) => {
     if (eventData['xaxis.autorange'] || eventData['yaxis.autorange']) {
-      setIsZoomed(false);
       onZoomedAreaChange?.(null);
       return;
     }
 
     const ranges = parseRelayoutRanges(eventData);
     if (ranges) {
-      setIsZoomed(true);
       onZoomedAreaChange?.(prev => {
         if (JSON.stringify(prev) !== JSON.stringify(ranges)) {
           return ranges;

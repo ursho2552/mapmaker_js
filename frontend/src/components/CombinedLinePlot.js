@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import Plot from 'react-plotly.js';
+import Plot from './Plot';
 import { Box, IconButton, Tooltip } from '@mui/material';
 import DownloadIcon from '@mui/icons-material/Download';
 import { fetchTimeseries } from '../api/client';

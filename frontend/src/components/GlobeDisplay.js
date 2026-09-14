@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useMemo } from 'react';
+import React, { useEffect, useRef, useMemo } from 'react';
 import Globe from 'react-globe.gl';
 import { fetchGrid } from '../api/client';
 import { useAsyncData } from '../hooks/useAsyncData';
@@ -33,7 +33,6 @@ const GlobeDisplay = ({
 
   // Globe points per selection, so revisiting a year does not refetch it.
   const cacheRef = useRef(new Map());
-  const [isHovered, setIsHovered] = useState(false);
 
   const readableIndex = nameToLabelMapping[index] || index;
   const readableGroup = group ? ` and ${group}` : '';
@@ -143,8 +142,6 @@ const GlobeDisplay = ({
         backgroundColor: 'rgba(18, 18, 18, 0.6)',
         overflow: 'hidden',
       }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
     >
       <div
         style={{

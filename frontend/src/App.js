@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import CombinedLinePlot from './components/CombinedLinePlot';
+import React, { lazy, Suspense, useState } from 'react';
+import LoadingFallback from './components/LoadingFallback';
 import ReferencesButton from './components/ReferencesButton';
 import DataPanel from './components/DataPanel';
 import Footer from './components/Footer';
@@ -20,6 +20,9 @@ import {
   projectDescription,
 } from './constants';
 import { Lock, LockOpen, ExpandLess, ExpandMore } from '@mui/icons-material';
+
+// Loaded on demand so Plotly lands in its own chunk instead of the main bundle.
+const CombinedLinePlot = lazy(() => import('./components/CombinedLinePlot'));
 
 const App = () => {
   // Initial panel definition
@@ -342,6 +345,7 @@ const App = () => {
             }}
           >
             {/* Combined line plot */}
+            <Suspense fallback={<LoadingFallback height={450} />}>
             <CombinedLinePlot
               point={selectedPoint}
               zoomedArea={area}
@@ -364,6 +368,7 @@ const App = () => {
               startYear={2012}
               endYear={2100}
             />
+            </Suspense>
           </Box>
         </Box>
 
