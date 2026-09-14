@@ -4,13 +4,14 @@ import { legendStyles } from '../../styles/display';
 /**
  * Vertical colour bar for the globe, which has no built-in one.
  * `legend` is `{ colors, labels }`, ordered from the low end upwards, with one
- * more label than colours: a label sits on every bin boundary.
+ * more label than colours: a label sits on every bin boundary. The bar spans
+ * `height` pixels from `top`.
  */
-const ColorLegend = ({ legend, unit = null }) => {
-  if (!legend?.colors.length) return null;
+const ColorLegend = ({ legend, unit = null, top, height }) => {
+  if (!legend?.colors.length || !(height > 0)) return null;
 
   return (
-    <div style={legendStyles.container(Boolean(unit))}>
+    <div style={legendStyles.container(top, height)}>
       <div style={legendStyles.swatches}>
         {legend.colors.map((color, i) => (
           <div key={i} style={{ flex: 1, backgroundColor: color }} />

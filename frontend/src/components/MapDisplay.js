@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 import Plot from './Plot';
+import FigureBox from './common/FigureBox';
 import LoadingOverlay from './common/LoadingOverlay';
 import PanelTitle from './common/PanelTitle';
 import ZoomHint from './common/ZoomHint';
@@ -15,10 +16,10 @@ import {
   unitOf,
 } from '../utils';
 import {
-  aspectBoxStyle,
   centerMessageStyle,
   colorbarBase,
   colorbarUnitTitle,
+  figureArea,
   hoverLabel,
   PLOT_MARGIN,
   surfaceStyle,
@@ -50,17 +51,10 @@ const plotStyle = { width: '100%', height: '100%' };
 /**
  * Equirectangular map: one degree of latitude is as long as one of longitude, so
  * the world is always 2:1, however the panel is sized or zoomed. The plot area
- * shrinks to fit, centred in the figure.
+ * shrinks to fit, centred horizontally and against the top margin, under the title.
  */
 const EQUAL_SCALE_X = { constrain: 'domain' };
-const EQUAL_SCALE_Y = { scaleanchor: 'x', scaleratio: 1, constrain: 'domain' };
-
-/** Height of the map in pixels within a figure of the given size, at the full 360° × 180° extent. */
-const mapHeight = (width, height) => {
-  const plotWidth = width - PLOT_MARGIN.l - PLOT_MARGIN.r;
-  const plotHeight = height - PLOT_MARGIN.t - PLOT_MARGIN.b;
-  return Math.max(0, Math.min(plotHeight, plotWidth / 2));
-};
+const EQUAL_SCALE_Y = { scaleanchor: 'x', scaleratio: 1, constrain: 'domain', constraintoward: 'top' };
 
 const parseRelayoutRanges = (eventData) => {
   const x = eventData['xaxis.range'] || [eventData['xaxis.range[0]'], eventData['xaxis.range[1]']];
@@ -113,7 +107,7 @@ const MapDisplay = ({
   }, [minValue, maxValue, colorscale]);
 
   // The colour bar matches the map's height rather than the whole plot area's.
-  const colorbarLength = mapHeight(width, height);
+  const colorbarLength = figureArea(width, height).height;
 
   const plotData = useMemo(() => {
     const heatmap = {
@@ -131,6 +125,9 @@ const MapDisplay = ({
       hoverlabel: hoverLabel,
       colorbar: {
         ...colorbarBase,
+        // Hung from the top of the plot area, level with the map.
+        y: 1,
+        yanchor: 'top',
         ...(colorbarLength > 0 && { lenmode: 'pixels', len: colorbarLength }),
         tickvals,
         ticktext,
@@ -208,7 +205,7 @@ const MapDisplay = ({
   );
 
   return (
-    <div style={aspectBoxStyle}>
+    <FigureBox>
       <div ref={surfaceRef} style={surfaceStyle(loading)}>
         <PanelTitle
           title={figureTitle({ index, group, scenario, model, year })}
@@ -234,7 +231,7 @@ const MapDisplay = ({
         <LoadingOverlay visible={loading} />
         <ZoomHint visible={zoomedArea != null && !loading} />
       </div>
-    </div>
+    </FigureBox>
   );
 };
 

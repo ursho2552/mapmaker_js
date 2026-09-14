@@ -133,7 +133,6 @@ export const logoTileSx = (width, height) => ({
   width,
   height,
   p: '5px',
-  boxSizing: 'border-box',
   backgroundColor: 'rgba(0, 0, 0, 0.25)',
   borderRadius: 1,
   textDecoration: 'none',
@@ -144,17 +143,32 @@ export const logoTileSx = (width, height) => ({
   },
 });
 
-/** Pulsing outline around the part of the page a tutorial step talks about. */
-export const tutorialHighlightSx = (active) =>
-  active
-    ? {
-        position: 'relative',
-        zIndex: 3000,
-        outline: `4px solid ${TUTORIAL_ACCENT}`,
-        boxShadow: '0 0 30px 10px rgba(79,195,247,0.6)',
-        animation: 'pulse 1.5s infinite',
-      }
-    : { position: 'relative' };
+const tutorialHighlightRing = {
+  outline: `4px solid ${TUTORIAL_ACCENT}`,
+  boxShadow: '0 0 30px 10px rgba(79,195,247,0.6)',
+  animation: 'pulse 1.5s infinite',
+};
+
+/**
+ * Pulsing outline around the part of the page a tutorial step talks about,
+ * `offset` pixels outside it. The ring takes no space, so nothing moves.
+ */
+export const tutorialHighlightSx = (active, offset = 0) => {
+  if (!active) return { position: 'relative' };
+  if (!offset) return { position: 'relative', zIndex: 3000, ...tutorialHighlightRing };
+  return {
+    position: 'relative',
+    zIndex: 3000,
+    '&::after': {
+      content: '""',
+      position: 'absolute',
+      inset: -offset,
+      borderRadius: 'inherit',
+      pointerEvents: 'none',
+      ...tutorialHighlightRing,
+    },
+  };
+};
 
 /** Glow applied to the lock icons while the tutorial talks about them. */
 export const lockHighlightSx = {

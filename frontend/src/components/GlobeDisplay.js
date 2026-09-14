@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import Globe from 'react-globe.gl';
 import ColorLegend from './common/ColorLegend';
+import FigureBox from './common/FigureBox';
 import LoadingOverlay from './common/LoadingOverlay';
 import PanelTitle from './common/PanelTitle';
 import { fetchGrid } from '../api/client';
@@ -16,8 +17,10 @@ import {
   unitOf,
 } from '../utils';
 import {
-  aspectBoxStyle,
   centerMessageStyle,
+  figureArea,
+  globeCanvasStyle,
+  PLOT_MARGIN,
   surfaceStyle,
   titleStyle,
 } from '../styles/display';
@@ -126,35 +129,41 @@ const GlobeDisplay = ({
     [selectedPoint]
   );
 
+  // The globe is as tall as a map would be in its place.
+  const diameter = figureArea(width, height).height;
+  const canvasStyle = globeCanvasStyle(width, diameter);
+
   return (
-    <div style={aspectBoxStyle}>
+    <FigureBox>
       <div ref={containerRef} style={surfaceStyle(loading)}>
         <PanelTitle
           title={figureTitle({ index, group, scenario, model, year })}
           loading={loading}
           style={titleStyle}
         />
-        <Globe
-          ref={globeRef}
-          width={width}
-          height={height}
-          globeImageUrl={EARTH_TEXTURE}
-          showAtmosphere={false}
-          backgroundColor="rgba(0,0,0,0)"
-          pointsData={pointsData}
-          pointAltitude="size"
-          pointColor="color"
-          pointRadius={0.9}
-          pointTransitionDuration={0}
-          onPointClick={(pt) => onPointClick?.(pt.lng, pt.lat)}
-          htmlElementsData={pinData}
-          htmlElement={createPinElement}
-        />
-        <ColorLegend legend={legend} unit={unitOf(index)} />
+        <div style={canvasStyle}>
+          <Globe
+            ref={globeRef}
+            width={canvasStyle.width}
+            height={canvasStyle.height}
+            globeImageUrl={EARTH_TEXTURE}
+            showAtmosphere={false}
+            backgroundColor="rgba(0,0,0,0)"
+            pointsData={pointsData}
+            pointAltitude="size"
+            pointColor="color"
+            pointRadius={0.9}
+            pointTransitionDuration={0}
+            onPointClick={(pt) => onPointClick?.(pt.lng, pt.lat)}
+            htmlElementsData={pinData}
+            htmlElement={createPinElement}
+          />
+        </div>
+        <ColorLegend legend={legend} unit={unitOf(index)} top={PLOT_MARGIN.t} height={diameter} />
         {error && <div style={centerMessageStyle('#ff6b6b')}>Failed to load data: {error}</div>}
         <LoadingOverlay visible={loading} />
       </div>
-    </div>
+    </FigureBox>
   );
 };
 

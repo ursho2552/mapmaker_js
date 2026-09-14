@@ -116,7 +116,8 @@ const ControlPanel = ({
         alignItems: 'center',
         minWidth: 0,
         borderRadius: 1,
-        ...tutorialHighlightSx(tutorialStep === CONTROL_PANEL_TUTORIAL_STEP),
+        // Highlighted a little way out: padding would resize the rows this subgrid shares with the lock icons.
+        ...tutorialHighlightSx(tutorialStep === CONTROL_PANEL_TUTORIAL_STEP, 10),
         ...sx,
       }}
     >

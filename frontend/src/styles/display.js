@@ -2,19 +2,31 @@
 
 const SURFACE_RADIUS = 4;
 
-/** Plot margins of the map: room for the two-line title, the colour bar and some air around. */
-export const PLOT_MARGIN = { l: 20, r: 90, t: 80, b: 24 };
+/** Space between the title and the top of the map or globe. */
+const TITLE_GAP = 16;
 
 /**
- * 4:3 box that the absolutely positioned surface fills, tall enough for the
- * title, the globe and its legend. The height cap keeps a full-width figure on
- * one screen when the columns stack.
+ * Margins around the map, or the globe in its place: room for a two-line title
+ * above, the colour bar on the right and a little air elsewhere.
  */
-export const aspectBoxStyle = {
+export const PLOT_MARGIN = { l: 20, r: 90, t: 76, b: 12 };
+
+/**
+ * Box that the absolutely positioned surface fills: exactly tall enough for the
+ * title and a full 2:1 map (`50cqw` is half the box's width, see `FigureBox`).
+ * The height cap keeps a full-width figure on one screen when the columns stack.
+ */
+export const figureBoxStyle = {
   position: 'relative',
   width: '100%',
-  aspectRatio: '4 / 3',
-  maxHeight: '75vh',
+  height: `min(calc(50cqw + ${PLOT_MARGIN.t + PLOT_MARGIN.b - (PLOT_MARGIN.l + PLOT_MARGIN.r) / 2}px), 75vh)`,
+};
+
+/** Size in pixels of the area a map or globe fills within a surface of the given size. */
+export const figureArea = (width, height) => {
+  const plotWidth = width - PLOT_MARGIN.l - PLOT_MARGIN.r;
+  const plotHeight = height - PLOT_MARGIN.t - PLOT_MARGIN.b;
+  return { width: Math.max(0, plotWidth), height: Math.max(0, Math.min(plotHeight, plotWidth / 2)) };
 };
 
 /** Transparent: figures sit directly on their panel's glass card. */
@@ -29,9 +41,10 @@ export const surfaceStyle = (loading) => ({
   cursor: loading ? 'wait' : 'default',
 });
 
+/** Figure title, sitting just above the map or globe. */
 export const titleStyle = {
   position: 'absolute',
-  top: 10,
+  bottom: `calc(100% - ${PLOT_MARGIN.t - TITLE_GAP}px)`,
   left: '5%',
   width: '90%',
   textAlign: 'center',
@@ -41,6 +54,34 @@ export const titleStyle = {
   pointerEvents: 'none',
   userSelect: 'none',
   zIndex: 5,
+};
+
+/** globe.gl's globe radius, initial camera distance (altitude 2.5 radii) and vertical field of view (three.js default). */
+const GLOBE_RADIUS = 100;
+const GLOBE_CAMERA_DISTANCE = 350;
+const GLOBE_CAMERA_FOV = 50;
+
+/** Fraction of its canvas's height the globe spans, seen from the initial camera distance. */
+const GLOBE_HEIGHT_FRACTION =
+  GLOBE_RADIUS /
+  Math.sqrt(GLOBE_CAMERA_DISTANCE ** 2 - GLOBE_RADIUS ** 2) /
+  Math.tan((GLOBE_CAMERA_FOV * Math.PI) / 360);
+
+/**
+ * Position and size of the globe's canvas that fit a globe of `diameter` pixels
+ * into the figure area, where a map would be. The canvas overhangs the surface,
+ * which clips it, since the globe only fills the middle of it.
+ */
+export const globeCanvasStyle = (surfaceWidth, diameter) => {
+  const height = diameter / GLOBE_HEIGHT_FRACTION;
+  return {
+    position: 'absolute',
+    top: PLOT_MARGIN.t - (height - diameter) / 2,
+    // Centred on the map area, which the colour bar pushes left of the surface's middle.
+    left: (PLOT_MARGIN.l - PLOT_MARGIN.r) / 2,
+    width: surfaceWidth,
+    height,
+  };
 };
 
 /** Message centred on a figure, e.g. "No data available". */
@@ -97,12 +138,12 @@ export const zoomHintStyle = (visible) => ({
 
 /** Colour bar drawn next to a globe (Plotly draws its own on the flat map). */
 export const legendStyles = {
-  container: (hasUnit) => ({
+  /** Spans `height` pixels from `top`; shrinks to its labels' width so the unit sits right beside them. */
+  container: (top, height) => ({
     position: 'absolute',
-    top: 80,
+    top,
     right: 10,
-    width: hasUnit ? 84 : 70,
-    height: 'calc(100% - 110px)',
+    height,
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'stretch',
@@ -116,7 +157,6 @@ export const legendStyles = {
     border: '1px solid rgba(255,255,255,0.15)',
   },
   labels: {
-    flex: 1,
     display: 'flex',
     flexDirection: 'column-reverse',
     justifyContent: 'space-between',
@@ -131,7 +171,7 @@ export const legendStyles = {
     transform: 'rotate(180deg)',
     color: 'rgba(255,255,255,0.7)',
     fontSize: 10,
-    marginLeft: 2,
+    marginLeft: 4,
     alignSelf: 'center',
   },
 };

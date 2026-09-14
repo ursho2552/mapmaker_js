@@ -19,7 +19,7 @@ import {
   tutorialHighlightSx,
   viewToggleSx,
 } from '../styles/panels';
-import { aspectBoxStyle } from '../styles/display';
+import FigureBox from './common/FigureBox';
 
 // Loaded on demand so three.js (globe) and Plotly (map) get their own chunks.
 const GlobeDisplay = lazy(() => import('./GlobeDisplay'));
@@ -146,9 +146,9 @@ const DataPanel = ({
 
       <Suspense
         fallback={
-          <div style={aspectBoxStyle}>
+          <FigureBox>
             <LoadingFallback sx={{ position: 'absolute', inset: 0 }} />
-          </div>
+          </FigureBox>
         }
       >
         {panel.view === 'map' ? (

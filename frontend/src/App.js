@@ -42,7 +42,7 @@ import './App.css';
 const CombinedLinePlot = lazy(() => import('./components/CombinedLinePlot'));
 
 const INITIAL_PANEL = {
-  year: 2025,
+  year: 2026,
   source: 'plankton',
   view: 'map',
   diversity: diversityIndices[1],
